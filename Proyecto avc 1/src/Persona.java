@@ -1,0 +1,47 @@
+/*
+No se pueden añadir constantes, enumeraciones, atributos, relaciones,
+constructores o métodos a las clases, ni tampoco agregar clases. Solo se permite agregar métodos privados,
+si ello lleva a una mejora del código o se logra mayor reúso, simplicidad y/o legibilidad.
+*/
+
+public class Persona {
+    private IdPersona id;
+    private Nombre nombreCompleto;
+    private String telefono;
+
+    // Constructor
+    public Persona(IdPersona id, Nombre nombre) {
+        this.id = id;
+        this.nombreCompleto = nombre;
+    }
+
+    // Getters y Setters
+    public IdPersona getIdPersona() {
+        return id;
+    }
+
+    public Nombre getNombreCompleto() {
+        return nombreCompleto;
+    }
+
+    public void setNombreCompleto(Nombre nombreCompleto) {
+        this.nombreCompleto = nombreCompleto;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public String toString() {
+        return "Persona [id=" + id + ", nombre=" + nombreCompleto + "]";
+    }
+
+    public boolean equals(Object otro) {
+        // falta completar creo....
+        return true
+    }
+}
