@@ -1,13 +1,38 @@
+class Nombre{
+    private Tratamiento tratamiento;
+    private String nombres;
+    private String apellidoMaterno;
+    private String apellidoPaterno;
 
+    public Tratamiento getTratamiento() {
+        return tratamiento;
+    }
+    public void setTratamiento(Tratamiento tratamiento){
+        this.tratamiento=tratamiento;
+    }
+    public String getNombres(){
+        return nombres;
+    }
+    public void setNombres(String nombres){
+        this.nombres=nombres;
+    }
+    public String getApellidoPaterno(){
+        return apellidoPaterno;
+    }
+    public void setApellidoPaterno(String apellidoPaterno){
+        this.apellidoPaterno=apellidoPaterno;
+    }
+    public String getApellidoMaterno(){
+        return apellidoMaterno;
+    }
+    public void setApellidoMaterno(String apellidoMaterno){
+        this.apellidoMaterno=apellidoMaterno;
+    }
+    public String toString(){
+        return nombres+","+tratamiento+","+apellidoPaterno+","+apellidoMaterno;
+    }
 
-void main() {
-    //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-    // to see how IntelliJ IDEA suggests fixing it.
-    IO.println(String.format("Hello and welcome!"));
-
-    for (int i = 1; i <= 5; i++) {
-
-
-        IO.println("i = " + i);
+    public boolean equals(Nombre nombre) {
+        return nombres==nombre.nombres && tratamiento==nombre.tratamiento&&apellidoPaterno==nombre.apellidoPaterno && apellidoMaterno==nombre.apellidoMaterno;
     }
 }
