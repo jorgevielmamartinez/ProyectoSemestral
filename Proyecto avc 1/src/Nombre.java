@@ -1,4 +1,4 @@
-class Nombre{
+public class Nombre{
     private Tratamiento tratamiento;
     private String nombres;
     private String apellidoMaterno;

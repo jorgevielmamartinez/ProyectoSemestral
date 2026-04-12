@@ -37,11 +37,13 @@ public class Persona {
     }
 
     public String toString() {
-        return "Persona [id=" + id + ", nombre=" + nombreCompleto + "]";
+        return  id +" "+ nombreCompleto +" "+ telefono;
     }
 
     public boolean equals(Object otro) {
-        // falta completar creo....
-        return true
+        if (id.equals(((Persona) otro).id)) {
+            return true;
+        }
+        return false;
     }
 }
