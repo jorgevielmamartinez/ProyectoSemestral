@@ -39,8 +39,6 @@ public class Bus {
     }
 
     public void addViaje(Viaje viaje) {
-        if (viaje != null && !this.viajes.contains(viaje)) {
-            this.viajes.add(viaje);
-        }
+        this.viajes.add(viaje);
     }
 }
