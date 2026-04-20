@@ -1,4 +1,4 @@
-class Nombre{
+class Nombre{ //clase hecha por Jorge Vielma Y Benjamin Vivanco
     private Tratamiento tratamiento;
     private String nombres;
     private String apellidoMaterno;
