@@ -10,9 +10,10 @@ public class Persona {
     private String telefono;
 
     // Constructor
-    public Persona(IdPersona id, Nombre nombre) {
+    public Persona(IdPersona id, Nombre nombre, String telefono) {
         this.id = id;
         this.nombreCompleto = nombre;
+        this.telefono = telefono;
     }
 
     // Getters y Setters

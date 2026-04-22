@@ -2,8 +2,11 @@ public class Pasajero extends Persona{
     private Nombre nomContacto;
     private String fonoContacto;
 
-    public Pasajero(IdPersona id, Nombre nombre) {
-        super(id, nombre);
+    public Pasajero(IdPersona id, Nombre nombre,String telefono,Nombre nomContacto,String fonoContacto) {
+        super(id, nombre,telefono);
+        this.nomContacto=nomContacto;
+        this.fonoContacto=fonoContacto;
+
     }
 
     public Nombre getNomContacto(){
