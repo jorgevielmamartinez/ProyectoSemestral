@@ -6,39 +6,57 @@ public class Venta {
     private TipoDocumento tipo;
     private LocalDate fecha;
     private Cliente cliente;
+
     private ArrayList<Pasaje> pasajes;
-    public Venta(String id,TipoDocumento tipo,LocalDate fec,Cliente cliente){
-        this.idDocumento=id;
-        this.tipo=tipo;
-        this.fecha=fec;
-        this.cliente=cliente;
-        this.pasajes=new ArrayList<>();
+
+    public Venta(String id, TipoDocumento tipo, LocalDate fecha, Cliente cliente) {
+        this.idDocumento = id;
+        this.tipo = tipo;
+        this.fecha = fecha;
+        this.cliente = cliente;
+        this.pasajes = new ArrayList<Pasaje>();
+
+        cliente.addVenta(this);
     }
-    public String getIdDocumento(){
+
+    public String getIdDocumento() {
         return idDocumento;
     }
-    public TipoDocumento getTipo(){
+
+    public TipoDocumento getTipo() {
         return tipo;
     }
-    public LocalDate getFecha(){
+
+    public LocalDate getFecha() {
         return fecha;
     }
 
     public Cliente getCliente() {
         return cliente;
     }
-    public void createPasaje(int asiento,Viaje viaje,Pasajero pasajero){
-        Pasaje p=new Pasaje(asiento,viaje,pasajero,this);  //el this es para pasar la venta que pide el constructor de pasaje.
-        pasajes.add(p);
+
+    public void createPasaje(int asiento, Viaje viaje, Pasajero pasajero) {
+
+        Pasaje pasaje = new Pasaje(asiento, viaje, pasajero, this);
+
+        this.pasajes.add(pasaje);
     }
-    public Pasaje[] getPasajes(){
-        return pasajes.toArray(new Pasaje[0]);
+
+    public Pasaje[] getPasajes() {
+        Pasaje[] arregloPasajes = new Pasaje[pasajes.size()];
+
+        for (int i = 0; i < pasajes.size(); i++) {
+            arregloPasajes[i] = pasajes.get(i);
+        }
+        return arregloPasajes;
     }
-    public int getMonto(){
-     int total=0;
-     for(Pasaje p: pasajes){
-         total+=p.getViaje().getPrecio();   //pasaje conecta con viaje,de ahi que uso esto
-     }
-     return total;
+
+    public int getMonto() {
+        int total = 0;
+
+        for (Pasaje pasaje : pasajes) {
+            total = total + pasaje.getViaje().getPrecio();
+        }
+        return total;
     }
 }
