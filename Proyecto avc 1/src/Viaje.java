@@ -74,12 +74,26 @@ public class Viaje {
     }
 
     public boolean existeDisponibilidad() {
-        return getNroAsientosDisponibles() > 0;
+       if (getNroAsientosDisponibles() > 0) {
+           return true;
+       }
+       return false;
     }
 
     public int getNroAsientosDisponibles() {
-        int ocupados = pasajes.size();
-        int totales = bus.getNroAsientos();
-        return totales - ocupados;
+      boolean[] ocupados= new boolean[bus.getNroAsientos()];
+      for(Pasaje p : pasajes) {
+          int numAsiento = p.getAsiento();
+          if(numAsiento>=1 && numAsiento<=ocupados.length) {
+              ocupados[numAsiento-1] = true;
+          }
+      }
+      int contador=0;
+      for(boolean ocupado : ocupados) {
+          if(!ocupado) {
+              contador++;
+          }
+      }
+      return contador;
     }
 }
