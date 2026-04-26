@@ -83,13 +83,11 @@ public class SistemaVentaPasajes {
 
     public String[][] getHorariosDisponibles(LocalDate fechaViaje) {
         ArrayList<Viaje> encontrados = new ArrayList<>();
-
         for (Viaje v : viajes) {
             if (v.getFecha().equals(fechaViaje)) {
                 encontrados.add(v);
             }
         }
-
         String[][] matriz = new String[encontrados.size()][4];
         for (int i = 0; i < encontrados.size(); i++) {
             Viaje v = encontrados.get(i);
@@ -104,10 +102,8 @@ public class SistemaVentaPasajes {
     public String[] listAsientosDeViaje(LocalDate fecha, LocalTime hora, String patente) {
         for (Viaje v : viajes) {
             if (v.getFecha().equals(fecha) && v.getHora().equals(hora) && v.getBus().getPatente().equals(patente)) {
-
                 String[][] asientosMatriz = v.getAsientos();
                 String[] resultado = new String[asientosMatriz.length];
-
                 for (int i = 0; i < asientosMatriz.length; i++) {
                     resultado[i] = asientosMatriz[i][1];
                 }
@@ -115,6 +111,19 @@ public class SistemaVentaPasajes {
             }
         }
         return new String[0];
+    }
+
+    public String[][] listViajes() {
+        String[][] lista = new String[viajes.size()][5];
+        for (int i = 0; i < viajes.size(); i++) {
+            Viaje v = viajes.get(i);
+            lista[i][0] = v.getFecha().toString();
+            lista[i][1] = v.getHora().toString();
+            lista[i][2] = v.getBus().getPatente();
+            lista[i][3] = String.valueOf(v.getBus().getNroAsientos());
+            lista[i][4] = String.valueOf(v.getNroAsientosDisponibles());
+        }
+        return lista;
     }
 
     public int getMontoVenta(String idDocumento,TipoDocumento tipo){
@@ -177,22 +186,7 @@ public class SistemaVentaPasajes {
         }
         return lista;
     }
-        public String[][] listViajes(){
-            if (viajes.size()==0){
-                return new String[0][0];
-            }
-            String[][]lista=new String[viajes.size()][4];
-            int i;
-            for (i=0;i<viajes.size();i++){
-                Viaje viaje=viajes.get(i);
-                lista[i][0]= String.valueOf(viaje.getFecha().format(DateTimeFormatter.ofPattern("dd/MM/yy")));
-                lista[i][1]=String.valueOf(viaje.getHora());
-                lista[i][2]= String.valueOf(viaje.getPrecio());
-                lista[i][3]=String.valueOf(viaje.getNroAsientosDisponibles());
-                lista[i][4]=viaje.getBus().getPatente();
-            }
-            return lista;
-    }
+
     public String[][] listPasajeros(LocalDate fecha,LocalTime hora,String patBus){
         Viaje viaje=findViaje(fecha.toString(),hora.toString(),patBus);
         if (viaje==null){

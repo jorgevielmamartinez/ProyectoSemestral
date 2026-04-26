@@ -35,12 +35,15 @@ public class Main {
             try {
                 opcion = Integer.parseInt(sc.nextLine());
                 switch (opcion) {
+
                     case 1:
                         createCliente();
                         break;
+
                     case 2:
                         createBus();
                         break;
+
                     case 3:
                         createViaje();
                         break;
@@ -62,9 +65,11 @@ public class Main {
                     default:
                         System.out.println("Opcion invalida.");
                 }
+
             } catch (Exception e) {
                 System.out.println("Error, ingrese un numero valido.");
             }
+
         } while (opcion != 8);
     }
 
@@ -223,12 +228,12 @@ public class Main {
         String patenteElegida = horarios[opcViaje][0];
         LocalTime horaElegida = LocalTime.parse(horarios[opcViaje][1]);
 
-        String[][]asientos = sistema.listAsientosDeViaje(fechaViaje, horaElegida, patenteElegida);
+        String[] asientos = sistema.listAsientosDeViaje(fechaViaje, horaElegida, patenteElegida);
 
         for (int i = 0; i < asientos.length; i++) {
             System.out.print("A" + (i+1) + ":[" + asientos[i] + "] ");
         }
-        System.out.println("");
+        System.out.println();
 
         for (int i = 0; i < cant; i++) {
             System.out.print("\nIngrese numero de asiento para el pasaje " + (i+1) + ": ");
