@@ -171,6 +171,7 @@ public class SistemaVentaPasajes {
     }
     public String[][] listViajes(){
 
+
     }
     public String[][] listPasajeros(LocalDate fecha,LocalTime hora,String patBus){
 
