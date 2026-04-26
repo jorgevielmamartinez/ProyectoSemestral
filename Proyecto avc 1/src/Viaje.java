@@ -16,7 +16,6 @@ public class Viaje {
         this.precio = precio;
         this.bus = bus;
         this.pasajes = new ArrayList<>();
-
         if (this.bus != null) {
             this.bus.addViaje(this);
         }

@@ -78,7 +78,6 @@ public class Main {
         if (tipo == 1) {
             System.out.print("Ingrese Rut: ");
             String rut = sc.nextLine();
-
             id = Rut.of(rut);
 
         } else {
@@ -179,9 +178,8 @@ public class Main {
     public void vendePasajes() {
         System.out.println("___ Vender Pasajes ___" +
                 "");
-        System.out.print("ID Documento (Folio Boleta/Factura): ");
-        String idDoc = sc.nextLine();
-
+        System.out.print("ID Documento: ");
+        String idDoc = sc.next();
         System.out.print("Tipo (1.Boleta, 2.Factura): ");
         int tipoD = Integer.parseInt(sc.nextLine());
 
@@ -194,17 +192,13 @@ public class Main {
 
         System.out.print("Ingrese RUT del cliente comprador (ej: 111-1): ");
         IdPersona idCliente = Rut.of(sc.nextLine());
-
         boolean iniciada = sistema.iniciaVenta(idDoc, tipoDoc, fechaVenta, idCliente);
-
         if (iniciada == false) {
             System.out.println("Error: Cliente no existe o documento repetido.");
             return;
         }
-
         System.out.print("Cuantos pasajes comprara?: ");
-        int cant = Integer.parseInt(sc.nextLine());
-
+        int cant = sc.nextInt();
         System.out.print("Fecha del viaje a buscar (dd/mm/yyyy): ");
         LocalDate fechaViaje = LocalDate.parse(sc.nextLine(), formFecha);
 
@@ -225,7 +219,7 @@ public class Main {
         String patenteElegida = horarios[opcViaje][0];
         LocalTime horaElegida = LocalTime.parse(horarios[opcViaje][1]);
 
-        String[] asientos = sistema.listAsientosDeViaje(fechaViaje, horaElegida, patenteElegida);
+        String[][]asientos = sistema.listAsientosDeViaje(fechaViaje, horaElegida, patenteElegida);
 
         for (int i = 0; i < asientos.length; i++) {
             System.out.print("A" + (i+1) + ":[" + asientos[i] + "] ");
