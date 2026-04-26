@@ -176,10 +176,11 @@ public class Main {
     }
 
     public void vendePasajes() {
-        System.out.println("___ Vender Pasajes ___" +
-                "");
+        System.out.println("___ Vender Pasajes ___" + "");
+
         System.out.print("ID Documento: ");
-        String idDoc = sc.next();
+        String idDoc = sc.nextLine();
+
         System.out.print("Tipo (1.Boleta, 2.Factura): ");
         int tipoD = Integer.parseInt(sc.nextLine());
 
@@ -193,12 +194,15 @@ public class Main {
         System.out.print("Ingrese RUT del cliente comprador (ej: 111-1): ");
         IdPersona idCliente = Rut.of(sc.nextLine());
         boolean iniciada = sistema.iniciaVenta(idDoc, tipoDoc, fechaVenta, idCliente);
-        if (iniciada == false) {
+
+        if (!iniciada) {
             System.out.println("Error: Cliente no existe o documento repetido.");
             return;
         }
         System.out.print("Cuantos pasajes comprara?: ");
         int cant = sc.nextInt();
+        sc.nextLine();
+        
         System.out.print("Fecha del viaje a buscar (dd/mm/yyyy): ");
         LocalDate fechaViaje = LocalDate.parse(sc.nextLine(), formFecha);
 
@@ -234,7 +238,9 @@ public class Main {
             IdPersona idPasajero = Rut.of(sc.nextLine());
 
             String nombreExiste = sistema.getNombrePasajero(idPasajero);
+
             if (nombreExiste == null) {
+
                 System.out.println("Pasajero no existe. Ingrese sus datos.");
                 Nombre nPas = new Nombre();
 
@@ -253,10 +259,13 @@ public class Main {
 
                 Nombre nCont = new Nombre();
                 nCont.setTratamiento(Tratamiento.SR);
+
                 System.out.print("Nombres Contacto Emergencia: ");
                 nCont.setNombres(sc.nextLine());
+
                 System.out.print("Apellido Contacto Emergencia: ");
                 nCont.setApellidoPaterno(sc.nextLine());
+
                 nCont.setApellidoMaterno("");
 
                 System.out.print("Fono Contacto Emergencia: ");
@@ -336,7 +345,4 @@ public class Main {
             }
         }
     }
-
-
-
 }
