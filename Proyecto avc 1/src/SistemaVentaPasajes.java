@@ -37,7 +37,7 @@ public class SistemaVentaPasajes{
         System.out.println(">>Pasajero agreagado exitosamente<<");
         return true;
     }
-    public boolean createBus(String patente,String marca,String modelo,String nroAsientos){
+    public boolean createBus(String patente,String marca,String modelo,int nroAsientos){
         if(findBus(patente)!=null){
             System.out.println(">>No se puede agregar un bus con la misma patente<<");
             return false;
@@ -185,7 +185,16 @@ public class SistemaVentaPasajes{
       return lista;
     }
     public String[][] listPasajeros(LocalDate fecha,LocalTime hora,String patBus){
-
+        Viaje viaje=findViaje(fecha.toString(),hora.toString(),patBus);
+        if (viaje==null){
+            return new String[0][0];
+        }
+        String[][] lista=new String[viajes.size()][1];
+        for (int i = 0; i < viajes.size(); i++) {
+            lista[i][0] =viaje.getAsientos().toString();
+            lista[i][1] =viaje.getListaPasajeros().toString();
+        }
+        return lista;
     }
     private Cliente findCliente(IdPersona id){
    for (Cliente c:clientes){

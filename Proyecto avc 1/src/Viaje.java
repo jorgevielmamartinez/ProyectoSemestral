@@ -16,7 +16,6 @@ public class Viaje {
         this.precio = precio;
         this.bus = bus;
         this.pasajes = new ArrayList<>();
-
         if (this.bus != null) {
             this.bus.addViaje(this);
         }
@@ -74,26 +73,26 @@ public class Viaje {
     }
 
     public boolean existeDisponibilidad() {
-       if (getNroAsientosDisponibles() > 0) {
-           return true;
-       }
-       return false;
+        if (getNroAsientosDisponibles() > 0) {
+            return true;
+        }
+        return false;
     }
 
     public int getNroAsientosDisponibles() {
-      boolean[] ocupados= new boolean[bus.getNroAsientos()];
-      for(Pasaje p : pasajes) {
-          int numAsiento = p.getAsiento();
-          if(numAsiento>=1 && numAsiento<=ocupados.length) {
-              ocupados[numAsiento-1] = true;
-          }
-      }
-      int contador=0;
-      for(boolean ocupado : ocupados) {
-          if(!ocupado) {
-              contador++;
-          }
-      }
-      return contador;
+        boolean[] ocupados= new boolean[bus.getNroAsientos()];
+        for(Pasaje p : pasajes) {
+            int numAsiento = p.getAsiento();
+            if(numAsiento>=1 && numAsiento<=ocupados.length) {
+                ocupados[numAsiento-1] = true;
+            }
+        }
+        int contador=0;
+        for(boolean ocupado : ocupados) {
+            if(!ocupado) {
+                contador++;
+            }
+        }
+        return contador;
     }
 }

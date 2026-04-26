@@ -1,3 +1,4 @@
-public enum TipoDocumento {
+public enum TipoDocumento { //Enum hecho por Jorge Vielma
     BOLETA,
+    FACTURA;
 }
