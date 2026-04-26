@@ -82,35 +82,39 @@ public class SistemaVentaPasajes {
     }
 
     public String[][] getHorariosDisponibles(LocalDate fechaViaje) {
-        int contadorViajes = 0;
+        ArrayList<Viaje> encontrados = new ArrayList<>();
+
         for (Viaje v : viajes) {
             if (v.getFecha().equals(fechaViaje)) {
-                contadorViajes++;
+                encontrados.add(v);
             }
         }
-        if (contadorViajes == 0) {
-            return new String[0][0];
+
+        String[][] matriz = new String[encontrados.size()][4];
+        for (int i = 0; i < encontrados.size(); i++) {
+            Viaje v = encontrados.get(i);
+            matriz[i][0] = v.getBus().getPatente();
+            matriz[i][1] = v.getHora().toString();
+            matriz[i][2] = String.valueOf(v.getPrecio());
+            matriz[i][3] = String.valueOf(v.getNroAsientosDisponibles());
         }
-        int llenadoMatriz = 0;
-        String[][] viajesDisponibles = new String[contadorViajes][4];
-        for (Viaje v : viajes) {
-            if (v.getFecha().equals(fechaViaje)) {
-                viajesDisponibles[llenadoMatriz][0] = v.getBus().getPatente();
-                viajesDisponibles[llenadoMatriz][1] = v.getHora().toString();
-                viajesDisponibles[llenadoMatriz][2] = String.valueOf(v.getPrecio());
-                viajesDisponibles[llenadoMatriz][3] = String.valueOf(v.getNroAsientosDisponibles());
-                llenadoMatriz++;
-            }
-        }
-        return viajesDisponibles;
+        return matriz;
     }
 
-    public String[][] listAsientosDeViaje(LocalDate fecha,LocalTime hora,String patBus){
-        Viaje v=findViaje(fecha.toString(),hora.toString(),patBus);
-        if(v==null){
-            return new String[0][0];
+    public String[] listAsientosDeViaje(LocalDate fecha, LocalTime hora, String patente) {
+        for (Viaje v : viajes) {
+            if (v.getFecha().equals(fecha) && v.getHora().equals(hora) && v.getBus().getPatente().equals(patente)) {
+
+                String[][] asientosMatriz = v.getAsientos();
+                String[] resultado = new String[asientosMatriz.length];
+
+                for (int i = 0; i < asientosMatriz.length; i++) {
+                    resultado[i] = asientosMatriz[i][1];
+                }
+                return resultado;
+            }
         }
-        return v.getAsientos();
+        return new String[0];
     }
 
     public int getMontoVenta(String idDocumento,TipoDocumento tipo){

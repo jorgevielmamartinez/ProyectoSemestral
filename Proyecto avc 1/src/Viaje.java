@@ -80,19 +80,7 @@ public class Viaje {
     }
 
     public int getNroAsientosDisponibles() {
-      boolean[] ocupados= new boolean[bus.getNroAsientos()];
-      for(Pasaje p : pasajes) {
-          int numAsiento = p.getAsiento();
-          if(numAsiento>=1 && numAsiento<=ocupados.length) {
-              ocupados[numAsiento-1] = true;
-          }
-      }
-      int contador=0;
-      for(boolean ocupado : ocupados) {
-          if(!ocupado) {
-              contador++;
-          }
-      }
-      return contador;
+        int total = bus.getNroAsientos();
+        return total - pasajes.size();
     }
 }
