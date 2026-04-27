@@ -145,6 +145,7 @@ public class Main {
 
         System.out.print("Numero asientos: ");
         int asientos = Integer.parseInt(sc.next());
+        sc.nextLine();
 
         boolean ok = sistema.createBus(patente, marca, modelo, asientos);
         if (ok) {
@@ -171,7 +172,7 @@ public class Main {
 
         System.out.print("Patente del Bus: ");
         String patente = sc.next();
-
+        sc.nextLine();
         boolean ok = sistema.createViaje(fecha, hora, precio, patente);
 
         if (ok) {
@@ -182,7 +183,7 @@ public class Main {
     }
 
     public void vendePasajes() {
-        System.out.println("___ Vender Pasajes ___" + "");
+        System.out.println("___ Vender Pasajes ___");
 
         System.out.print("ID Documento: ");
         String idDoc = sc.next();
@@ -259,7 +260,7 @@ public class Main {
 
                 System.out.print("Apellido Paterno: ");
                 nPas.setApellidoPaterno(sc.next());
-
+                System.out.println("Apellido Materno: ");
                 nPas.setApellidoMaterno(sc.next());
 
                 System.out.print("Telefono pasajero: ");
@@ -305,7 +306,7 @@ public class Main {
 
         System.out.print("Patente del bus: ");
         String patente = sc.next();
-
+        sc.nextLine();
         String[][] lista = sistema.listPasajeros(fecha, hora, patente);
 
         if (lista.length == 0) {

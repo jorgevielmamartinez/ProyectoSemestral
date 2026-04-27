@@ -24,7 +24,6 @@ public class SistemaVentaPasajes {
         }
         Cliente cliente = new Cliente(id, nom, fono, email);
         clientes.add(cliente);
-        System.out.println(">>Cliente agregado exitosamente<<");
         return true;
     }
 
@@ -35,7 +34,6 @@ public class SistemaVentaPasajes {
         }
         Pasajero pasajero=new Pasajero(id,nom,fono,nomContacto,fonoContacto);
         pasajeros.add(pasajero);
-        System.out.println(">>Pasajero agreagado exitosamente<<");
         return true;
     }
     public boolean createBus(String patente,String marca,String modelo,int nroAsientos){
@@ -47,7 +45,6 @@ public class SistemaVentaPasajes {
         bus.setMarca(marca);
         bus.setModelo(modelo);
         buses.add(bus);
-        System.out.println(">>Bus agregado exitosamente<<");
         return true;
     }
     public boolean createViaje(LocalDate fecha,LocalTime hora,int precio,String patBus){
@@ -62,7 +59,6 @@ public class SistemaVentaPasajes {
         }
         Viaje viaje=new Viaje(fecha,hora,precio,bus);
         viajes.add(viaje);
-        System.out.println("<<Viaje agregado correctamente<<");
         return true;
     }
     public boolean iniciaVenta(String idDoc,TipoDocumento tipo,LocalDate fechaVenta,IdPersona idCliente){
@@ -78,7 +74,6 @@ public class SistemaVentaPasajes {
         }
         venta=new Venta(idDoc,tipo,fechaVenta,bandera);
         ventas.add(venta);
-        System.out.println("Venta iniciada exitosamente");
         return true;
     }
 
@@ -118,7 +113,7 @@ public class SistemaVentaPasajes {
         String[][] lista = new String[viajes.size()][6];
         for (int i = 0; i < viajes.size(); i++) {
             Viaje v = viajes.get(i);
-            lista[i][0] = v.getFecha().toString();
+            lista[i][0] = v.getFecha().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             lista[i][1] = v.getHora().toString();
             lista[i][2] = v.getBus().getPatente();
             lista[i][3] = String.valueOf(v.getBus().getNroAsientos());
@@ -143,7 +138,7 @@ public class SistemaVentaPasajes {
             lista[i][0] = v.getIdDocumento();
             lista[i][1] = v.getCliente().getNombreCompleto().toString();
             lista[i][2] = String.valueOf(v.getTotalVenta());
-            lista[i][3] = v.getFecha().toString();
+            lista[i][3] = v.getFecha().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         }
         return lista;
     }
