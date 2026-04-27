@@ -95,18 +95,16 @@ public class SistemaVentaPasajes {
         return matriz;
     }
 
-    public String[] listAsientosDeViaje(LocalDate fecha, LocalTime hora, String patente) {
+    public String[][] listAsientosDeViaje(LocalDate fecha, LocalTime hora, String patente) {
         for (Viaje v : viajes) {
-            if (v.getFecha().equals(fecha) && v.getHora().equals(hora) && v.getBus().getPatente().equals(patente)) {
-                String[][] asientosMatriz = v.getAsientos();
-                String[] resultado = new String[asientosMatriz.length];
-                for (int i = 0; i < asientosMatriz.length; i++) {
-                    resultado[i] = asientosMatriz[i][1];
-                }
-                return resultado;
+            if (v.getFecha().equals(fecha) &&
+                    v.getHora().equals(hora) &&
+                    v.getBus().getPatente().equals(patente)) {
+
+                return v.getAsientos();
             }
         }
-        return new String[0];
+        return new String[0][0];
     }
 
     public String[][] listViajes() {
