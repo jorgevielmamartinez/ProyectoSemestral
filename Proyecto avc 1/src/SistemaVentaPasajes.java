@@ -114,14 +114,35 @@ public class SistemaVentaPasajes {
     }
 
     public String[][] listViajes() {
-        String[][] lista = new String[viajes.size()][5];
+        String[][] lista = new String[viajes.size()][6]; // 6 columnas según Fig 13
         for (int i = 0; i < viajes.size(); i++) {
             Viaje v = viajes.get(i);
             lista[i][0] = v.getFecha().toString();
             lista[i][1] = v.getHora().toString();
             lista[i][2] = v.getBus().getPatente();
             lista[i][3] = String.valueOf(v.getBus().getNroAsientos());
-            lista[i][4] = String.valueOf(v.getNroAsientosDisponibles());
+            lista[i][4] = String.valueOf(v.getNroAsientosOcupados());
+            lista[i][5] = String.valueOf(v.getNroAsientosDisponibles());
+        }
+        return lista;
+    }
+
+    public String[][] listPasajeros(LocalDate fecha, LocalTime hora, String patente) {
+        Viaje v = findViaje(fecha.toString(), hora.toString(), patente);
+        if (v == null) return new String[0][0];
+
+        return v.getListaPasajeros();
+    }
+
+
+    public String[][] listVentas() {
+        String[][] lista = new String[ventas.size()][4];
+        for (int i = 0; i < ventas.size(); i++) {
+            Venta v = ventas.get(i);
+            lista[i][0] = v.getIdDocumento();
+            lista[i][1] = v.getCliente().getNombreCompleto().toString();
+            lista[i][2] = String.valueOf(v.getTotalVenta());
+            lista[i][3] = v.getFecha().toString();
         }
         return lista;
     }
@@ -169,36 +190,7 @@ public class SistemaVentaPasajes {
         venta.createPasaje(asiento,viaje,pasajero);
         return true;
     }
-    public String[][] listVentas(){
-        if (ventas.size()==0){
-            return new String[0][0];
-        }
-        String[][] lista =new String[ventas.size()][7];
-        for (int i = 0; i < ventas.size(); i++) {
-            Venta venta=ventas.get(i);
-            lista[i][0] = venta.getIdDocumento();
-            lista[i][1] = venta.getTipo().toString();
-            lista[i][2]= venta.getFecha().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            lista[i][3]= venta.getCliente().getIdPersona().toString();
-            lista[i][4] = venta.getCliente().getNombreCompleto().toString();
-            lista[i][5] = venta.getPasajes().toString();
-            lista[i][6] = String.valueOf(venta.getMonto());
-        }
-        return lista;
-    }
 
-    public String[][] listPasajeros(LocalDate fecha,LocalTime hora,String patBus){
-        Viaje viaje=findViaje(fecha.toString(),hora.toString(),patBus);
-        if (viaje==null){
-            return new String[0][0];
-        }
-        String[][] lista=new String[viajes.size()][2];
-        for (int i = 0; i < viajes.size(); i++) {
-            lista[i][0] =viaje.getAsientos().toString();
-            lista[i][1] =viaje.getListaPasajeros().toString();
-        }
-        return lista;
-    }
     private Cliente findCliente(IdPersona id){
         for (Cliente c: clientes){
             if (c.getIdPersona().equals(id)){
@@ -239,5 +231,7 @@ public class SistemaVentaPasajes {
         }
         return null;
     }
+
+
 
 }
