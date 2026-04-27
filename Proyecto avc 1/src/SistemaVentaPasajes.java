@@ -2,6 +2,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+//Trabajamos Benja Vivanco, Téllez y Jorge
 public class SistemaVentaPasajes {
     ArrayList<Cliente> clientes=new ArrayList<>();
     ArrayList<Pasajero> pasajeros=new ArrayList<>();
@@ -114,7 +115,7 @@ public class SistemaVentaPasajes {
     }
 
     public String[][] listViajes() {
-        String[][] lista = new String[viajes.size()][6]; // 6 columnas según Fig 13
+        String[][] lista = new String[viajes.size()][6];
         for (int i = 0; i < viajes.size(); i++) {
             Viaje v = viajes.get(i);
             lista[i][0] = v.getFecha().toString();
