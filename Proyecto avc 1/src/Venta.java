@@ -59,4 +59,12 @@ public class Venta {
         }
         return total;
     }
+
+    public int getTotalVenta() {
+        int total = 0;
+        for (Pasaje p : pasajes) {
+            total = total + p.getViaje().getPrecio();
+        }
+        return total;
+    }
 }

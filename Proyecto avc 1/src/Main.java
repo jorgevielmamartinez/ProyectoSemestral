@@ -34,12 +34,15 @@ public class Main {
             try {
                 opcion = Integer.parseInt(sc.nextLine());
                 switch (opcion) {
+
                     case 1:
                         createCliente();
                         break;
+
                     case 2:
                         createBus();
                         break;
+
                     case 3:
                         createViaje();
                         break;
@@ -61,9 +64,11 @@ public class Main {
                     default:
                         System.out.println("Opcion invalida.");
                 }
+
             } catch (Exception e) {
                 System.out.println("Error, ingrese un numero valido.");
             }
+
         } while (opcion != 8);
     }
 
@@ -101,19 +106,20 @@ public class Main {
         }
 
         System.out.print("Nombres: ");
-        nombre.setNombres(sc.nextLine());
+        nombre.setNombres(sc.next());
 
         System.out.print("Apellido Paterno: ");
-        nombre.setApellidoPaterno(sc.nextLine());
+        nombre.setApellidoPaterno(sc.next());
 
         System.out.print("Apellido Materno: ");
-        nombre.setApellidoMaterno(sc.nextLine());
+        nombre.setApellidoMaterno(sc.next());
 
         System.out.print("Telefono: ");
-        String fono = sc.nextLine();
+        String fono = sc.next();
 
         System.out.print("Email: ");
-        String email = sc.nextLine();
+        String email = sc.next();
+        sc.nextLine();
 
         boolean ok = sistema.createCliente(id, nombre, fono, email);
 
@@ -128,18 +134,18 @@ public class Main {
         System.out.println("___ Crear Bus ___");
 
         System.out.print("Patente: ");
-        String patente = sc.nextLine();
+        String patente = sc.next();
 
         System.out.print("Marca: ");
-        String marca = sc.nextLine();
+        String marca = sc.next();
 
         System.out.print("Modelo: ");
-        String modelo = sc.nextLine();
+        String modelo = sc.next();
 
         System.out.print("Numero asientos: ");
-        int asientos = Integer.parseInt(sc.nextLine());
+        int asientos = Integer.parseInt(sc.next());
 
-        boolean ok = sistema.createBus(patente, marca, modelo, String.valueOf(asientos));
+        boolean ok = sistema.createBus(patente, marca, modelo, asientos);
         if (ok) {
             System.out.println("Bus creado con exito!");
         } else {
@@ -154,16 +160,16 @@ public class Main {
         DateTimeFormatter formHora = DateTimeFormatter.ofPattern("HH:mm");
 
         System.out.print("Fecha (dd/mm/yyyy): ");
-        LocalDate fecha = LocalDate.parse(sc.nextLine(), formFecha);
+        LocalDate fecha = LocalDate.parse(sc.next(), formFecha);
 
         System.out.print("Hora (hh:mm): ");
-        LocalTime hora = LocalTime.parse(sc.nextLine(), formHora);
+        LocalTime hora = LocalTime.parse(sc.next(), formHora);
 
         System.out.print("Precio pasaje: ");
-        int precio = Integer.parseInt(sc.nextLine());
+        int precio = Integer.parseInt(sc.next());
 
         System.out.print("Patente del Bus: ");
-        String patente = sc.nextLine();
+        String patente = sc.next();
 
         boolean ok = sistema.createViaje(fecha, hora, precio, patente);
 
@@ -175,31 +181,34 @@ public class Main {
     }
 
     public void vendePasajes() {
-        System.out.println("___ Vender Pasajes ___" +
-                "");
+        System.out.println("___ Vender Pasajes ___" + "");
+
         System.out.print("ID Documento: ");
         String idDoc = sc.next();
+
         System.out.print("Tipo (1.Boleta, 2.Factura): ");
-        int tipoD = Integer.parseInt(sc.nextLine());
+        int tipoD = Integer.parseInt(sc.next());
 
         TipoDocumento tipoDoc = (tipoD != 1) ? TipoDocumento.FACTURA : TipoDocumento.BOLETA;
 
         DateTimeFormatter formFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         System.out.print("Fecha de venta (dd/mm/yyyy): ");
 
-        LocalDate fechaVenta = LocalDate.parse(sc.nextLine(), formFecha);
+        LocalDate fechaVenta = LocalDate.parse(sc.next(), formFecha);
 
         System.out.print("Ingrese RUT del cliente comprador (ej: 111-1): ");
-        IdPersona idCliente = Rut.of(sc.nextLine());
+        IdPersona idCliente = Rut.of(sc.next());
         boolean iniciada = sistema.iniciaVenta(idDoc, tipoDoc, fechaVenta, idCliente);
-        if (iniciada == false) {
+
+        if (!iniciada) {
             System.out.println("Error: Cliente no existe o documento repetido.");
             return;
         }
         System.out.print("Cuantos pasajes comprara?: ");
         int cant = sc.nextInt();
+
         System.out.print("Fecha del viaje a buscar (dd/mm/yyyy): ");
-        LocalDate fechaViaje = LocalDate.parse(sc.nextLine(), formFecha);
+        LocalDate fechaViaje = LocalDate.parse(sc.next(), formFecha);
 
         String[][] horarios = sistema.getHorariosDisponibles(fechaViaje);
         if (horarios.length == 0) {
@@ -213,53 +222,61 @@ public class Main {
         }
 
         System.out.print("Seleccione un viaje (ingrese el numero de lista): ");
-        int opcViaje = Integer.parseInt(sc.nextLine()) - 1;
+        int opcViaje = Integer.parseInt(sc.next()) - 1;
 
         String patenteElegida = horarios[opcViaje][0];
         LocalTime horaElegida = LocalTime.parse(horarios[opcViaje][1]);
 
-        String[][]asientos = sistema.listAsientosDeViaje(fechaViaje, horaElegida, patenteElegida);
+        String[][] matrizAsientos = new String[][]{sistema.listAsientosDeViaje(fechaViaje, horaElegida, patenteElegida)};
 
-        for (int i = 0; i < asientos.length; i++) {
-            System.out.print("A" + (i+1) + ":[" + asientos[i] + "] ");
+        for (int i = 0; i < matrizAsientos.length; i++) {
+            System.out.print("[" + matrizAsientos[i][1] + "] A" + matrizAsientos[i][0] + "\t");
+
+            if ((i + 1) % 4 == 0){
+                System.out.println();
+            }
         }
-        System.out.println("");
 
         for (int i = 0; i < cant; i++) {
             System.out.print("\nIngrese numero de asiento para el pasaje " + (i+1) + ": ");
-            int asiento = Integer.parseInt(sc.nextLine());
+            int asiento = Integer.parseInt(sc.next());
 
             System.out.print("Ingrese RUT del Pasajero que viaja: ");
-            IdPersona idPasajero = Rut.of(sc.nextLine());
+            IdPersona idPasajero = Rut.of(sc.next());
 
             String nombreExiste = sistema.getNombrePasajero(idPasajero);
+
             if (nombreExiste == null) {
+
                 System.out.println("Pasajero no existe. Ingrese sus datos.");
                 Nombre nPas = new Nombre();
 
                 nPas.setTratamiento(Tratamiento.SR);
 
                 System.out.print("Nombres: ");
-                nPas.setNombres(sc.nextLine());
+                nPas.setNombres(sc.next());
 
                 System.out.print("Apellido Paterno: ");
-                nPas.setApellidoPaterno(sc.nextLine());
+                nPas.setApellidoPaterno(sc.next());
 
-                nPas.setApellidoMaterno(sc.nextLine());
+                nPas.setApellidoMaterno(sc.next());
 
                 System.out.print("Telefono pasajero: ");
-                String fonoP = sc.nextLine();
+                String fonoP = sc.next();
 
                 Nombre nCont = new Nombre();
                 nCont.setTratamiento(Tratamiento.SR);
+
                 System.out.print("Nombres Contacto Emergencia: ");
-                nCont.setNombres(sc.nextLine());
+                nCont.setNombres(sc.next());
+
                 System.out.print("Apellido Contacto Emergencia: ");
-                nCont.setApellidoPaterno(sc.nextLine());
+                nCont.setApellidoPaterno(sc.next());
+
                 nCont.setApellidoMaterno("");
 
                 System.out.print("Fono Contacto Emergencia: ");
-                String fonoC = sc.nextLine();
+                String fonoC = sc.next();
 
                 sistema.createPasajero(idPasajero, nPas, fonoP, nCont, fonoC);
             }
@@ -280,13 +297,13 @@ public class Main {
         DateTimeFormatter formHora = DateTimeFormatter.ofPattern("HH:mm");
 
         System.out.print("Fecha del viaje (dd/mm/yyyy): ");
-        LocalDate fecha = LocalDate.parse(sc.nextLine(), formFecha);
+        LocalDate fecha = LocalDate.parse(sc.next(), formFecha);
 
         System.out.print("Hora del viaje (hh:mm): ");
-        LocalTime hora = LocalTime.parse(sc.nextLine(), formHora);
+        LocalTime hora = LocalTime.parse(sc.next(), formHora);
 
         System.out.print("Patente del bus: ");
-        String patente = sc.nextLine();
+        String patente = sc.next();
 
         String[][] lista = sistema.listPasajeros(fecha, hora, patente);
 
@@ -320,20 +337,11 @@ public class Main {
     }
 
     public void listViajes() {
-        System.out.println("___ Lista de Viajes ___");
-
-        String[][] viajes = sistema.listViajes();
-
-        if (viajes.length == 0) {
-            System.out.println("No hay viajes registrados.");
-        } else {
-            System.out.println("Fecha | Hora | Patente | Asientos Totales | Asientos Libres");
-
-            for (int i = 0; i < viajes.length; i++) {
-
-                System.out.println(viajes[i][0] + " | " + viajes[i][1] + " | " + viajes[i][2] + " | " + viajes[i][3] + " | " + viajes[i][4]);
-            }
+        System.out.println("--- LISTADO DE VIAJES ---");
+        String[][] datos = sistema.listViajes();
+        System.out.println("Fecha | Hora | Patente | Capacidad | Ocupados | Disponibles");
+        for (String[] fila : datos) {
+            System.out.println(String.join(" | ", fila));
         }
     }
-
 }

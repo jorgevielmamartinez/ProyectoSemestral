@@ -61,9 +61,17 @@ public class Viaje {
     }
 
     public String[][] getListaPasajeros() {
-        String[][] lista = new String[pasajes.size()][4];
-        for (int i = 0; i < pasajes.size(); i++) {
-            Pasajero p = pasajes.get(i).getPasajero();
+        List<Pasajero> pasajerosUnicos = new ArrayList<>();
+
+        for (Pasaje p : pasajes) {
+            if (!pasajerosUnicos.contains(p.getPasajero())) {
+                pasajerosUnicos.add(p.getPasajero());
+            }
+        }
+
+        String[][] lista = new String[pasajerosUnicos.size()][4];
+        for (int i = 0; i < pasajerosUnicos.size(); i++) {
+            Pasajero p = pasajerosUnicos.get(i);
             lista[i][0] = p.getIdPersona().toString();
             lista[i][1] = p.getNombreCompleto().toString();
             lista[i][2] = p.getNomContacto().toString();
@@ -80,19 +88,9 @@ public class Viaje {
     }
 
     public int getNroAsientosDisponibles() {
-        boolean[] ocupados= new boolean[bus.getNroAsientos()];
-        for(Pasaje p : pasajes) {
-            int numAsiento = p.getAsiento();
-            if(numAsiento>=1 && numAsiento<=ocupados.length) {
-                ocupados[numAsiento-1] = true;
-            }
-        }
-        int contador=0;
-        for(boolean ocupado : ocupados) {
-            if(!ocupado) {
-                contador++;
-            }
-        }
-        return contador;
+        return bus.getNroAsientos() - pasajes.size();
+    }
+    public int getNroAsientosOcupados() {
+        return pasajes.size();
     }
 }
