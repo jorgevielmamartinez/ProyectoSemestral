@@ -221,7 +221,7 @@ public class Main {
         System.out.println("::: Datos de la Venta :::");
         System.out.println("ID Documento: " + idDoc);
         System.out.println("Tipo: " + tipoDoc);
-        System.out.println("Fecha: " + fechaVenta);
+        System.out.println("Fecha: " + fechaVenta.format(formFecha));
 
         System.out.print("Cantidad de pasajes: ");
         int cant = Integer.parseInt(sc.nextLine());
@@ -307,6 +307,8 @@ public class Main {
 
     private void listVentas() {
         String[][] ventas = sistema.listVentas();
+        System.out.println("___ Lista de Ventas ___");
+        System.out.println("Doc | Cliente | Total | Fecha");
         for (String[] v : ventas) {
             System.out.println(String.join(" | ", v));
         }
@@ -314,6 +316,8 @@ public class Main {
 
     private void listViajes() {
         String[][] datos = sistema.listViajes();
+        System.out.println("___ Lista de Viajes ___");
+        System.out.println("Fecha | Hora | Patente | Asientos Totales | Asientos Libres");
         for (String[] d : datos) {
             System.out.println(String.join(" | ", d));
         }
@@ -333,7 +337,8 @@ public class Main {
         String pat = sc.nextLine();
 
         String[][] lista = sistema.listPasajeros(fecha, hora, pat);
-
+        System.out.println("___ Lista de Pasajeros de un Viaje ___");
+        System.out.println("ID | Nombre | Contacto | Fono Contacto");
         for (String[] p : lista) {
             System.out.println(String.join(" | ", p));
         }
