@@ -328,17 +328,31 @@ public class Main {
     }
 
     private void listPasajerosViaje() {
-        DateTimeFormatter f1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        DateTimeFormatter f2 = DateTimeFormatter.ofPattern("HH:mm");
+        System.out.println("___ Lista de Pasajeros de un Viaje ___");
 
-        LocalDate fecha = LocalDate.parse(sc.next(), f1);
-        LocalTime hora = LocalTime.parse(sc.next(), f2);
-        String pat = sc.next();
+        DateTimeFormatter formFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter formHora = DateTimeFormatter.ofPattern("HH:mm");
 
-        String[][] lista = sistema.listPasajeros(fecha, hora, pat);
+        System.out.print("Fecha del viaje (dd/mm/yyyy): ");
+        LocalDate fecha = LocalDate.parse(sc.nextLine(), formFecha);
 
-        for (String[] p : lista) {
-            System.out.println(String.join(" | ", p));
+        System.out.print("Hora del viaje (hh:mm): ");
+        LocalTime hora = LocalTime.parse(sc.nextLine(), formHora);
+
+        System.out.print("Patente del bus: ");
+        String patente = sc.nextLine();
+
+        String[][] lista = sistema.listPasajeros(fecha, hora, patente);
+
+        if (lista.length == 0) {
+            System.out.println("No hay pasajeros o no existe el viaje.");
+        } else {
+            System.out.println("ID | Nombre | Contacto | Fono Contacto");
+
+            for (int i = 0; i < lista.length; i++) {
+
+                System.out.println(lista[i][0] + " | " + lista[i][1] + " | " + lista[i][2] + " | " + lista[i][3]);
+            }
         }
     }
 }
