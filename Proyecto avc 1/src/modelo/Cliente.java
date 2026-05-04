@@ -1,10 +1,15 @@
+package modelo;
+
+import utilidades.IdPersona;
+import utilidades.Nombre;
+
 import java.util.ArrayList;
 
 public class Cliente extends Persona {
     private String email;
     ArrayList<Venta> ventas = new ArrayList();
 
-    public Cliente(IdPersona id, Nombre nom,String telefono, String email){
+    public Cliente(IdPersona id, Nombre nom, String telefono, String email){
         super(id,nom,telefono);
         this.email = email;
     }

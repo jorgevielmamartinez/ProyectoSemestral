@@ -1,3 +1,9 @@
+package controlador;
+
+import modelo.*;
+import utilidades.IdPersona;
+import utilidades.Nombre;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -29,7 +35,7 @@ public class SistemaVentaPasajes {
         return true;
     }
 
-    public boolean createPasajero(IdPersona id,Nombre nom,String fono,Nombre nomContacto,String fonoContacto){
+    public boolean createPasajero(IdPersona id, Nombre nom, String fono, Nombre nomContacto, String fonoContacto){
         if(findPasajero(id)!=null){
             System.out.println(">>No se puede agregar un pasajero con el mismo id<<");
             return false;
@@ -58,7 +64,7 @@ public class SistemaVentaPasajes {
         }
         Bus bus=findBus(patBus);
         if(bus==null){
-            System.out.println(">>Bus no existente<<");
+            System.out.println(">>modelo.Bus no existente<<");
             return false;
         }
         Viaje viaje=new Viaje(fecha,hora,precio,bus);
@@ -220,7 +226,7 @@ public class SistemaVentaPasajes {
         return null;
     }
 
-    private Viaje findViaje(String fecha,String hora,String patenteBus){
+    private Viaje findViaje(String fecha, String hora, String patenteBus){
         for (Viaje v: viajes){
             if (v.getFecha().toString().equals(fecha) && v.getHora().toString().equals(hora) && v.getBus().getPatente().equals(patenteBus)){
                 return v;

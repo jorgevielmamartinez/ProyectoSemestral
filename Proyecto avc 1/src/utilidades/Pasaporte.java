@@ -1,3 +1,5 @@
+package utilidades;
+
 public class Pasaporte implements IdPersona {
     private String numero;
     private String nacionalidad;
