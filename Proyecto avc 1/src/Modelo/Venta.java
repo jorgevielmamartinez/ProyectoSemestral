@@ -1,3 +1,5 @@
+package Modelo;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 //clase hecha por Jorge Vielma

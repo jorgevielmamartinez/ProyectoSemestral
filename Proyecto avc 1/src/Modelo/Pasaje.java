@@ -1,3 +1,4 @@
+package Modelo;
 
 public class Pasaje {
     private static int contadorNumero = 1;

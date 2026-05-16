@@ -1,6 +1,12 @@
+package Modelo;
+
+import Utilidades.Direccion;
+import Utilidades.IdPersona;
+import Utilidades.Nombre;
+
 import java.util.ArrayList;
 
-public class Tripulante extends Persona{
+public abstract class Tripulante extends Persona {
     Direccion direccion;
     public  Tripulante(IdPersona idPersona, Nombre nombre, Direccion direccion){
         super(idPersona,nombre, String.valueOf(direccion));
@@ -11,12 +17,7 @@ public class Tripulante extends Persona{
     public void setDireccion(Direccion direccion) {
         this.direccion = direccion;
     }
-    ArrayList<Viaje>viajesTripulante;
 
-    public void addViaje(Viaje viaje){
-        viajesTripulante.add(viaje);
-    }
-    public int getNroViajes(){
-      return viajesTripulante.size();
-    }
+    public abstract void addViaje(Viaje viaje);
+    public abstract int getNroViajes();
 }

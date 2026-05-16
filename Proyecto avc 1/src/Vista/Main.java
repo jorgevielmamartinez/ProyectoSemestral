@@ -1,3 +1,8 @@
+package Vista;
+
+import Controlador.SistemaVentaPasajes;
+import Utilidades.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -65,20 +70,20 @@ public class Main {
         } while (opcion !=8);
     }
     private void createCliente() {
-        System.out.println("...... Creación de un nuevo Cliente ......");
+        System.out.println("...... Creación de un nuevo Modelo.Cliente ......");
 
-        System.out.print("Tipo documento (1.Rut, 2.Pasaporte): ");
+        System.out.print("Tipo documento (1.Utilidades.Rut, 2.Utilidades.Pasaporte): ");
         int tipo = Integer.parseInt(sc.nextLine());
 
         IdPersona id = null;
         String rut = "", num = "", nac = "";
 
         if (tipo == 1) {
-            System.out.print("Ingrese Rut: ");
+            System.out.print("Ingrese Utilidades.Rut: ");
             rut = sc.nextLine();
             id = Rut.of(rut);
         } else {
-            System.out.print("Numero Pasaporte: ");
+            System.out.print("Numero Utilidades.Pasaporte: ");
             num = sc.nextLine();
 
             System.out.print("Nacionalidad: ");
@@ -112,9 +117,9 @@ public class Main {
         boolean ok = sistema.createCliente(id, nombre, fono, email);
 
         if (ok) {
-            System.out.println("...... Cliente guardado exitosamente ......");
+            System.out.println("...... Modelo.Cliente guardado exitosamente ......");
         } else {
-            System.out.println(">> Error: Cliente ya existe <<");
+            System.out.println(">> Error: Modelo.Cliente ya existe <<");
         }
     }
 
@@ -141,13 +146,13 @@ public class Main {
             System.out.println("Marca: " + marca);
             System.out.println("Modelo: " + modelo);
             System.out.println("Numero de asientos: " + asientos);
-            System.out.println("...... Bus guardado exitosamente ......");
+            System.out.println("...... Modelo.Bus guardado exitosamente ......");
         } else {
-            System.out.println(">> Error: Bus ya existe <<");
+            System.out.println(">> Error: Modelo.Bus ya existe <<");
         }
     }
     private void createViaje() {
-        System.out.println("...... Creación de un nuevo Viaje ......");
+        System.out.println("...... Creación de un nuevo Modelo.Viaje ......");
 
         DateTimeFormatter formFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         DateTimeFormatter formHora = DateTimeFormatter.ofPattern("HH:mm");
@@ -161,7 +166,7 @@ public class Main {
         System.out.print("Precio: ");
         int precio = Integer.parseInt(sc.next());
 
-        System.out.print("Patente Bus: ");
+        System.out.print("Patente Modelo.Bus: ");
         String patente = sc.next();
         sc.nextLine();
 
@@ -171,16 +176,16 @@ public class Main {
             System.out.println("Fecha: " + fecha);
             System.out.println("Hora: " + hora);
             System.out.println("Precio: " + precio);
-            System.out.println("Patente Bus: " + patente);
-            System.out.println("...... Viaje guardado exitosamente ......");
+            System.out.println("Patente Modelo.Bus: " + patente);
+            System.out.println("...... Modelo.Viaje guardado exitosamente ......");
         } else {
-            System.out.println(">> Error: Bus no existe o conflicto <<");
+            System.out.println(">> Error: Modelo.Bus no existe o conflicto <<");
         }
     }
 
     private void vendePasajes() {
 
-        System.out.println("...... Venta de pasajes ......");
+        System.out.println("...... Modelo.Venta de pasajes ......");
 
         System.out.print("ID Documento: ");
         String idDoc = sc.next();
@@ -195,7 +200,7 @@ public class Main {
         System.out.print("Fecha de venta: ");
         LocalDate fechaVenta = LocalDate.parse(sc.next(), formFecha);
 
-        System.out.print("Rut[1] o Pasaporte[2]: ");
+        System.out.print("Utilidades.Rut[1] o Utilidades.Pasaporte[2]: ");
         int tipoCliente = Integer.parseInt(sc.next());
 
         IdPersona idCliente;
@@ -205,7 +210,7 @@ public class Main {
             String rut = sc.next();
             idCliente = Rut.of(rut);
         } else {
-            System.out.print("Numero Pasaporte: ");
+            System.out.print("Numero Utilidades.Pasaporte: ");
             String num = sc.next();
 
             System.out.print("Nacionalidad: ");
@@ -221,7 +226,7 @@ public class Main {
             return;
         }
 
-        System.out.println("::: Datos de la Venta :::");
+        System.out.println("::: Datos de la Modelo.Venta :::");
         System.out.println("ID Documento: " + idDoc);
         System.out.println("Tipo: " + tipoDoc);
         System.out.println("Fecha: " + fechaVenta);
@@ -279,7 +284,7 @@ public class Main {
                 Nombre n = new Nombre();
                 n.setTratamiento(Tratamiento.SR);
 
-                System.out.print("Nombre: ");
+                System.out.print("Utilidades.Nombre: ");
                 n.setNombres(sc.next());
 
                 System.out.print("Apellido: ");
@@ -303,13 +308,13 @@ public class Main {
 
             sistema.vendePasaje(idDoc, tipoDoc, fechaViaje, hora, patente, asiento, idPasajero);
 
-            System.out.println("::: Pasaje agregado exitosamente :::");
+            System.out.println("::: Modelo.Pasaje agregado exitosamente :::");
         }
 
         int total = sistema.getMontoVenta(idDoc, tipoDoc);
 
         System.out.println("::: Monto total de la venta: $" + total);
-        System.out.println("::: Venta cerrada exitosamente :::");
+        System.out.println("::: Modelo.Venta cerrada exitosamente :::");
     }
 
     private void listVentas() {
@@ -327,7 +332,7 @@ public class Main {
     }
 
     private void listPasajerosViaje() {
-        System.out.println("___ Lista de Pasajeros de un Viaje ___");
+        System.out.println("___ Lista de Pasajeros de un Modelo.Viaje ___");
 
         DateTimeFormatter formFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         DateTimeFormatter formHora = DateTimeFormatter.ofPattern("HH:mm");
@@ -346,7 +351,7 @@ public class Main {
         if (lista.length == 0) {
             System.out.println("No hay pasajeros o no existe el viaje.");
         } else {
-            System.out.println("ID | Nombre | Contacto | Fono Contacto");
+            System.out.println("ID | Utilidades.Nombre | Contacto | Fono Contacto");
 
             for (int i = 0; i < lista.length; i++) {
 

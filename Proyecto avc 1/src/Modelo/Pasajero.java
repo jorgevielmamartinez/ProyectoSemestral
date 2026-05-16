@@ -1,8 +1,13 @@
-public class Pasajero extends Persona{
+package Modelo;
+
+import Utilidades.IdPersona;
+import Utilidades.Nombre;
+
+public class Pasajero extends Persona {
     private Nombre nomContacto;
     private String fonoContacto;
 
-    public Pasajero(IdPersona id, Nombre nombre,String telefono,Nombre nomContacto,String fonoContacto) {
+    public Pasajero(IdPersona id, Nombre nombre, String telefono, Nombre nomContacto, String fonoContacto) {
         super(id, nombre,telefono);
         this.nomContacto=nomContacto;
         this.fonoContacto=fonoContacto;

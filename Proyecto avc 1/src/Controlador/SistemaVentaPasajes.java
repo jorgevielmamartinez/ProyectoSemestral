@@ -1,3 +1,10 @@
+package Controlador;
+
+import Modelo.Cliente;
+import Modelo.Pasajero;
+import Utilidades.IdPersona;
+import Utilidades.Nombre;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -27,7 +34,7 @@ public class SistemaVentaPasajes{
             return true;
         }
 
-    public boolean createPasajero(IdPersona id,Nombre nom,String fono,Nombre nomContacto,String fonoContacto){
+    public boolean createPasajero(IdPersona id, Nombre nom, String fono, Nombre nomContacto, String fonoContacto){
           if(findPasajero(id)!=null){
               System.out.println(">>No se puede agregar un pasajero con el mismo id<<");
               return false;
@@ -55,14 +62,14 @@ public class SistemaVentaPasajes{
         }
         Bus bus=findBus(patBus);
         if (bus==null){
-            System.out.println(">>Bus no existente<<");
+            System.out.println(">>Modelo.Bus no existente<<");
             return false;
         }
       Viaje viaje=new Viaje(fecha,hora,precio,bus);
       viajes.add(viaje);
       return true;
     }
-    public boolean iniciaVenta(String idDoc,TipoDocumento tipo,LocalDate fechaVenta,IdPersona idCliente){
+    public boolean iniciaVenta(String idDoc, TipoDocumento tipo, LocalDate fechaVenta, IdPersona idCliente){
      Cliente bandera=findCliente(idCliente);
         if (bandera==null){
             System.out.println(">>No se encontro al cliente<<");
@@ -105,7 +112,7 @@ public class SistemaVentaPasajes{
         }
         return new String[0][0];
     }
-    public int getMontoVenta(String idDocumento,TipoDocumento tipo){
+    public int getMontoVenta(String idDocumento, TipoDocumento tipo){
         for(Venta v:ventas){
             if(v.getIdDocumento().equals(idDocumento)&& v.getTipo().equals(tipo)){
                 return v.getMonto();
@@ -122,7 +129,7 @@ public class SistemaVentaPasajes{
        }
        return null;
     }
-    public boolean vendePasaje(String idDoc,TipoDocumento tipo,LocalDate fecha,LocalTime hora,String patBus,int asiento,IdPersona idPasajero){
+    public boolean vendePasaje(String idDoc, TipoDocumento tipo, LocalDate fecha, LocalTime hora, String patBus, int asiento, IdPersona idPasajero){
      Venta venta=findVenta(idDoc,tipo);
      if (venta==null){
          return false;
@@ -189,7 +196,7 @@ public class SistemaVentaPasajes{
    }
    return null;
     }
-    private Venta findVenta(String idDocumento,TipoDocumento tipoDocumento){
+    private Venta findVenta(String idDocumento, TipoDocumento tipoDocumento){
      for (Venta v:ventas){
          if (v.getIdDocumento().equals(idDocumento)&&v.getTipo().equals(tipoDocumento)){
              return v;
@@ -205,7 +212,7 @@ public class SistemaVentaPasajes{
      }
      return null;
     }
-    private Viaje findViaje(String fecha,String hora,String patenteBus){
+    private Viaje findViaje(String fecha, String hora, String patenteBus){
     for (Viaje v:viajes){
         if (v.getFecha().equals(fecha)&& v.getHora().equals(hora)&& v.getBus().getPatente().equals(patenteBus)){
             return v;

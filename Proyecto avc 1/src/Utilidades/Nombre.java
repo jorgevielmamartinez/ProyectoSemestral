@@ -1,3 +1,5 @@
+package Utilidades;
+
 public class Nombre{
     private Tratamiento tratamiento;
     private String nombres;
