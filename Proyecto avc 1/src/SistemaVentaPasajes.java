@@ -1,3 +1,6 @@
+import utilidades.IdPersona;
+import utilidades.Nombre;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -28,7 +31,7 @@ public class SistemaVentaPasajes {
         return true;
     }
 
-    public boolean createPasajero(IdPersona id,Nombre nom,String fono,Nombre nomContacto,String fonoContacto){
+    public boolean createPasajero(IdPersona id, Nombre nom, String fono, Nombre nomContacto, String fonoContacto){
         if(findPasajero(id)!=null){
             System.out.println(">>No se puede agregar un pasajero con el mismo id<<");
             return false;

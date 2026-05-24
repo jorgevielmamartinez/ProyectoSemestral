@@ -1,15 +1,21 @@
+package utilidades;
+
 public class Pasaporte implements IdPersona {
     private String numero;
     private String nacionalidad;
+
+    // CONSTRUCTOR
     public Pasaporte(String numero, String nacionalidad) {
         this.numero = numero;
         this.nacionalidad = nacionalidad;
     }
 
+    // LOGICA DE SINGLETON1
     public String getNumero() {
         return numero;
     }
 
+    // LOGICA DE SINGLETON2
     public String getNacionalidad() {
         return nacionalidad;
     }
@@ -17,6 +23,7 @@ public class Pasaporte implements IdPersona {
         if (nacionalidad==null || numero==null) return null;
         return new Pasaporte(numero,nacionalidad);
     }
+
 
     public boolean equals(Object obj) {
         if (this == obj) return true;

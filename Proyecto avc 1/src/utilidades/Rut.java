@@ -1,8 +1,6 @@
+package utilidades;
 
-
-import java.io.Serializable;
 import java.util.Objects;
-import java.util.Scanner;
 
 public class Rut implements IdPersona {
     private final long numero;

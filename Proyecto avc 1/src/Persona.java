@@ -4,6 +4,9 @@ constructores o métodos a las clases, ni tampoco agregar clases. Solo se permit
 si ello lleva a una mejora del código o se logra mayor reúso, simplicidad y/o legibilidad.
 */
 
+import utilidades.IdPersona;
+import utilidades.Nombre;
+
 public class Persona {
     private IdPersona id;
     private Nombre nombreCompleto;
