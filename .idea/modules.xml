@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Excepciones/Excepciones.iml" filepath="$PROJECT_DIR$/Excepciones/Excepciones.iml" />
       <module fileurl="file://$PROJECT_DIR$/Proyecto avc 1/Proyecto avc 1.iml" filepath="$PROJECT_DIR$/Proyecto avc 1/Proyecto avc 1.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/ProyectoSemestral.iml" filepath="$PROJECT_DIR$/.idea/ProyectoSemestral.iml" />
     </modules>
