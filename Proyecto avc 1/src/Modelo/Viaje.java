@@ -1,3 +1,5 @@
+package Modelo;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -45,12 +47,12 @@ public class Viaje {
         String[][] matriz = new String[bus.getNroAsientos()][2];
         for (int i = 0; i < bus.getNroAsientos(); i++) {
             matriz[i][0] = String.valueOf(i + 1);
-            matriz[i][1] = "L";
+            matriz[i][1] = "Libre";
         }
 
         for (Pasaje p : pasajes) {
             int numAsiento = p.getAsiento();
-            matriz[numAsiento - 1][1] = "O";
+            matriz[numAsiento - 1][1] = "Ocupado";
         }
 
         return matriz;
@@ -81,16 +83,15 @@ public class Viaje {
     }
 
     public boolean existeDisponibilidad() {
-       if (getNroAsientosDisponibles() > 0) {
-           return true;
-       }
-       return false;
+        if (getNroAsientosDisponibles() > 0) {
+            return true;
+        }
+        return false;
     }
 
     public int getNroAsientosDisponibles() {
         return bus.getNroAsientos() - pasajes.size();
     }
-
     public int getNroAsientosOcupados() {
         return pasajes.size();
     }

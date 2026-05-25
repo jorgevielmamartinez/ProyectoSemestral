@@ -1,6 +1,8 @@
+package Modelo;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
-
+//clase hecha por Jorge Vielma
 public class Venta {
     private String idDocumento;
     private TipoDocumento tipo;

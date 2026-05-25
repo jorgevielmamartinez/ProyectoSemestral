@@ -1,10 +1,9 @@
-/*
-No se pueden añadir constantes, enumeraciones, atributos, relaciones,
-constructores o métodos a las clases, ni tampoco agregar clases. Solo se permite agregar métodos privados,
-si ello lleva a una mejora del código o se logra mayor reúso, simplicidad y/o legibilidad.
-*/
+package Modelo;
 
-public class Persona {
+import Utilidades.IdPersona;
+import Utilidades.Nombre;
+
+public abstract class Persona {
     private IdPersona id;
     private Nombre nombreCompleto;
     private String telefono;

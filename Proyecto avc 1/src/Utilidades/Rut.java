@@ -1,8 +1,6 @@
+package Utilidades;
 
-
-import java.io.Serializable;
 import java.util.Objects;
-import java.util.Scanner;
 
 public class Rut implements IdPersona {
     private final long numero;
@@ -18,9 +16,9 @@ public class Rut implements IdPersona {
         String rutDV=rutLimpio.substring(rutLimpio.length()-1);
         long numero;
         char dv;
-            numero = Long.parseLong(rutLong);
-            dv=rutDV.charAt(0);
-            return new Rut(numero,dv);
+        numero = Long.parseLong(rutLong);
+        dv=rutDV.charAt(0);
+        return new Rut(numero,dv);
     }
     @Override
     public String toString() {
