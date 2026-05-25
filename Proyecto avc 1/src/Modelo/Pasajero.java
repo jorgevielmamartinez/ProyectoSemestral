@@ -1,17 +1,16 @@
-import utilidades.IdPersona;
-import utilidades.Nombre;
+package Modelo;
 
-import java.util.ArrayList;
+import Utilidades.IdPersona;
+import Utilidades.Nombre;
 
-public class Pasajero extends Persona{
+public class Pasajero extends Persona {
     private Nombre nomContacto;
     private String fonoContacto;
-    ArrayList<Pasaje> pasajeList;
+
     public Pasajero(IdPersona id, Nombre nombre, String telefono, Nombre nomContacto, String fonoContacto) {
         super(id, nombre,telefono);
         this.nomContacto=nomContacto;
         this.fonoContacto=fonoContacto;
-        this.pasajeList=new ArrayList<>();
 
     }
 
