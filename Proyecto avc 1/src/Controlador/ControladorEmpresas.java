@@ -69,12 +69,6 @@ public class ControladorEmpresas {
 
     }
 
-
-
-
-
-
-
     public void hireConductorForEmpresa(Rut rutEmp,IdPersona id,Nombre nom,Direccion dir ) throws SistemaVentaPasajesException{
         Optional<Empresa> empresa=findEmpresa(rutEmp);
         if(empresa.isEmpty()){
@@ -85,9 +79,6 @@ public class ControladorEmpresas {
         }
         empresa.get().addConductor(id,nom,dir);
     }
-
-
-
 
     public void hireAuxiliarForEmpresa(Rut rutEmp,IdPersona id,Nombre nom,Direccion dir) throws SistemaVentaPasajesException{
         Optional<Empresa> empresa = findEmpresa(rutEmp);
@@ -104,8 +95,6 @@ public class ControladorEmpresas {
 
         empresa.get().addAuxiliar(id,nom,dir);
     }
-
-
 
     public String[][] listEmpresas(){
         if(empresas.size()==0){return new String[0][0];}
@@ -137,21 +126,18 @@ public class ControladorEmpresas {
         Viaje[]llegadas= terminal.get().getLlegadas();
         Viaje[]salidas= terminal.get().getSalidas();
 
-        //Pasar ambas a lista
+
         ArrayList<Viaje> salida= new ArrayList<>(Arrays.asList(salidas));
         ArrayList<Viaje> llegada= new ArrayList<>(Arrays.asList(llegadas));
 
 
-        //Eliminar las fechas que no nos sirven
         salida.removeIf(viaje -> viaje.getFecha().isBefore(fecha));
         llegada.removeIf(viaje -> viaje.getFecha().isBefore(fecha));
 
-
-        //creamos el arreglo de retorno
         String[][] ArrayViajes=new String[salida.size()+llegada.size()][5];
         int index = 0;
 
-        // Agregar salidas al arreglo
+
         for (Viaje viaje : salida) {
             ArrayViajes[index][0] = "Salida";
             ArrayViajes[index][1] = "" + viaje.getHora();
@@ -161,7 +147,6 @@ public class ControladorEmpresas {
             index++;
         }
 
-        // Agregar llegadas al arreglo
         for (Viaje viaje : llegada) {
             ArrayViajes[index][0] = "Llegada";
             ArrayViajes[index][1] = "" + viaje.getHora();
@@ -208,7 +193,7 @@ public class ControladorEmpresas {
 
 
 
-    // todo
+
     protected Optional<Empresa> findEmpresa(Rut rut) {
 
         for(Empresa n:empresas){
