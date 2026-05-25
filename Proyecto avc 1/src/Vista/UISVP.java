@@ -6,6 +6,7 @@ import Controlador.*;
 
 import Excepciones.SistemaVentaPasajesException;
 
+import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -29,6 +30,7 @@ public class UISVP {
     private final static ControladorEmpresas CE = ControladorEmpresas.getInstance();
     private final static SistemaVentaPasajes SVP = SistemaVentaPasajes.getInstance();
 
+    // MENU
     public void menu() {
         int opcion;
         do {
@@ -48,10 +50,11 @@ public class UISVP {
             System.out.println(" 11) Listar empresas");
             System.out.println(" 12) Listar llegadas/salidas del terminal");
             System.out.println(" 13) Listar ventas de empresa");
-            System.out.println(" 14) Salir");
+            System.out.println(" 14) AUTORUN");
+            System.out.println(" 15) Salir");
             System.out.println("____________________________");
             System.out.print("..:: Ingrese número de opción: ");
-            opcion = elegirOpc(14);
+            opcion = elegirOpc(15);
             System.out.println();
 
 
@@ -69,9 +72,10 @@ public class UISVP {
                 case 11 -> listEmpresas();
                 case 12 -> listLlegadasSalidasTerminal();
                 case 13 -> listVentasEmpresas();
-                case 14 -> System.out.println("Saliendo del programa");
+                case 14 -> autoRun();
+                case 15 -> System.out.println("Saliendo del programa");
             }
-        } while (opcion != 14);
+        } while (opcion != 15);
     }
 
 
@@ -821,6 +825,102 @@ public class UISVP {
         System.out.println("\n...:::: Venta realizada exitosamente ::::....\n\n");
     }
 
+    // Opcion 15) correr automaticamente
+    private void autoRun() {
+        System.out.println("=== AUTORUN INICIADO ===");
+
+        // 1. Se crea la opción (1)
+        CE.createEmpresa(
+                Rut.of("60.911.006-6"),
+                "Las Brisas de Oriente",
+                "https://www.lasbrisasoriente.cl"
+        );
+
+
+
+        // 2. Se crea el tripulante diego antonio
+        IdPersona idAux = Rut.of("10.350.582-8");
+
+        Nombre n = new Nombre();
+        n.setTratamiento(Tratamiento.SR);
+        n.setNombres("Diego Antonio");
+        n.setApellidoPaterno("Galindo");
+        n.setApellidoMaterno("Torres");
+
+        Direccion d = new Direccion("Santa Rosa", 123, "Bulnes");
+
+        CE.hireAuxiliarForEmpresa(
+                Rut.of("60.911.006-6"),
+                idAux,
+                n,
+                d
+        );
+
+        // 2.1. se crea el extra
+        IdPersona idCond = Rut.of("11.111.111-1");
+
+        Nombre n2 = new Nombre();
+        n2.setTratamiento(Tratamiento.SR);
+        n2.setNombres("Jacob Benjamin");
+        n2.setApellidoPaterno("Mercado");
+        n2.setApellidoMaterno("Vasquez");
+
+        Direccion d2 = new Direccion("Paso ancho", 67, "San Carlos");
+
+        CE.hireConductorForEmpresa(
+                Rut.of("60.911.006-6"),
+                idCond,
+                n2,
+                d2
+        );
+
+
+        // 3. Se crea el terminal
+
+        CE.createTerminal(
+                "Fray Silvano",
+                new Direccion("Almirante Gaete", 1240, "Chillan")
+        );
+
+        CE.createTerminal(
+                "Terminal Pinto",
+                new Direccion("Calle central", 100, "Pinto")
+        );
+
+
+        // 4. se crea el bus
+        CE.createBus(
+                "AZYB12",
+                "Mercedes",
+                "Novo",
+                50,
+                Rut.of("60.911.006-6")
+        );
+
+        // 5. se crea el viaje
+
+        IdPersona[] trip = {
+                Rut.of("10.350.582-8")
+        };
+
+        String[] comunas = {
+                "Chillan",
+                "Pinto"
+        };
+
+        SVP.createViaje(
+                LocalDate.of(2024, 10, 21),
+                LocalTime.of(10, 40),
+                4300,
+                90,
+                "AZYB12",
+                trip,
+                comunas
+        );
+
+        System.out.println("=== AUTORUN TERMINADO ===");
+    }
+
     private int elegirOpc(int cantOpciones) {
         int opc = 0;
 
@@ -902,99 +1002,3 @@ public class UISVP {
         return false;
     }
 }
-
-// Datos predeterminados
-
-    /*
-    public void cargaDatosPredeterminados() {
-
-        // Empresa 1
-        Rut rutEmpresa1 = Rut.of("11.111.111-1");
-        String nomEmpresa1 = "Empresa 1";
-        String urlEmpresa1 = "https://empresa1.cl";
-        CE.createEmpresa(rutEmpresa1, nomEmpresa1, urlEmpresa1);
-
-        // Auxiliar 1
-        Rut rutEmpresaAuxiliar1= Rut.of("11.111.111-1");
-        IdPersona idAuxiliar1 = Rut.of("22.222.222-2");
-        Nombre nombreAuxiliar1 = new Nombre();
-        nombreAuxiliar1.setTratamiento(Tratamiento.valueOf("SR"));
-        nombreAuxiliar1.setNombres("Pedro Alejandro");
-        nombreAuxiliar1.setApellidoPaterno("Ramirez");
-        nombreAuxiliar1.setApellidoMaterno("Torres");
-        Direccion direccionAuxiliar1 = new Direccion("Avenida. UBB", 882, "Chillan");
-        CE.hireAuxiliarForEmpresa(rutEmpresaAuxiliar1, idAuxiliar1, nombreAuxiliar1, direccionAuxiliar1);
-
-        // Condutor 1
-        Rut rutEmpresaConductor1= Rut.of("11.111.111-1");
-        IdPersona idConductor1 = Rut.of("33.333.333-3");
-        Utilidades.Nombre nombreConductor1 = new Utilidades.Nombre();
-        nombreConductor1.setTratamiento(Tratamiento.valueOf("SR"));
-        nombreConductor1.setNombres("Miguel Angel");
-        nombreConductor1.setApellidoPaterno("Fernandez");
-        nombreConductor1.setApellidoMaterno("Garcia");
-        Direccion direccionConductor1 = new Direccion("Avenida. Udec", 374, "San Carlos");
-        CE.hireConductorForEmpresa(rutEmpresaConductor1, idConductor1, nombreConductor1, direccionConductor1);
-
-
-        // Terminal 1
-        String nombreT1 = "Terminal 1";
-        Direccion  direccionT1 = new Direccion("Calle terminal1", 222, "Chillan");
-        CE.createTerminal(nombreT1, direccionT1);
-
-        // Terminal 2
-        String nombreT2 = "Terminal 2";
-        Direccion  direccionT2 = new Direccion("Calle terminal2", 333, "Talca");
-        CE.createTerminal(nombreT2, direccionT2);
-
-        // Bus
-        CE.createBus("HIID", "Mercedes", "kjfdsl", 40, rutEmpresa1);
-
-        // Viaje
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-        IdPersona[] idTripulantes = new IdPersona[2];
-        idTripulantes[0] = idAuxiliar1;
-        idTripulantes[1] = idConductor1;
-        String[] comunas = new String[2];
-        comunas[0] = "Chillan";          // Comuna de salida
-        comunas[1] = "Talca";       // Comuna de llegada
-
-        SVP.createViaje(LocalDate.parse("20/03/2025", dateFormatter),
-                LocalTime.parse("15:30", timeFormatter),
-                1000, 90, "HIID", idTripulantes, comunas);
-
-        // cliente
-        Utilidades.IdPersona id1 = Utilidades.Pasaporte.of("1234", "chileno");
-        Utilidades.IdPersona id2 = Utilidades.Rut.of("66.666.666-6");
-        Utilidades.IdPersona id3 = Utilidades.Pasaporte.of("91011", "boliviano");
-        Utilidades.IdPersona id4 = Utilidades.Pasaporte.of("1324", "chileno");
-        Utilidades.Nombre n1 = new Utilidades.Nombre();
-        n1.setNombres("Lucas Daniel");
-        n1.setApellidoPaterno("Fernandez");
-        n1.setApellidoMaterno("Garcia");
-        n1.setTratamiento(Utilidades.Tratamiento.valueOf("SR"));
-
-        Utilidades.Nombre n2 = new Utilidades.Nombre();
-        n2.setNombres("Sofia Isabel");
-        n2.setApellidoPaterno("Martinez");
-        n2.setApellidoMaterno("Lopez");
-        n2.setTratamiento(Utilidades.Tratamiento.valueOf("SRA"));
-
-        Utilidades.Nombre n3 = new Utilidades.Nombre();
-        n3.setNombres("Carlos Alberto");
-        n3.setApellidoPaterno("Rodriguez");
-        n3.setApellidoMaterno("Silva");
-
-        Utilidades.Nombre n4 = new Utilidades.Nombre();
-        n4.setNombres("Carlos Alberto");
-        n4.setApellidoPaterno("Rodriguez");
-
-        SVP.createCliente(id1, n1,"95234", "matias@gmail.com"); //cliente con pasaporte
-        SVP.createCliente(id2, n2,"4873", "some@gmail.com"); //cliente con rut
-
-        SVP.createPasajero(id1, n1, "83247", n1, "83247"); // pasajero con pasaporte
-        SVP.createPasajero(id2, n2, "1234", n2, "1234"); // pasajero con rut
-    }
-
-     */
