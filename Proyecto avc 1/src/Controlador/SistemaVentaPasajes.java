@@ -153,7 +153,7 @@ public class SistemaVentaPasajes{
                return String.valueOf(p.getNombreCompleto());
            }
        }
-       return null;
+       return "";
     }
     public void vendePasaje(String idDoc, TipoDocumento tipo, LocalDate fecha, LocalTime hora, String patBus, int asiento, IdPersona idPasajero){
      Venta venta=findVenta(idDoc,tipo).orElseThrow(()->new SistemaVentaPasajesException("No existe una venta con el id y tipo de documento indicado"));
