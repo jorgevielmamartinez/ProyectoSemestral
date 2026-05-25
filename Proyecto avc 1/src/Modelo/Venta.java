@@ -42,6 +42,8 @@ public class Venta {
         Pasaje pasaje = new Pasaje(asiento, viaje, pasajero, this);
 
         this.pasajes.add(pasaje);
+
+        viaje.addVenta(this);
     }
 
     public Pasaje[] getPasajes() {
@@ -69,4 +71,6 @@ public class Venta {
         }
         return total;
     }
+
+
 }

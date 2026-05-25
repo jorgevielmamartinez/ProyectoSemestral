@@ -11,6 +11,7 @@ public class Viaje {
     private int precio;
     private Bus bus;
     private List<Pasaje> pasajes;
+    private ArrayList<Venta> ventas = new ArrayList<>();
 
     public Viaje(LocalDate fecha, LocalTime hora, int precio, Bus bus) {
         this.fecha = fecha;
@@ -37,6 +38,16 @@ public class Viaje {
 
     public void setPrecio(int precio) {
         this.precio = precio;
+    }
+
+    public Venta[] getVentas() {
+        return ventas.toArray(new Venta[0]);
+    }
+
+    public void addVenta(Venta venta) {
+        if (!ventas.contains(venta)) {
+            ventas.add(venta);
+        }
     }
 
     public Bus getBus() {

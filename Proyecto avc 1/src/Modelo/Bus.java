@@ -1,18 +1,24 @@
 package Modelo;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Bus {
+
     private String patente;
     private String marca;
     private String modelo;
     private int nroAsientos;
-    private List<Viaje> viajes;
+
+    private Empresa empresa;
+
+    private ArrayList<Viaje> viajes;
 
     public Bus(String patente, int nroAsientos, Empresa empresa) {
+
         this.patente = patente;
         this.nroAsientos = nroAsientos;
+        this.empresa = empresa;
+
         this.viajes = new ArrayList<>();
     }
 
@@ -40,9 +46,18 @@ public class Bus {
         return nroAsientos;
     }
 
+    public Empresa getEmpresa() {
+        return empresa;
+    }
+
+    public Viaje[] getViajes() {
+        return viajes.toArray(new Viaje[0]);
+    }
+
     public void addViaje(Viaje viaje) {
-        if (!this.viajes.contains(viaje)) {
-            this.viajes.add(viaje);
+
+        if (!viajes.contains(viaje)) {
+            viajes.add(viaje);
         }
     }
 }

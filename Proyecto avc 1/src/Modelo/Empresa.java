@@ -22,6 +22,7 @@ public class Empresa {
         this.conductores=new ArrayList();
         this.auxiliares=new ArrayList();
     }
+
     public Rut getRut(){
         return this.rut;
     }
