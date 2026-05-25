@@ -958,6 +958,67 @@ public class UISVP {
             System.out.println("Error creando cliente: " + e.getMessage());
         }
 
+        // 7. Crear venta de pasaje automática
+
+        try {
+
+            // iniciar venta
+            SVP.iniciaVenta(
+                    "V001",
+                    TipoDocumento.BOLETA,
+                    LocalDate.of(2024, 10, 21),
+                    "Chillan",
+                    "Pinto",
+                    Rut.of("22.222.222-2"),
+                    1
+            );
+
+            // crear pasajero (porque aún no existe)
+            Nombre pasajero = new Nombre();
+            pasajero.setTratamiento(Tratamiento.SR);
+            pasajero.setNombres("Jorge Alexis");
+            pasajero.setApellidoPaterno("Vielma");
+            pasajero.setApellidoMaterno("Sanchez");
+
+            Nombre contacto = new Nombre();
+            contacto.setTratamiento(Tratamiento.SR);
+            contacto.setNombres("Benjamin Benjamin");
+            contacto.setApellidoPaterno("Vivanco");
+            contacto.setApellidoMaterno("Tellez");
+
+            SVP.createPasajero(
+                    Rut.of("22.222.222-2"),
+                    pasajero,
+                    "911111111",
+                    contacto,
+                    "922222222"
+            );
+
+            // vender pasaje asiento 10
+            SVP.vendePasaje(
+                    "V001",
+                    TipoDocumento.BOLETA,
+                    LocalDate.of(2024, 10, 21),
+                    LocalTime.of(10, 40),
+                    "AZYB12",
+                    10,
+                    Rut.of("22.222.222-2")
+            );
+
+            // pagar venta en efectivo
+            SVP.pagaVenta(
+                    "V001",
+                    TipoDocumento.BOLETA
+            );
+
+        } catch (SistemaVentaPasajesException e) {
+
+            System.out.println(
+                    "Error creando venta automática: "
+                            + e.getMessage()
+            );
+        }
+
         System.out.println("=== AUTORUN TERMINADO ===");
     }
 
