@@ -31,6 +31,9 @@ public class ControladorEmpresas {
         }
     }
 
+    public String[][] listLlegadasSalidasTerminal(String nombreTerminal, String fecha) {
+        return new String[0][0];
+    }
 
 
 
