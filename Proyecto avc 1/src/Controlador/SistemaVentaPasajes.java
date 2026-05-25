@@ -228,4 +228,14 @@ public class SistemaVentaPasajes{
         }
         return null;
     }
+
+    private static ControladorEmpresas instance = null;
+
+
+    public static ControladorEmpresas getInstance() {
+        if (instance == null) {
+            instance = new ControladorEmpresas();
+        }
+        return instance;
+    }
 }

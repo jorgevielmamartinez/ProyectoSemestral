@@ -11,6 +11,7 @@ public class ControladorEmpresas {
     private ArrayList<Terminal> terminales=new ArrayList<>();
 
 
+    // Instanciar
     private static ControladorEmpresas instance = null;
 
 
