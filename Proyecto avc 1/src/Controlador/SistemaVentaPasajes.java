@@ -323,8 +323,65 @@ public class SistemaVentaPasajes{
         return new String[0];
     }
 
-    public String[][] getHorariosDisponibles(LocalDate fechaV, String origen, String destino, int cant) {
-        return new String[0][];
+    public String[][] getHorariosDisponibles(LocalDate fechaV,
+                                             String origen,
+                                             String destino,
+                                             int cant) {
+
+        ArrayList<Viaje> encontrados = new ArrayList<>();
+
+        for (Viaje v : viajes) {
+
+            boolean mismaFecha =
+                    v.getFecha().equals(fechaV);
+
+            boolean mismoOrigen =
+                    v.getTerminalSalida()
+                            .getDireccion()
+                            .getComuna()
+                            .equalsIgnoreCase(origen);
+
+            boolean mismoDestino =
+                    v.getTerminalLlegada()
+                            .getDireccion()
+                            .getComuna()
+                            .equalsIgnoreCase(destino);
+
+            boolean disponible =
+                    v.existeDisponibilidad(cant);
+
+            if (mismaFecha
+                    && mismoOrigen
+                    && mismoDestino
+                    && disponible) {
+
+                encontrados.add(v);
+            }
+        }
+
+        String[][] matriz =
+                new String[encontrados.size()][4];
+
+        for (int i = 0; i < encontrados.size(); i++) {
+
+            Viaje v = encontrados.get(i);
+
+            matriz[i][0] =
+                    v.getBus().getPatente();
+
+            matriz[i][1] =
+                    v.getHora().toString();
+
+            matriz[i][2] =
+                    String.valueOf(v.getPrecio());
+
+            matriz[i][3] =
+                    String.valueOf(
+                            v.getNroAsientosDisponibles()
+                    );
+        }
+
+        return matriz;
     }
 }
 

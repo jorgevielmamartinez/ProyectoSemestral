@@ -78,7 +78,7 @@ public class UISVP {
         } while (opcion != 15);
     }
 
-
+    // 1) Crear empresa
     private void createEmpresa() {
         try {
             System.out.println("...:::: Creando una nueva Empresa ::::....");
@@ -95,7 +95,7 @@ public class UISVP {
         }
     }
 
-
+    // 2) Contratar tripulante");
     private void contrataTripulante() {
         try {
             System.out.println("...:::: Contratando un nuevo tripulante ::::....\n");
@@ -174,7 +174,7 @@ public class UISVP {
         }
     }
 
-
+    // 3) Crear terminal
     private void createTerminal() {
         try {
             System.out.println("...:::: Creando un nuevo Terminal ::::....");
@@ -193,7 +193,7 @@ public class UISVP {
         }
     }
 
-
+    // 4) Crear cliente
     private void createCliente() {
 
         System.out.println("...::: Crear un nuevo Modelo.Cliente :::...\n");
@@ -258,7 +258,7 @@ public class UISVP {
 
     }
 
-
+    // 5) Crear bus
     private void createBus() {
         System.out.println("...:::: Creando un nuevo Bus ::::....");
 
@@ -286,7 +286,7 @@ public class UISVP {
         }
     }
 
-
+    // 6) Crear viaje
     private void createViaje() {
 
         System.out.println("...::: Creacion de un nuevo Viaje :::....");
@@ -923,9 +923,9 @@ public class UISVP {
 
         Nombre nombreCliente = new Nombre();
         nombreCliente.setTratamiento(Tratamiento.SR);
-        nombreCliente.setNombres("Leon ");
+        nombreCliente.setNombres("Jorge Alexis");
         nombreCliente.setApellidoPaterno("Vielma");
-        nombreCliente.setApellidoMaterno("Munoz"); // si tu sistema no permite vacío, pon "N/A"
+        nombreCliente.setApellidoMaterno("Sanchez"); // si tu sistema no permite vacío, pon "N/A"
 
         String telefono = "911111111";
         String email = "jorge@gmail.com";
