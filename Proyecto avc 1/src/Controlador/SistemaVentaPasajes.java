@@ -324,6 +324,7 @@ public class SistemaVentaPasajes{
     }
 
     public String[][] getHorariosDisponibles(LocalDate fechaV, String origen, String destino, int cant) {
-
+        return new String[0][];
     }
 }
+
