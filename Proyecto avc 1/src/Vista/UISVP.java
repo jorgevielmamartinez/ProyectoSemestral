@@ -1,5 +1,6 @@
 package Vista;
 //Clase hecha por benjamin vivanco y tellez
+import Modelo.TipoDocumento;
 import Utilidades.*;
 import Controlador.*;
 
@@ -72,7 +73,6 @@ public class UISVP {
             }
         } while (opcion != 14);
     }
-
 
 
     private void createEmpresa() {
@@ -248,12 +248,11 @@ public class UISVP {
             SVP.createCliente(idPersona, nombreCliente, telefono, email);
             System.out.println("\n....:::: Cliente guardado exitosamente ::::....\n");
 
-        } catch (SistemaVentaPasajesException e ) {
+        } catch (SistemaVentaPasajesException e) {
             System.out.println("..:: Error : " + e.getMessage());
         }
 
     }
-
 
 
     private void createBus() {
@@ -262,11 +261,11 @@ public class UISVP {
         String patente = leeString("Patente");
 
         do {
-            if (!esPatenteAlfanumerica(patente)) {
+            if (esPatenteAlfanumerica(patente)) {
                 System.out.println("La Patente debe ser alfanumerica");
                 patente = leeString("Patente");
             }
-        } while (!esPatenteAlfanumerica(patente));
+        } while (esPatenteAlfanumerica(patente));
 
         String marca = leeString("Marca");
         String modelo = leeString("Modelo");
@@ -282,7 +281,6 @@ public class UISVP {
             System.err.println("..:: Error : " + e.getMessage());
         }
     }
-
 
 
     private void createViaje() {
@@ -359,7 +357,7 @@ public class UISVP {
         comunas[1] = leeString("Nombre comuna llegada");
 
         try {
-            SVP.createViaje(fecha, hora, precio,duracion, patente, idTripulantesArray ,comunas);
+            SVP.createViaje(fecha, hora, precio, duracion, patente, idTripulantesArray, comunas);
             System.out.println("\n...:::: Viaje guardado exitosamente ::::....");
 
         } catch (SistemaVentaPasajesException e) {
@@ -388,15 +386,11 @@ public class UISVP {
         // Llegada
         String destino = leeString("Destino (comuna)");
 
-        TipoDocumento tipoDocumento = null;
-        switch (tipo) {
-            case 1:
-                tipoDocumento = TipoDocumento.valueOf("BOLETA");
-                break;
-            case 2:
-                tipoDocumento = TipoDocumento.valueOf("FACTURA");
-                break;
-        }
+        TipoDocumento tipoDocumento = switch (tipo) {
+            case 1 -> TipoDocumento.valueOf("BOLETA");
+            case 2 -> TipoDocumento.valueOf("FACTURA");
+            default -> null;
+        };
 
         System.out.println("\n\n:::: Datos del Cliente\n\n");
         int op = leeOpc("Rut[1] o Pasaporte[2]", 2);
@@ -437,10 +431,10 @@ public class UISVP {
         int cant = leeInt("Cantidad de pasajes");
 
         try {
-            SVP.iniciaVenta(IdDocumento, tipoDocumento,fechaV,origen ,destino, idCliente, cant);
+            SVP.iniciaVenta(IdDocumento, tipoDocumento, fechaV, origen, destino, idCliente, cant);
 
 
-            String[][] matrizViajes = SVP.getHorariosDisponibles(fechaV,origen, destino, cant);
+            String[][] matrizViajes = SVP.getHorariosDisponibles(fechaV, origen, destino, cant);
 
             System.out.println("\n\n:::: Listado de Horarios Disponibles");
 
@@ -450,7 +444,7 @@ public class UISVP {
             System.out.printf("       +------------+----------------+------------+------------+%n");
             for (int i = 0; i < matrizViajes.length; i++) {
                 System.out.printf(" %-5d | %-10s | %-14s | %-10s | %-10s |%n",
-                        i + 1, matrizViajes[i][0], matrizViajes[i][1], "$"+matrizViajes[i][2], matrizViajes[i][3]);
+                        i + 1, matrizViajes[i][0], matrizViajes[i][1], "$" + matrizViajes[i][2], matrizViajes[i][3]);
                 System.out.printf("       +------------+----------------+------------+------------+%n");
             } //POSICION DE VIAJE ELEGIDO
 
@@ -461,7 +455,7 @@ public class UISVP {
             LocalTime horaV = LocalTime.parse(matrizViajes[Viaje][1], DateTimeFormatter.ofPattern("HH:mm"));
             String patBus = matrizViajes[Viaje][0];
 
-            String[] matrizAsientos = SVP.listAsientosDeViaje(fechaV, LocalTime.parse(matrizViajes[Viaje][1]), matrizViajes[Viaje][0]);
+            String[][] matrizAsientos = SVP.listAsientosDeViaje(fechaV, LocalTime.parse(matrizViajes[Viaje][1]), matrizViajes[Viaje][0]);
 
             System.out.printf("       *---*---*---*---*---*%n");
             for (int i = 0; i < matrizAsientos.length; i++) {
@@ -625,7 +619,7 @@ public class UISVP {
                 } //cierre del switch
             }// cierre del for
 
-            Optional<Integer> montoVenta = SVP.getMontoVenta(IdDocumento, tipoDocumento);
+            Optional<Integer> montoVenta = Optional.of(SVP.getMontoVenta(IdDocumento, tipoDocumento));
             System.out.println();
             System.out.println("\n:::: Monto Total de la venta: " + montoVenta.get());
             System.out.println();
@@ -648,7 +642,6 @@ public class UISVP {
         String[][] listaVentas = SVP.listVentas();
 
 
-
         if (listaVentas.length != 0) {
             System.out.printf("\n%44s\n", "...:::: Listado de Ventas ::::....\n");
             System.out.printf(" +------------+----------+------------+-----------------+----------------------------------+--------------+--------------+%n");
@@ -661,7 +654,7 @@ public class UISVP {
                 String fechaFormateada = fecha.format(nuevoFormato);
 
                 System.out.printf(" |      %-5s | %-7s  | %-10s |    %-5s | %-32s |            %-2s|       %-6s |%n",
-                        listaVentas[i][0], listaVentas[i][1], fechaFormateada, listaVentas[i][3], listaVentas[i][4], listaVentas[i][5], "$"+listaVentas[i][6]);
+                        listaVentas[i][0], listaVentas[i][1], fechaFormateada, listaVentas[i][3], listaVentas[i][4], listaVentas[i][5], "$" + listaVentas[i][6]);
                 System.out.printf(" +------------+----------+------------+-----------------+----------------------------------+--------------+--------------+%n");
             }
         } else {
@@ -670,11 +663,12 @@ public class UISVP {
 
 
     }
+
     private void listViajes() {
         DateTimeFormatter formatoOriginal = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         DateTimeFormatter nuevoFormato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        String[][] lista= SVP.listViajes();
+        String[][] lista = SVP.listViajes();
 
         if (lista.length != 0) {
             System.out.printf("\n%44s\n", "...:::: Listado de Viajes ::::....\n");
@@ -801,7 +795,7 @@ public class UISVP {
                     LocalDate fecha = LocalDate.parse(fechaOriginal, formatoOriginal);
                     String fechaFormateada = fecha.format(nuevoFormato);
                     System.out.printf(" | %-10s  | %-8s  | %-8s      | %-14s |%n",
-                            fechaFormateada, lista[i][1], "$"+lista[i][2], "Pago " + lista[i][3]);
+                            fechaFormateada, lista[i][1], "$" + lista[i][2], "Pago " + lista[i][3]);
                     System.out.printf(" *-------------*-----------*---------------*----------------*%n");
                 }
             } else {
@@ -812,15 +806,15 @@ public class UISVP {
         }
     }
 
-    private void pagaVentaPasajes(String idDocumento,TipoDocumento tipo) {
+    private void pagaVentaPasajes(String idDocumento, TipoDocumento tipo) {
         System.out.println(":::: Pago de la venta");
-        int opcPago= leeOpc("Efectivo[1] o Tarjeta[2]",2);
+        int opcPago = leeOpc("Efectivo[1] o Tarjeta[2]", 2);
 
-        if(opcPago==1) {
+        if (opcPago == 1) {
             SVP.pagaVenta(idDocumento, tipo);
 
         } else {
-            long nroTarjeta= Long.parseLong(leeString("Ingrese numero de Tarjeta"));
+            long nroTarjeta = Long.parseLong(leeString("Ingrese numero de Tarjeta"));
             SVP.pagaVenta(idDocumento, tipo, nroTarjeta);
         }
         System.out.println();
@@ -863,12 +857,12 @@ public class UISVP {
         return num;
     }
 
-    private int [] separador(String asientos,int cant){
+    private int[] separador(String asientos, int cant) {
 
         String[] numerosString = asientos.split(",");
         int[] numAsientos = new int[cant];
 
-        for (int i = 0; i < cant; i++){
+        for (int i = 0; i < cant; i++) {
             numAsientos[i] = Integer.parseInt(numerosString[i]);
         }
 
@@ -902,12 +896,12 @@ public class UISVP {
     private static boolean esPatenteAlfanumerica(String input) {
         for (char c : input.toCharArray()) {
             if (!Character.isLetterOrDigit(c)) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
-
+}
 
 // Datos predeterminados
 

@@ -240,4 +240,90 @@ public class SistemaVentaPasajes{
         }
         return Optional.empty();
     }
+
+    public String getNombreCliente(IdPersona idPersona) {
+
+        for (Cliente c : clientes) {
+
+            if (c.getIdPersona().equals(idPersona)) {
+                return c.getNombreCompleto().toString();
+            }
+        }
+
+        return null;
+    }
+
+    public String[][] listPasajerosViaje(LocalDate fecha,
+                                         LocalTime hora,
+                                         String patenteBus) {
+
+        return new String[0][0];
+    }
+
+    public void pagaVenta(String idDocumento, TipoDocumento tipo) {
+
+        for (Venta v : ventas) {
+
+            if (v.getIdDocumento().equals(idDocumento)
+                    && v.getTipo().equals(tipo)) {
+
+                Pago pago = new PagoEfectivo(v.getMonto());
+
+                return;
+            }
+        }
+    }
+
+    public void pagaVenta(String idDocumento,
+                          TipoDocumento tipo,
+                          long nroTarjeta) {
+
+        for (Venta v : ventas) {
+
+            if (v.getIdDocumento().equals(idDocumento)
+                    && v.getTipo().equals(tipo)) {
+
+                Pago pago = new PagoTarjeta(v.getMonto(), nroTarjeta);
+
+                return;
+            }
+        }
+    }
+
+
+    public String[] pasajesAImprimir(String idDocumento, TipoDocumento tipoDocumento) {
+
+        ArrayList<String> lista = new ArrayList<>();
+
+        for (Venta v : ventas) {
+
+            if (v.getIdDocumento().equals(idDocumento)
+                    && v.getTipo().equals(tipoDocumento)) {
+
+                lista.add("===== BOLETA =====");
+
+                for (Pasaje p : v.getPasajes()) {
+
+                    lista.add("Asiento: " + p.getAsiento());
+
+                    lista.add("Bus: " +
+                            p.getViaje().getBus().getPatente());
+
+                    lista.add("Hora: " +
+                            p.getViaje().getHora());
+
+                    lista.add("Precio: $" +
+                            p.getViaje().getPrecio());
+                }
+
+                return lista.toArray(new String[0]);
+            }
+        }
+
+        return new String[0];
+    }
+
+    public String[][] getHorariosDisponibles(LocalDate fechaV, String origen, String destino, int cant) {
+
+    }
 }
