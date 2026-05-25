@@ -1,24 +1,20 @@
 package Modelo;
 
 import java.util.ArrayList;
-
+import java.util.List;
+//Clase hecha por Jacob Mercado
 public class Bus {
-
     private String patente;
     private String marca;
     private String modelo;
     private int nroAsientos;
-
+    private List<Viaje> viajes;
     private Empresa empresa;
-
-    private ArrayList<Viaje> viajes;
-
     public Bus(String patente, int nroAsientos, Empresa empresa) {
-
         this.patente = patente;
         this.nroAsientos = nroAsientos;
         this.empresa = empresa;
-
+        empresa.addBus(this);
         this.viajes = new ArrayList<>();
     }
 
@@ -46,18 +42,18 @@ public class Bus {
         return nroAsientos;
     }
 
+    public void addViaje(Viaje viaje) {
+       for (Viaje v : viajes) {
+           if (viaje.getBus().getPatente().equals(v.getBus().getPatente())) {
+          return;
+           }
+       }
+       this.viajes.add(viaje);
+    }
     public Empresa getEmpresa() {
         return empresa;
     }
-
     public Viaje[] getViajes() {
         return viajes.toArray(new Viaje[0]);
-    }
-
-    public void addViaje(Viaje viaje) {
-
-        if (!viajes.contains(viaje)) {
-            viajes.add(viaje);
-        }
     }
 }

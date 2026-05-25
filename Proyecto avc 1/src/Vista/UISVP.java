@@ -1,9 +1,7 @@
 package Vista;
-
-//import Modelo.*;
+//Clase hecha por benjamin vivanco y tellez
 import Utilidades.*;
 import Controlador.*;
-import Modelo.TipoDocumento;
 
 import Excepciones.SistemaVentaPasajesException;
 
@@ -14,7 +12,6 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Optional;
 import java.util.Scanner;
-
 public class UISVP {
     private static UISVP INSTANCE = new UISVP();
     private Scanner sc;
@@ -362,7 +359,7 @@ public class UISVP {
         comunas[1] = leeString("Nombre comuna llegada");
 
         try {
-            SVP.createViaje(fecha, hora, precio, duracion, patente, idTripulantesArray ,comunas);
+            SVP.createViaje(fecha, hora, precio,duracion, patente, idTripulantesArray ,comunas);
             System.out.println("\n...:::: Viaje guardado exitosamente ::::....");
 
         } catch (SistemaVentaPasajesException e) {
@@ -391,19 +388,14 @@ public class UISVP {
         // Llegada
         String destino = leeString("Destino (comuna)");
 
-        TipoDocumento tipoDocumento;
-
+        TipoDocumento tipoDocumento = null;
         switch (tipo) {
             case 1:
-                tipoDocumento = TipoDocumento.BOLETA;
+                tipoDocumento = TipoDocumento.valueOf("BOLETA");
                 break;
-
             case 2:
-                tipoDocumento = TipoDocumento.FACTURA;
+                tipoDocumento = TipoDocumento.valueOf("FACTURA");
                 break;
-
-            default:
-                tipoDocumento = null;
         }
 
         System.out.println("\n\n:::: Datos del Cliente\n\n");
@@ -917,8 +909,9 @@ public class UISVP {
     }
 
 
-    // Datos predeterminados
+// Datos predeterminados
 
+    /*
     public void cargaDatosPredeterminados() {
 
         // Empresa 1
@@ -1009,4 +1002,5 @@ public class UISVP {
         SVP.createPasajero(id1, n1, "83247", n1, "83247"); // pasajero con pasaporte
         SVP.createPasajero(id2, n2, "1234", n2, "1234"); // pasajero con rut
     }
-}
+
+     */
