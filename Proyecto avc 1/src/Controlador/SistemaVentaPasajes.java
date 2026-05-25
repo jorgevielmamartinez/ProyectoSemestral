@@ -6,7 +6,6 @@ import Utilidades.Nombre;
 import Excepciones.SistemaVentaPasajesException;
 import Utilidades.Rut;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -110,7 +109,7 @@ public class SistemaVentaPasajes{
 
 
     }
-    public String[][] getHorariosDisponibles(LocalDate fechaViaje) {
+    public String[][] getHorariosDisponibles(LocalDate fechaViaje, String origen, String destino, int cant) {
         ArrayList<Viaje> encontrados = new ArrayList<>();
         for (Viaje v : viajes) {
             if (v.getFecha().equals(fechaViaje)) {
@@ -155,6 +154,71 @@ public class SistemaVentaPasajes{
        }
        return null;
     }
+
+    public String getNombreCliente(IdPersona idCliente){
+        for (Cliente cliente : clientes) {
+            if (cliente.getIdPersona().equals(idCliente)) {
+                return cliente.getNombreCompleto().toString();
+            }
+        }
+        return null;
+    }
+
+    public String[] pasajesAImprimir(String idDocumento, TipoDocumento tipoDocumento) {
+        Optional<Venta> venta = findVenta(idDocumento, tipoDocumento);
+
+        if (venta.isEmpty()) {
+            return new String[] {"No se encontraron pasajes para la venta con ID: " + idDocumento};
+        }
+
+        ArrayList<String> resultado = new ArrayList<>();
+
+        resultado.add(":::: Imprimiendo los pasajes\n");
+        resultado.add("------------------ PASAJE ------------------");
+
+        for (Pasaje pasaje : venta.get().getPasajes()) {
+            Viaje viaje = pasaje.getViaje();
+            Pasajero pasajero = pasaje.getPasajero();
+
+            resultado.add("NUMERO DE PASAJE  : " + pasaje.getNumero());
+            resultado.add("FECHA DE VIAJE    : " + viaje.getFecha().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            resultado.add("HORA DE VIAJE     : " + viaje.getHora().format(DateTimeFormatter.ofPattern("HH:mm")));
+            resultado.add("PATENTE BUS       : " + viaje.getBus().getPatente());
+            resultado.add("ASIENTO           : " + pasaje.getAsiento());
+            resultado.add("RUT/PASAPORTE     : " + pasajero.getIdPersona());
+            resultado.add("NOMBRE PASAJERO   : " + pasajero.getNombreCompleto().toString());
+            resultado.add("--------------------------------------------\n");
+        }
+
+        return resultado.toArray(new String[0]);
+    }
+
+    public String[][] listPasajerosViaje(LocalDate fecha, LocalTime hora, String patBus) throws SistemaVentaPasajesException {
+        Viaje viaje = findViaje(fecha.toString(), hora.toString(), patBus)
+                .orElseThrow(() -> new SistemaVentaPasajesException("No existe viaje con la fecha, hora y patente de bus indicados"));
+
+        return viaje.getListaPasajeros();
+
+    }
+
+    public void pagaVenta(String idDocumento, TipoDocumento tipo) throws SistemaVentaPasajesException {
+        Venta venta= findVenta(idDocumento, tipo).orElseThrow(() ->
+                new SistemaVentaPasajesException("No existe venta con el id y tipo de documento indicados"));
+
+        if(!venta.pagaMonto()){
+            throw new SistemaVentaPasajesException("La venta ya fue pagada");
+        }
+    }
+
+    public void pagaVenta(String idDocumento, TipoDocumento tipo, long nroTarjeta) throws SistemaVentaPasajesException {
+        Venta venta= findVenta(idDocumento, tipo).orElseThrow(() ->
+                new SistemaVentaPasajesException("No existe venta con el id y tipo de documento indicados"));
+
+        if(!venta.pagaMonto(nroTarjeta)){
+            throw new SistemaVentaPasajesException("La venta ya fue pagada");
+        }
+    }
+
     public void vendePasaje(String idDoc, TipoDocumento tipo, LocalDate fecha, LocalTime hora, String patBus, int asiento, IdPersona idPasajero){
      Venta venta=findVenta(idDoc,tipo).orElseThrow(()->new SistemaVentaPasajesException("No existe una venta con el id y tipo de documento indicado"));
 
