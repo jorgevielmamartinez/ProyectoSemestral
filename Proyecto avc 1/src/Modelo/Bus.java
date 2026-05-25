@@ -41,11 +41,8 @@ public class Bus {
     }
 
     public void addViaje(Viaje viaje) {
-       for (Viaje v : viajes) {
-           if (viaje.getBus().getPatente().equals(v.getBus().getPatente())) {
-          return;
-           }
-       }
-       this.viajes.add(viaje);
+        if (!this.viajes.contains(viaje)) {
+            this.viajes.add(viaje);
+        }
     }
 }
