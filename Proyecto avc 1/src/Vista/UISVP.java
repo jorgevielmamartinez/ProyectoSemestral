@@ -467,18 +467,18 @@ public class UISVP {
             String[][] matrizAsientos = SVP.listAsientosDeViaje(fechaV, LocalTime.parse(matrizViajes[Viaje][1]), matrizViajes[Viaje][0]);
 
             System.out.printf("       *---*---*---*---*---*%n");
-            for (int i = 0; i < matrizAsientos.length; i++) {
 
-                System.out.printf("       |%-2s |", matrizAsientos[i]);
-                i++;
-                System.out.printf(" %-2s|   |", matrizAsientos[i]);
-                i += 2;
-                System.out.printf(" %-2s|", matrizAsientos[i]);
-                i--;
-                System.out.printf(" %-2s|%n", matrizAsientos[i]);
+            for (int i = 0; i < matrizAsientos.length; i += 4) {
+
+                String as1 = (i < matrizAsientos.length) ? matrizAsientos[i][0] : "  ";
+                String as2 = (i + 1 < matrizAsientos.length) ? matrizAsientos[i + 1][0] : "  ";
+                String as3 = (i + 2 < matrizAsientos.length) ? matrizAsientos[i + 2][0] : "  ";
+                String as4 = (i + 3 < matrizAsientos.length) ? matrizAsientos[i + 3][0] : "  ";
+
+                System.out.printf("       |%-2s | %-2s|   | %-2s| %-2s|%n", as1, as2, as3, as4);
                 System.out.printf("       |---+---+---+---+---|%n");
-                i++;
             }
+
             String asientos;
             int[] numAsientos;
             boolean asientosDisponibles;
