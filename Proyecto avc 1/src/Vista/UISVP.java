@@ -918,6 +918,30 @@ public class UISVP {
                 comunas
         );
 
+        // 6. Se crea un cliente
+        IdPersona idCliente = Rut.of("22.222.222-2");
+
+        Nombre nombreCliente = new Nombre();
+        nombreCliente.setTratamiento(Tratamiento.SR);
+        nombreCliente.setNombres("Leon ");
+        nombreCliente.setApellidoPaterno("Vielma");
+        nombreCliente.setApellidoMaterno("Munoz"); // si tu sistema no permite vacío, pon "N/A"
+
+        String telefono = "911111111";
+        String email = "jorge@gmail.com";
+
+        try {
+            SVP.createCliente(
+                    idCliente,
+                    nombreCliente,
+                    telefono,
+                    email
+            );
+
+        } catch (SistemaVentaPasajesException e) {
+            System.out.println("Error creando cliente: " + e.getMessage());
+        }
+
         System.out.println("=== AUTORUN TERMINADO ===");
     }
 
