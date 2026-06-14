@@ -26,4 +26,7 @@ public class Cliente extends Persona {
             }
         }
     }
+    public Venta[] getVentas() {
+        return ventas.toArray(new Venta[0]);
+    }
 }

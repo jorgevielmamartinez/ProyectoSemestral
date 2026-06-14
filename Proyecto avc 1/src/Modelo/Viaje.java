@@ -166,4 +166,7 @@ public class Viaje {
     public Terminal getTerminalSalida(){
         return salida;
     }
+
+    public void addVenta(Venta venta) {
+    }
 }

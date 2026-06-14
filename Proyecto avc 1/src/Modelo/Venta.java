@@ -44,6 +44,8 @@ public class Venta {
         Pasaje pasaje = new Pasaje(asiento, viaje, pasajero, this);
 
         this.pasajes.add(pasaje);
+
+        viaje.addVenta(this);
     }
 
     public Pasaje[] getPasajes() {
@@ -104,4 +106,6 @@ public class Venta {
         Venta venta = (Venta) o;
         return Objects.equals(idDocumento, venta.idDocumento) && tipo == venta.tipo && Objects.equals(fecha, venta.fecha) && Objects.equals(cliente, venta.cliente) && Objects.equals(pago, venta.pago) && Objects.equals(pasajes, venta.pasajes);
     }
+
+
 }
