@@ -11,6 +11,7 @@ public class ControladorEmpresas {
     private ArrayList<Terminal> terminales=new ArrayList<>();
 
 
+    // Instanciar
     private static ControladorEmpresas instance = null;
 
 
@@ -31,9 +32,6 @@ public class ControladorEmpresas {
         }
     }
 
-    public String[][] listLlegadasSalidasTerminal(String nombreTerminal, String fecha) {
-        return new String[0][0];
-    }
 
 
 
