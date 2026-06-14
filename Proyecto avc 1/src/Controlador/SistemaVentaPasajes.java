@@ -13,7 +13,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.OptionalInt;
 
 //Trabajamos Benja Vivanco,Tellez y Jorge
 public class SistemaVentaPasajes{
@@ -139,23 +138,22 @@ public class SistemaVentaPasajes{
         }
         return new String[0][0];
     }
-    public Optional<Integer> getMontoVenta(String idDocumento, TipoDocumento tipo){
-        for(Venta v : ventas){
-            if(v.getIdDocumento().equals(idDocumento) &&
-                    v.getTipo().equals(tipo)){
-                return Optional.of(v.getMonto());
+    public int getMontoVenta(String idDocumento, TipoDocumento tipo){
+        for(Venta v:ventas){
+            if(v.getIdDocumento().equals(idDocumento)&& v.getTipo().equals(tipo)){
+                return v.getMonto();
             }
         }
-        return Optional.empty();
+        return 0;
     }
 
-    public Optional<String> getNombrePasajero(IdPersona idPasajero){
-        for (Pasajero p : pasajeros){
+    public String getNombrePasajero(IdPersona idPasajero){
+        for (Pasajero p: pasajeros){
             if (p.getIdPersona().equals(idPasajero)){
-                return Optional.of(String.valueOf(p.getNombreCompleto()));
+                return String.valueOf(p.getNombreCompleto());
             }
         }
-        return Optional.empty();
+        return "";
     }
     public void vendePasaje(String idDoc, TipoDocumento tipo, LocalDate fecha, LocalTime hora, String patBus, int asiento, IdPersona idPasajero){
         Venta venta=findVenta(idDoc,tipo).orElseThrow(()->new SistemaVentaPasajesException("No existe una venta con el id y tipo de documento indicado"));
@@ -208,44 +206,6 @@ public class SistemaVentaPasajes{
         if (v == null) return new String[0][0];
 
         return v.getListaPasajeros();
-    }
-    public void generatePasajesVenta(String idDocumento,TipoDocumento tipo)throws SistemaVentaPasajesException {
-    Venta venta=null;
-    for (Venta v:ventas) {
-        if (v.getIdDocumento().equals(idDocumento)&& v.getTipo().equals(tipo)) {
-            venta = v;
-            break;
-        }
-    }
-    if (venta==null){
-        throw new SistemaVentaPasajesException("No existe una venta con los datos");
-    }
-    IOSVP iosvp=IOSVP.getInstance();
-     final String ventaPasajes="ventaPasajes.txt";
-     iosvp.savePasajesDeVenta(venta.getPasajes(),ventaPasajes);
-    }
-    public void readDatosIniciales()throws SistemaVentaPasajesException{
-     Object datos[]=IOSVP.getInstance().readDatosIniciales();
-     setDatosIniciales(datos);
-     ctrlEmpresas.setDatosIniciales(datos);
-    }
-    public void saveDatosSistema()throws SistemaVentaPasajesException{
-     IOSVP.getInstance().saveDatosSistema(new Object[]{this,ctrlEmpresas});
-    }
-    public void readDatosSistema()throws SistemaVentaPasajesException{
-      Object[] controladores=IOSVP.getInstance().readControladores();
-      for (Object controlador:controladores){
-          if(controlador instanceof SistemaVentaPasajes){
-              SistemaVentaPasajes svp=(SistemaVentaPasajes)controlador;
-              this.ventas=svp.ventas;
-              this.clientes=svp.clientes;
-              this.viajes=svp.viajes;
-              this.pasajeros=svp.pasajeros;
-          }
-          if (controlador instanceof ControladorEmpresas){
-              ctrlEmpresas.setInstanciaPersistente(ControladorEmpresas) controlador);
-          }
-      }
     }
     private Optional<Cliente> findCliente(IdPersona id){
         for (Cliente c:clientes){
@@ -338,7 +298,7 @@ public class SistemaVentaPasajes{
             if (v.getIdDocumento().equals(idDocumento)
                     && v.getTipo().equals(tipo)) {
 
-                Pago pago = new PagoTarjeta(v.getMonto(),nroTarjeta);
+                Pago pago = new PagoTarjeta(v.getMonto(), nroTarjeta);
 
                 return;
             }
@@ -438,4 +398,43 @@ public class SistemaVentaPasajes{
 
         return matriz;
     }
+    public void generatePasajesVenta(String idDocumento,TipoDocumento tipo)throws SistemaVentaPasajesException {
+        Venta venta=null;
+        for (Venta v:ventas) {
+            if (v.getIdDocumento().equals(idDocumento)&& v.getTipo().equals(tipo)) {
+                venta = v;
+                break;
+            }
+        }
+        if (venta==null){
+            throw new SistemaVentaPasajesException("No existe una venta con los datos");
+        }
+        IOSVP iosvp=IOSVP.getInstance();
+        final String ventaPasajes="ventaPasajes.txt";
+        iosvp.savePasajesDeVenta(venta.getPasajes(),ventaPasajes);
+    }
+    public void readDatosIniciales()throws SistemaVentaPasajesException{
+        Object datos[]=IOSVP.getInstance().readDatosIniciales();
+        setDatosIniciales(datos);
+        ctrlEmpresas.setDatosIniciales(datos);
+    }
+    public void saveDatosSistema()throws SistemaVentaPasajesException{
+        IOSVP.getInstance().saveDatosSistema(new Object[]{this,ctrlEmpresas});
+    }
+    public void readDatosSistema()throws SistemaVentaPasajesException{
+        Object[] controladores=IOSVP.getInstance().readControladores();
+        for (Object controlador:controladores){
+            if(controlador instanceof SistemaVentaPasajes){
+                SistemaVentaPasajes svp=(SistemaVentaPasajes)controlador;
+                this.ventas=svp.ventas;
+                this.clientes=svp.clientes;
+                this.viajes=svp.viajes;
+                this.pasajeros=svp.pasajeros;
+            }
+            if (controlador instanceof ControladorEmpresas){
+                ctrlEmpresas.setInstanciaPersistente(ControladorEmpresas) controlador);
+            }
+        }
+    }
+
 }
