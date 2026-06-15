@@ -28,8 +28,8 @@ public class IOSVP {
         ArrayList<Viaje> viajes = new ArrayList<>();
 
         try {
-            BufferedReader br = new BufferedReader(new FileReader("SVPIniciales.txt"));
-
+            BufferedReader br = new BufferedReader(
+                    new FileReader("src/Persistencia/SVPDatosIniciales.txt"));
             String linea;
             int bloque = 0;
 
@@ -94,7 +94,8 @@ public class IOSVP {
             br.close();
 
         } catch (IOException e) {
-            throw new SistemaVentaPasajesException("Error leyendo archivo inicial");
+            e.printStackTrace();
+            throw new SistemaVentaPasajesException(e.getMessage());
         }
 
         return new Object[] {

@@ -51,7 +51,8 @@ public class UISVP {
             System.out.println(" 12) Listar llegadas/salidas del terminal");
             System.out.println(" 13) Listar ventas de empresa");
             System.out.println(" 14) AUTORUN");
-            System.out.println(" 15) Salir");
+            System.out.println(" 15) Cargar Datos Iniciales");
+            System.out.println(" 0) Salir");
             System.out.println("____________________________");
             System.out.print("..:: Ingrese número de opción: ");
             opcion = elegirOpc(15);
@@ -73,9 +74,10 @@ public class UISVP {
                 case 12 -> listLlegadasSalidasTerminal();
                 case 13 -> listVentasEmpresas();
                 case 14 -> autoRun();
-                case 15 -> System.out.println("Saliendo del programa");
+                case 15 -> cargarDatosIniciales();
+                case 0 -> System.out.println("Saliendo del programa");
             }
-        } while (opcion != 15);
+        } while (opcion != 0);
     }
 
     // 1) Crear empresa
@@ -1101,5 +1103,14 @@ public class UISVP {
             }
         }
         return false;
+    }
+
+    private void cargarDatosIniciales() {
+        try {
+            SVP.readDatosIniciales();
+            System.out.println("...:::: Datos iniciales cargados exitosamente ::::...");
+        } catch (SistemaVentaPasajesException e) {
+            System.out.println("...:::: Error: " + e.getMessage());
+        }
     }
 }
