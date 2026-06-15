@@ -283,4 +283,15 @@ public class ControladorEmpresas {
         return Optional.empty();
 
     }
+
+    @SuppressWarnings("unchecked")
+    public void setDatosIniciales(Object[] datos) {
+        this.empresas = (ArrayList<Empresa>) datos[2];
+        this.terminales = (ArrayList<Terminal>) datos[3];
+    }
+
+    public void setInstanciaPersistente(ControladorEmpresas ce) {
+        this.empresas = ce.empresas;
+        this.terminales = ce.terminales;
+    }
 }

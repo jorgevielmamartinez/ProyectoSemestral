@@ -2,25 +2,25 @@ package Modelo;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Objects;
 
-//clase hecha por Jorge Vielma
 public class Venta {
+
     private String idDocumento;
     private TipoDocumento tipo;
     private LocalDate fecha;
     private Cliente cliente;
-    private Pago pago;
-    private ArrayList<Pasaje> pasajes;
 
-    public Venta(String id, TipoDocumento tipo, LocalDate fecha, Cliente cliente) {
-        this.idDocumento = id;
+    private ArrayList<Pasaje> pasajes;
+    private Pago pago;
+
+    public Venta(String idDoc, TipoDocumento tipo, LocalDate fec, Cliente cli) {
+        this.idDocumento = idDoc;
         this.tipo = tipo;
-        this.fecha = fecha;
-        this.cliente = cliente;
-        this.pasajes = new ArrayList<Pasaje>();
-        this.pago=null;
-        cliente.addVenta(this);
+        this.fecha = fec;
+        this.cliente = cli;
+        this.pasajes = new ArrayList<>();
+
+        cli.addVenta(this);
     }
 
     public String getIdDocumento() {
@@ -40,72 +40,68 @@ public class Venta {
     }
 
     public void createPasaje(int asiento, Viaje viaje, Pasajero pasajero) {
-
         Pasaje pasaje = new Pasaje(asiento, viaje, pasajero, this);
+        pasajes.add(pasaje);
+        viaje.addPasaje(pasaje);
+    }
 
-        this.pasajes.add(pasaje);
-
-        viaje.addVenta(this);
+    public void addPasaje(Pasaje pasaje) {
+        if (!pasajes.contains(pasaje)) {
+            pasajes.add(pasaje);
+        }
     }
 
     public Pasaje[] getPasajes() {
-        Pasaje[] arregloPasajes = new Pasaje[pasajes.size()];
-
-        for (int i = 0; i < pasajes.size(); i++) {
-            arregloPasajes[i] = pasajes.get(i);
-        }
-        return arregloPasajes;
+        return pasajes.toArray(new Pasaje[0]);
     }
 
+    public int getMonto() {
+        int total = 0;
 
-    public int getMontoPagado(){
-        if (pago != null) {
-            return pago.getMonto();
+        for (Pasaje p : pasajes) {
+            total += p.getViaje().getPrecio();
         }
-        return 0;
+
+        return total;
     }
-    public boolean pagaMonto(){
+
+    public int getMontoPagado() {
         if (pago == null) {
-            int montoTotal = getMonto();
-            pago = new PagoEfectivo(montoTotal);
-            return true;
+            return 0;
         }
-        return false;
+
+        return pago.getMonto();
     }
-    public boolean pagaMonto(long nroTarjeta){
+
+    public boolean pagaMonto() {
+        pago = new PagoEfectivo(getMonto());
+        return true;
+    }
+
+    public boolean pagaMonto(long nroTarjeta) {
+        pago = new PagoTarjeta(getMonto(), nroTarjeta);
+        return true;
+    }
+
+    public String getTipoPago() {
         if (pago == null) {
-            int montoTotal = getMonto();
-            pago = new PagoTarjeta((long) montoTotal, (int) nroTarjeta);
-            return true;
-        }
-        return false;
-    }
-    public String getTipoPago(){
-        if (pago instanceof PagoEfectivo){
-            return "Efectivo";
-
-        } else if (pago instanceof PagoTarjeta) {
-            return "Tarjeta";
+            return "";
         }
 
-        return null;
-    }
-
-    public int getMonto(){
-        int monto = 0;
-        for (Pasaje pasaje : pasajes) {
-            monto += pasaje.getViaje().getPrecio();
-        }
-        return monto;
+        return pago.getClass().getSimpleName();
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Venta venta = (Venta) o;
-        return Objects.equals(idDocumento, venta.idDocumento) && tipo == venta.tipo && Objects.equals(fecha, venta.fecha) && Objects.equals(cliente, venta.cliente) && Objects.equals(pago, venta.pago) && Objects.equals(pasajes, venta.pasajes);
+    public boolean equals(Object otro) {
+        if (this == otro) {
+            return true;
+        }
+
+        if (!(otro instanceof Venta venta)) {
+            return false;
+        }
+
+        return idDocumento.equals(venta.idDocumento)
+                && tipo.equals(venta.tipo);
     }
-
-
 }
