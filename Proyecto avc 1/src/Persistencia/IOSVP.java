@@ -10,6 +10,9 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 public class IOSVP {
 
     private static IOSVP instance = new IOSVP();
@@ -28,12 +31,22 @@ public class IOSVP {
         ArrayList<Viaje> viajes = new ArrayList<>();
 
         try {
+            InputStream is = IOSVP.class.getResourceAsStream("SVPDatosIniciales.txt");
+
+            if (is == null) {
+                throw new SistemaVentaPasajesException(
+                        "No se encontró SVPDatosIniciales.txt en Persistencia");
+            }
+
             BufferedReader br = new BufferedReader(
-                    new FileReader("src/Persistencia/SVPDatosIniciales.txt"));
+                    new InputStreamReader(is));
+
             String linea;
             int bloque = 0;
 
             while ((linea = br.readLine()) != null) {
+
+                System.out.println(linea);
 
                 if (linea.equals("+")) {
                     bloque++;

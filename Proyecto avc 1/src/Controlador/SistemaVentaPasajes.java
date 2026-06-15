@@ -423,8 +423,9 @@ public class SistemaVentaPasajes{
         final String ventaPasajes="ventaPasajes.txt";
         iosvp.savePasajesDeVenta(venta.getPasajes(),ventaPasajes);
     }
-    public void readDatosIniciales()throws SistemaVentaPasajesException{
-        Object datos[]=IOSVP.getInstance().readDatosIniciales();
+    public void readDatosIniciales() {
+        Object[] datos = IOSVP.getInstance().readDatosIniciales();
+
         setDatosIniciales(datos);
         ctrlEmpresas.setDatosIniciales(datos);
     }
