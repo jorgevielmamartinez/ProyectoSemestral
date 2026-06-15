@@ -10,6 +10,8 @@ public class Bus {
     private int nroAsientos;
     private List<Viaje> viajes;
     private Empresa empresa;
+
+    // Constructor
     public Bus(String patente, int nroAsientos, Empresa empresa) {
         this.patente = patente;
         this.nroAsientos = nroAsientos;

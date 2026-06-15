@@ -88,14 +88,16 @@ public class Venta {
             return "Tarjeta";
         }
 
-        return null;
+        return null;    
     }
 
     public int getMonto(){
         int monto = 0;
+
         for (Pasaje pasaje : pasajes) {
             monto += pasaje.getViaje().getPrecio();
         }
+
         return monto;
     }
 
