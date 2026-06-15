@@ -4,20 +4,19 @@ import Utilidades.IdPersona;
 import Utilidades.Nombre;
 
 public abstract class Persona {
-    private IdPersona id;
+
+    private IdPersona idPersona;
     private Nombre nombreCompleto;
     private String telefono;
 
-    // Constructor
     public Persona(IdPersona id, Nombre nombre, String telefono) {
-        this.id = id;
+        this.idPersona = id;
         this.nombreCompleto = nombre;
         this.telefono = telefono;
     }
 
-    // Getters y Setters
     public IdPersona getIdPersona() {
-        return id;
+        return idPersona;
     }
 
     public Nombre getNombreCompleto() {
@@ -36,14 +35,21 @@ public abstract class Persona {
         this.telefono = telefono;
     }
 
+    @Override
     public String toString() {
-        return  id +" "+ nombreCompleto +" "+ telefono;
+        return idPersona + " " + nombreCompleto + " " + telefono;
     }
 
+    @Override
     public boolean equals(Object otro) {
-        if (id.equals(((Persona) otro).id)) {
+        if (this == otro) {
             return true;
         }
-        return false;
+
+        if (!(otro instanceof Persona persona)) {
+            return false;
+        }
+
+        return idPersona.equals(persona.idPersona);
     }
 }
