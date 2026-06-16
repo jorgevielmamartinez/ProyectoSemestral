@@ -21,6 +21,8 @@ public class IOSVP {
     }
 
     public Object[] readDatosIniciales() {
+
+
         ArrayList<Cliente> clientes = new ArrayList<>();
         ArrayList<Pasajero> pasajeros = new ArrayList<>();
         ArrayList<Empresa> empresas = new ArrayList<>();
@@ -167,6 +169,8 @@ public class IOSVP {
             throw new SistemaVentaPasajesException(e.getMessage());
         }
 
+        imprimirDatosIniciales(clientes, pasajeros, empresas, terminales, viajes);
+
         return new Object[]{
                 clientes,
                 pasajeros,
@@ -174,6 +178,67 @@ public class IOSVP {
                 terminales,
                 viajes
         };
+    }
+
+    // imprime lo de arriba
+    private void imprimirDatosIniciales(ArrayList<Cliente> clientes,
+                                        ArrayList<Pasajero> pasajeros,
+                                        ArrayList<Empresa> empresas,
+                                        ArrayList<Terminal> terminales,
+                                        ArrayList<Viaje> viajes) {
+
+        System.out.println("\n==============================");
+        System.out.println("   DATOS INICIALES CARGADOS");
+        System.out.println("==============================");
+
+        System.out.println("\n--- CLIENTES ---");
+        for (Cliente c : clientes) {
+            System.out.printf("%-15s | %-35s | %-18s | %s%n",
+                    c.getIdPersona(),
+                    c.getNombreCompleto(),
+                    c.getTelefono(),
+                    c.getEmail());
+        }
+
+        System.out.println("\n--- PASAJEROS ---");
+        for (Pasajero p : pasajeros) {
+            System.out.printf("%-15s | %-35s | Tel: %-18s | Contacto: %-35s | %s%n",
+                    p.getIdPersona(),
+                    p.getNombreCompleto(),
+                    p.getTelefono(),
+                    p.getNomContacto(),
+                    p.getFonoContacto());
+        }
+
+        System.out.println("\n--- EMPRESAS ---");
+        for (Empresa e : empresas) {
+            System.out.printf("%-15s | %-20s | %-30s | Buses: %-2d | Tripulantes: %-2d%n",
+                    e.getRut(),
+                    e.getNombre(),
+                    e.getUrl(),
+                    e.getBuses().length,
+                    e.getTripulantes().length);
+        }
+
+        System.out.println("\n--- TERMINALES ---");
+        for (Terminal t : terminales) {
+            System.out.printf("%-20s | %s%n",
+                    t.getNombre(),
+                    t.getDireccion());
+        }
+
+        System.out.println("\n--- VIAJES ---");
+        for (Viaje v : viajes) {
+            System.out.printf("%-10s | %-5s | $%-6d | Bus: %-8s | %-20s -> %-20s%n",
+                    v.getFecha(),
+                    v.getHora(),
+                    v.getPrecio(),
+                    v.getBus().getPatente(),
+                    v.getTerminalSalida().getNombre(),
+                    v.getTerminalLlegada().getNombre());
+        }
+
+        System.out.println("\n==============================\n");
     }
 
     private Nombre crearNombre(String tratamiento, String nombres,
