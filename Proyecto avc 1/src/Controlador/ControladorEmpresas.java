@@ -9,7 +9,9 @@ public class ControladorEmpresas {
     private ArrayList<Empresa> empresas=new ArrayList<>();
     private ArrayList<Bus> buses = new ArrayList<>();
     private ArrayList<Terminal> terminales=new ArrayList<>();
+    private ArrayList<Tripulante>tripulaciones=new ArrayList<>();
 
+    // Instanciar
     private static ControladorEmpresas instance = null;
 
 
@@ -191,7 +193,26 @@ public class ControladorEmpresas {
 
     }
 
-
+    protected void setInstanciPersistente(ControladorEmpresas instanciPersistente){
+        instance=instanciPersistente;
+    }
+    protected void setDatosIniciales(Object[] objetos){
+        empresas.clear();
+        terminales.clear();
+        buses.clear();
+        tripulaciones.clear();
+        for (Object o:objetos){
+            if(o instanceof Empresa){
+                empresas.add((Empresa) o);
+            }if (o instanceof Terminal){
+                terminales.add((Terminal) o);
+            }if (o instanceof Bus) {
+                buses.add((Bus) o);
+            }if (o instanceof Tripulante){
+                tripulaciones.add((Tripulante) o);
+            }
+        }
+    }
 
 
     protected Optional<Empresa> findEmpresa(Rut rut) {
@@ -283,14 +304,4 @@ public class ControladorEmpresas {
 
     }
 
-    @SuppressWarnings("unchecked")
-    public void setDatosIniciales(Object[] datos) {
-        this.empresas = (ArrayList<Empresa>) datos[2];
-        this.terminales = (ArrayList<Terminal>) datos[3];
-    }
-
-    public void setInstanciaPersistente(ControladorEmpresas ce) {
-        this.empresas = ce.empresas;
-        this.terminales = ce.terminales;
-    }
 }
