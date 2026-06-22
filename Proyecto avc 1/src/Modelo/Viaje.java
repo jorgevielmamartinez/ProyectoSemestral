@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Viaje {
     private LocalDate fecha;
@@ -22,12 +23,12 @@ public class Viaje {
     private ArrayList<Pasajero> Listapasajeros = new ArrayList<>();
     private ArrayList<Conductor> conductores;
 
-    public Viaje(LocalDate fecha, LocalTime hora, int precio, int dur, Bus bus,Auxiliar aux, Conductor[] cond, Terminal sale, Terminal llega) {
+    public Viaje(LocalDate fecha, LocalTime hora, int precio, int dur, Optional bus, Auxiliar aux, Conductor[] cond, Terminal sale, Terminal llega) {
         this.fecha = fecha;;
         this.hora = hora;
         this.precio = precio;
         this.duracion = dur;
-        this.bus = bus;
+        bus = bus;
         this.bus.addViaje(this);
         this.auxiliar=aux;
         aux.addViaje(this);

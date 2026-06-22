@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 //Trabajamos Benja Vivanco,Tellez y Jorge
@@ -32,8 +33,9 @@ public class SistemaVentaPasajes{
     public static SistemaVentaPasajes getInstance(){
         return instance;
     }
-    public void createCliente(IdPersona id, Nombre nom, String fono, String email) {
-        Cliente cliente = new Cliente(id, nom,fono,email);
+    public void createCliente(IdPersona id, Nombre nom, String fono,String email) throws SistemaVentaPasajesException {
+        Cliente cliente = new Cliente(id, nom,fono);
+        cliente.setEmail(email);
 
         if (findCliente(id).isEmpty()) {
             clientes.add(cliente);
@@ -72,7 +74,7 @@ public class SistemaVentaPasajes{
         Terminal salida  = ctrlEmpresas.findTerminalPorComuna(comunas[0]).orElseThrow(() -> new SistemaVentaPasajesException("No existe terminal de salida en la comuna indicada"));
         Terminal llegada = ctrlEmpresas.findTerminalPorComuna(comunas[1]).orElseThrow(() -> new SistemaVentaPasajesException("No existe terminal de llegada en la comuna indicada"));
 
-        Viaje viaje = new Viaje(fecha, hora, precio, duracion, busOptional, auxiliar, conductores, salida, llegada);
+        Viaje viaje = new Viaje(fecha, hora, precio, duracion, findBus(buses), auxiliar, conductores, salida, llegada);
         viajes.add(viaje);
     }
     public void iniciaVenta(String idDoc, TipoDocumento tipo, LocalDate fechaViaje, String comSalida, String comLlegada,IdPersona idCliente, int nroPasajes) throws SistemaVentaPasajesException {
@@ -397,6 +399,9 @@ public class SistemaVentaPasajes{
         }
 
         return matriz;
+    }
+    private Optional<Bus> findBus(List<Bus> buses, String patente){
+        return buses.stream().filter(x -> x.getPatente().equalsIgnoreCase(patente)).findFirst();
     }
 }
 

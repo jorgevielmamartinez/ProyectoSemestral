@@ -22,8 +22,9 @@ public class ControladorEmpresas {
         return instance;
     }
 
-    public void createEmpresa(Rut rut,String nombre,String url)throws SistemaVentaPasajesException{
-        Empresa em=new Empresa(rut, nombre,url);
+    public void createEmpresa(Rut rut,String nombre, String url)throws SistemaVentaPasajesException{
+        Empresa em=new Empresa(rut, nombre);
+        em.setUrl(url);
 
         if(!findEmpresa(rut).equals(rut)){
             empresas.add(em);
