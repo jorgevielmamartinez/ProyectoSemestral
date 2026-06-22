@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
+
 //Hecha totalmente por benja Vivanco
 public class IOSVP {
     private static IOSVP instance;
@@ -67,6 +69,62 @@ public class IOSVP {
         sc.close();
         return out.toArray(new Object[0]);
     }
+
+
+    public void saveControladores(Object[] controladores) throws SVPException {
+        File file = new File("src/Persistencia/SVPObjetos.obj");
+        try {
+            ObjectOutputStream outStream = new ObjectOutputStream(new FileOutputStream(file));
+            outStream.writeObject(controladores);
+            outStream.close();
+        } catch (FileNotFoundException e) {
+            throw new SVPException("No se puede abrir o crear el archivo \"SVPObjetos.obj\" ");
+        } catch (IOException e){
+            throw new SVPException("No se puede grabar en el archivo SVPObjetos.obj");
+        }
+    }
+
+    public Object[] readControladores() throws SVPException {
+        File file = new File("src/Persistencia/SVPObjetos.obj");
+        Object[] objetos;
+        try {
+            ObjectInputStream input = new ObjectInputStream(new FileInputStream(file));
+            objetos = (Object[]) input.readObject();
+            input.close();
+            return objetos;
+        } catch (IOException e){
+            throw new SVPException("No existe o no se puede abrir el archivo SVPObjetos.obj ");
+        } catch (ClassNotFoundException e ){
+            throw new SVPException("No se puede leer el archivo SVPObjetos.obj .");
+        }
+    }
+
+    public void savePasajesDeVenta(Pasaje[] pasajes, String nombreArchivo) throws FileNotFoundException {
+        File file = new File(nombreArchivo);
+        PrintStream printStream = new PrintStream(new FileOutputStream(file));
+
+        for (Pasaje pasaje : pasajes) {
+            printStream.print(pasaje.toString());
+        }
+        printStream.flush();
+        printStream.close();
+    }
+
+
+    private Optional<Empresa> findEmpresa(List<Empresa> empresas, Rut rut){
+        return empresas.stream().filter(x -> x.getRut().equals(rut)).findFirst();
+    }
+    private Optional<Tripulante> findTripulante(List<Tripulante> tripulantes, IdPersona id){
+        return tripulantes.stream().filter(x -> x.getIdPersona().equals(id)).findFirst();
+    }
+    private Optional<Bus> findBus(List<Bus> buses, String patente){
+        return buses.stream().filter(x -> x.getPatente().equalsIgnoreCase(patente)).findFirst();
+    }
+    private Optional<Terminal> findTerminal(List<Terminal> terminals, String nombre ){
+        return terminals.stream().filter(x -> x.getNombre().equalsIgnoreCase(nombre)).findFirst();
+    }
+
+    // METODOS EXTRAS
 
     private void clientePasajeros(String linea){
         String[] datos = linea.split(";");
@@ -173,57 +231,13 @@ public class IOSVP {
 
 
 
-    public void saveControladores(Object[] controladores) throws SVPException {
-        File file = new File("src/Persistencia/SVPObjetos.obj");
-        try {
-            ObjectOutputStream outStream = new ObjectOutputStream(new FileOutputStream(file));
-            outStream.writeObject(controladores);
-            outStream.close();
-        } catch (FileNotFoundException e) {
-            throw new SVPException("No se puede abrir o crear el archivo \"SVPObjetos.obj\" ");
-        } catch (IOException e){
-            throw new SVPException("No se puede grabar en el archivo SVPObjetos.obj");
-        }
-    }
 
-    public Object[] readControladores() throws SVPException {
-        File file = new File("src/Persistencia/SVPObjetos.obj");
-        Object[] objetos;
-        try {
-            ObjectInputStream input = new ObjectInputStream(new FileInputStream(file));
-            objetos = (Object[]) input.readObject();
-            input.close();
-            return objetos;
-        } catch (IOException e){
-            throw new SVPException("No existe o no se puede abrir el archivo SVPObjetos.obj ");
-        } catch (ClassNotFoundException e ){
-            throw new SVPException("No se puede leer el archivo SVPObjetos.obj .");
-        }
-    }
 
-    public void savePasajesDeVenta(Pasaje[] pasajes, String nombreArchivo) throws FileNotFoundException {
-        File file = new File(nombreArchivo);
-        PrintStream printStream = new PrintStream(new FileOutputStream(file));
 
-        for (Pasaje pasaje : pasajes) {
-            printStream.print(pasaje.toString());
-        }
-        printStream.flush();
-        printStream.close();
-    }
 
-    private Optional<Empresa> findEmpresa(List<Empresa> empresas, Rut rut){
-        return empresas.stream().filter(x -> x.getRut().equals(rut)).findFirst();
-    }
-    private Optional<Tripulante> findTripulante(List<Tripulante> tripulantes, IdPersona id){
-        return tripulantes.stream().filter(x -> x.getIdPersona().equals(id)).findFirst();
-    }
-    private Optional<Bus> findBus(List<Bus> buses, String patente){
-        return buses.stream().filter(x -> x.getPatente().equalsIgnoreCase(patente)).findFirst();
-    }
-    private Optional<Terminal> findTerminal(List<Terminal> terminals, String nombre ){
-        return terminals.stream().filter(x -> x.getNombre().equalsIgnoreCase(nombre)).findFirst();
-    }
+
+
+
 
     private String formatPatente(String patente){
         return patente.charAt(0) + "" + patente.charAt(1) + "." + patente.charAt(2) + patente.charAt(3) + "-" + patente.charAt(4) + patente.charAt(5);

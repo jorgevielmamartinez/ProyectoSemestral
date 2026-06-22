@@ -18,6 +18,7 @@ public class Direccion {
     public String getComuna(){
         return comuna;
     }
+    
     @Override
     public String toString() {
         return calle + ";" + numero + ";" + comuna;

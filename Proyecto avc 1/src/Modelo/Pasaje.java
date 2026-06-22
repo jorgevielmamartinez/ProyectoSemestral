@@ -21,16 +21,12 @@ public class Pasaje {
         }
     }
 
-    public int getNumero() {
-        return numero;
-    }
-
     public int getAsiento() {
         return asiento;
     }
 
-    public Viaje getViaje() {
-        return viaje;
+    public int getNumero() {
+        return numero;
     }
 
     public Pasajero getPasajero() {
@@ -40,4 +36,20 @@ public class Pasaje {
     public Venta getVenta() {
         return venta;
     }
+
+    public Viaje getViaje() {
+        return viaje;
+    }
+
+    @Override
+    public String toString() {
+        return "Pasaje{" +
+                "numero=" + numero +
+                ", asiento=" + asiento +
+                ", pasajero=" + pasajero +
+                ", viaje=" + viaje +
+                '}';
+    }
+
+
 }

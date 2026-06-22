@@ -53,19 +53,13 @@ public class Viaje {
     public LocalTime getHora() {
         return hora;
     }
-    public int getPrecio() {
-        return precio;
-    }
     public void setPrecio(int precio) {
         this.precio = precio;
     }
-    public Bus getBus(){
-        return bus;
-    }
+
     public void setDuracion(int duracion) {
         this.duracion = duracion;
     }
-
     public LocalDateTime getFechaHoraTermino() {
         LocalDateTime fechaHoraSalida = LocalDateTime.of(fecha,hora);
         return fechaHoraSalida.plusMinutes(duracion);
@@ -91,6 +85,14 @@ public class Viaje {
 
     }
 
+    public boolean existeDisponibilidad(int nroAsientos){
+        int asientosBus = bus.getNroAsientos();
+        int asientosVendidos = Listapasajes.size();
+        int asientosLibres = asientosBus - asientosVendidos;
+
+        return asientosLibres >= nroAsientos;
+    }
+
     public String[][] getAsientos(){
         String [][] ListaAsientos=new String[bus.getNroAsientos()][2];
 
@@ -105,6 +107,11 @@ public class Viaje {
 
         return ListaAsientos;
     }
+
+    public Bus getBus(){
+        return bus;
+    }
+
     public String[][] getListaPasajeros(){
         String [][] MatrizPasajero= new String[Listapasajeros.size()][5];
         for(int i=0;i<Listapasajeros.size();i++){
@@ -116,18 +123,15 @@ public class Viaje {
         }
         return MatrizPasajero;
     }
-    public boolean existeDisponibilidad(int nroAsientos){
-        int asientosBus = bus.getNroAsientos();
-        int asientosVendidos = Listapasajes.size();
-        int asientosLibres = asientosBus - asientosVendidos;
-
-        return asientosLibres >= nroAsientos;
-    }
 
     public int getNroAsientosDisponibles(){
         int total=this.bus.getNroAsientos();
         total-= Listapasajes.size();
         return total;
+    }
+
+    public int getPrecio() {
+        return precio;
     }
 
     public Venta[] getVentas(){
@@ -142,6 +146,9 @@ public class Viaje {
         Venta[] ventasArray=new Venta[ventasLista.size()];
         return ventasLista.toArray(ventasArray);
     }
+
+
+
 
     public void addConductor(Conductor conductor){
         if(conductores.size() < 2) {
@@ -168,6 +175,4 @@ public class Viaje {
         return salida;
     }
 
-    public void addVenta(Venta venta) {
-    }
 }

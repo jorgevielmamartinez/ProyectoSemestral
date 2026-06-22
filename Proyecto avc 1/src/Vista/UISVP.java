@@ -52,8 +52,7 @@ public class UISVP {
             System.out.println(" 15) Leer datos iniciales");
             System.out.println(" 16) Guardar datos del sistema");
             System.out.println(" 17) Leer datos del sistema");
-
-            System.out.println(" 0) Salir");
+            System.out.println(" 18) Salir");
             System.out.println("____________________________");
             System.out.print("..:: Ingrese número de opción: ");
             opcion = elegirOpc(15);
@@ -77,7 +76,7 @@ public class UISVP {
                 case 14 ->
                 case 15 ->
                 case 16 ->
-                case 17 ->
+                case 17 -> 
 
                 // FALTAN COSAS ACA
                 case 50 -> autoRun();
@@ -663,6 +662,21 @@ public class UISVP {
         }
     }
 
+    private void pagaVentaPasajes(String idDocumento, TipoDocumento tipo) {
+        System.out.println(":::: Pago de la venta");
+        int opcPago = leeOpc("Efectivo[1] o Tarjeta[2]", 2);
+
+        if (opcPago == 1) {
+            SVP.pagaVenta(idDocumento, tipo);
+
+        } else {
+            long nroTarjeta = Long.parseLong(leeString("Ingrese numero de Tarjeta"));
+            SVP.pagaVenta(idDocumento, tipo, nroTarjeta);
+        }
+        System.out.println();
+        System.out.println("\n...:::: Venta realizada exitosamente ::::....\n\n");
+    }
+
     private void listVentas() {
         DateTimeFormatter formatoOriginal = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         DateTimeFormatter nuevoFormato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -834,22 +848,9 @@ public class UISVP {
         }
     }
 
-    private void pagaVentaPasajes(String idDocumento, TipoDocumento tipo) {
-        System.out.println(":::: Pago de la venta");
-        int opcPago = leeOpc("Efectivo[1] o Tarjeta[2]", 2);
 
-        if (opcPago == 1) {
-            SVP.pagaVenta(idDocumento, tipo);
 
-        } else {
-            long nroTarjeta = Long.parseLong(leeString("Ingrese numero de Tarjeta"));
-            SVP.pagaVenta(idDocumento, tipo, nroTarjeta);
-        }
-        System.out.println();
-        System.out.println("\n...:::: Venta realizada exitosamente ::::....\n\n");
-    }
-
-    // Opcion 15) correr automaticamente
+    // Opcion 50) correr automaticamente
     private void autoRun() {
         System.out.println("=== AUTORUN INICIADO ===");
 

@@ -42,6 +42,10 @@ public class Bus {
         return nroAsientos;
     }
 
+    public Empresa getEmpresa() {
+        return empresa;
+    }
+
     public void addViaje(Viaje viaje) {
        for (Viaje v : viajes) {
            if (viaje.getBus().getPatente().equals(v.getBus().getPatente())) {
@@ -50,9 +54,7 @@ public class Bus {
        }
        this.viajes.add(viaje);
     }
-    public Empresa getEmpresa() {
-        return empresa;
-    }
+
     public Viaje[] getViajes() {
         return viajes.toArray(new Viaje[0]);
     }

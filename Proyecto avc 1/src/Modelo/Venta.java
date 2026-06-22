@@ -35,6 +35,16 @@ public class Venta {
         return fecha;
     }
 
+    public int getMonto() {
+        int total = 0;
+
+        for (Pasaje p : pasajes) {
+            total += p.getViaje().getPrecio();
+        }
+
+        return total;
+    }
+
     public Cliente getCliente() {
         return cliente;
     }
@@ -45,24 +55,8 @@ public class Venta {
         viaje.addPasaje(pasaje);
     }
 
-    public void addPasaje(Pasaje pasaje) {
-        if (!pasajes.contains(pasaje)) {
-            pasajes.add(pasaje);
-        }
-    }
-
     public Pasaje[] getPasajes() {
         return pasajes.toArray(new Pasaje[0]);
-    }
-
-    public int getMonto() {
-        int total = 0;
-
-        for (Pasaje p : pasajes) {
-            total += p.getViaje().getPrecio();
-        }
-
-        return total;
     }
 
     public int getMontoPagado() {
@@ -83,14 +77,6 @@ public class Venta {
         return true;
     }
 
-    public String getTipoPago() {
-        if (pago == null) {
-            return "";
-        }
-
-        return pago.getClass().getSimpleName();
-    }
-
     @Override
     public boolean equals(Object otro) {
         if (this == otro) {
@@ -103,5 +89,27 @@ public class Venta {
 
         return idDocumento.equals(venta.idDocumento)
                 && tipo.equals(venta.tipo);
+    }
+
+    public String getTipoPago() {
+        if (pago == null) {
+            return "";
+        }
+
+        return pago.getClass().getSimpleName();
+    }
+
+    /*
+
+    ===========
+    Metodo extras al uml
+    ===========
+
+    */
+
+    public void addPasaje(Pasaje pasaje) {
+        if (!pasajes.contains(pasaje)) {
+            pasajes.add(pasaje);
+        }
     }
 }
