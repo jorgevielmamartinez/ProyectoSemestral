@@ -10,8 +10,6 @@ public class ControladorEmpresas {
     private ArrayList<Bus> buses = new ArrayList<>();
     private ArrayList<Terminal> terminales=new ArrayList<>();
 
-
-    // Instanciar
     private static ControladorEmpresas instance = null;
 
 

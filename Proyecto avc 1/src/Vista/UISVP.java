@@ -1032,7 +1032,7 @@ public class UISVP {
             try {
                 opc = sc.nextInt();
 
-                if (opc > 0 && opc <= cantOpciones) {
+                if (opc >= 0 && opc <= cantOpciones) {
                     valido = true;
                 } else {
                     System.out.print("..:: Opcion fuera de rango, intente denuevo : ");
