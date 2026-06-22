@@ -48,8 +48,12 @@ public class UISVP {
             System.out.println(" 11) Listar empresas");
             System.out.println(" 12) Listar llegadas/salidas del terminal");
             System.out.println(" 13) Listar ventas de empresa");
-            System.out.println(" 14) AUTORUN");
-            System.out.println(" 15) Salir");
+            System.out.println(" 14) Generar pasajes venta");
+            System.out.println(" 15) Leer datos iniciales");
+            System.out.println(" 16) Guardar datos del sistema");
+            System.out.println(" 17) Leer datos del sistema");
+            System.out.println(" 50) AUTORUN");
+            System.out.println(" 0) Salir");
             System.out.println("____________________________");
             System.out.print("..:: Ingrese número de opción: ");
             opcion = elegirOpc(15);
@@ -70,10 +74,16 @@ public class UISVP {
                 case 11 -> listEmpresas();
                 case 12 -> listLlegadasSalidasTerminal();
                 case 13 -> listVentasEmpresas();
-                case 14 -> autoRun();
-                case 15 -> System.out.println("Saliendo del programa");
+                case 14 ->
+                case 15 ->
+                case 16 ->
+                case 17 ->
+
+                // FALTAN COSAS ACA
+                case 50 -> autoRun();
+                case 18 -> System.out.println("Saliendo del programa");
             }
-        } while (opcion != 15);
+        } while (opcion != 18);
     }
 
     // 1) Crear empresa
