@@ -1,308 +1,250 @@
 package Persistencia;
 
 import Modelo.*;
+import Excepciones.*;
+import Utilidades.IdPersona;
 import Utilidades.*;
-import Excepciones.SistemaVentaPasajesException;
 
 import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
+//Hecha totalmente por benja Vivanco
 public class IOSVP {
+    private static IOSVP instance;
 
-    private static IOSVP instance = new IOSVP();
-
-    private IOSVP() {}
+    private IOSVP() {
+        this.empresas = new ArrayList<>();
+        this.tripulantes = new ArrayList<>();
+    }
 
     public static IOSVP getInstance() {
+        if (instance == null) {
+            instance = new IOSVP();
+        }
         return instance;
     }
 
-    public Object[] readDatosIniciales() {
+    private List<Empresa> empresas = new ArrayList<>();
+    private List<Tripulante> tripulantes = new ArrayList<>();
+    private List<Bus> buses = new ArrayList<>();
+    private List<Terminal> terminales = new ArrayList<>();
+    private List<Object> out = new ArrayList<>();
+
+    public Object[] readDatosIniciales() throws FileNotFoundException {
+        Scanner sc = new Scanner(new File("SVPDatosIniciales.txt")).useDelimiter("[\t\r\n]+");
+        int secc = 1;
+        while(sc.hasNext()){
+            String linea = sc.next();
+            if (linea.equals("+")) {
+                secc++;
+                if (sc.hasNext()) linea = sc.next();
+            }
+
+            switch (secc){
+                case 1:
+                    clientePasajeros(linea);
+                    break;
+                case 2:
+                    empresas(linea);
+                    break;
+                case 3:
+                    tripulantes(linea);
+                    break;
+                case 4:
+                    terminales(linea);
+                    break;
+                case 5:
+                    buses(linea);
+                    break;
+                case 6:
+                    viajes(linea);
+                    break;
+            }
+            if(secc == 7) break;
+        }
+        sc.close();
+        return out.toArray(new Object[0]);
+    }
+
+    private void clientePasajeros(String linea){
+        String[] datos = linea.split(";");
+
+        // LIMPIEZA CLAVE: Quitamos espacios en blanco de todos los elementos
+        for (int i = 0; i < datos.length; i++) {
+            datos[i] = datos[i].trim();
+        }
+
+        switch(datos[0]){
+            case "C":
+                Cliente cliente = new Cliente( getIdpersona(datos[1]),getNombre(Tratamiento.valueOf(datos[2]), datos[3], datos[4], datos[5]), datos[6]);
+                if (datos.length > 7) cliente.setEmail(datos[7]); // Prevención de OutOfBounds
+                out.add(cliente);
+                break;
+            case "P":
+                // public Pasajero(IdPersona id, Nombre nombre, String telefono, Nombre nomContacto, String fonoContacto) {
+                Pasajero pasajero = new Pasajero( getIdpersona(datos[1]),getNombre(Tratamiento.valueOf(datos[2]), datos[3], datos[4], datos[5]),datos[6],getNombre(Tratamiento.valueOf(datos[7]), datos[8], datos[9], datos[10]),datos[11]);
+                out.add(pasajero);
+                break;
+            case "CP":
+                Cliente cliente2 = new Cliente(getIdpersona(datos[1]),getNombre(Tratamiento.valueOf(datos[2]), datos[3], datos[4], datos[5]), datos[6]);
+                if (datos.length > 7) cliente2.setEmail(datos[7]); // Prevención de OutOfBounds
+                out.add(cliente2);
+                Pasajero pasajero2 = new Pasajero( getIdpersona(datos[1]),getNombre(Tratamiento.valueOf(datos[2]), datos[3], datos[4], datos[5]),datos[6],getNombre(Tratamiento.valueOf(datos[7]), datos[8], datos[9], datos[10]),datos[11]);
+                out.add(pasajero2);
+                break;
+        }
+    }
+
+    private void terminales(String linea){
+        String[] datos = linea.split(";");
+
+        for (int i = 0; i < datos.length; i++) {
+            datos[i] = datos[i].trim();
+        }
+
+        Terminal ter = new Terminal( getDireccion(datos[1], Integer.parseInt(datos[2]), datos[3]),datos[0]);
+        out.add(ter);
+        terminales.add(ter);
+    }
+
+    private void viajes(String linea){
+        String[] datos = linea.split(";");
+
+        for (int i = 0; i < datos.length; i++) {
+            datos[i] = datos[i].trim();
+        }
+        //    public Viaje(LocalDate fecha, LocalTime hora, int precio, int dur, Bus bus,Auxiliar aux, Conductor[] cond, Terminal sale, Terminal llega) {
+
+        Viaje viaje = new Viaje(
+                LocalDate.parse(datos[0], DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+                LocalTime.parse(datos[1], DateTimeFormatter.ofPattern("HH:mm")),
+                Integer.parseInt(datos[2]),
+                Integer.parseInt(datos[3]),
+                findBus(buses,formatPatente(datos[4])),
+                (Auxiliar) findTripulante(tripulantes, getIdpersona(datos[5])).orElseThrow(() -> new NoSuchElementException("Auxiliar no encontrado: " + datos[5])),
+                new Conductor[]{(Conductor) findTripulante(tripulantes, getIdpersona(datos[6])).orElseThrow(() -> new NoSuchElementException("Conductor no encontrado: " + datos[6]))},
+                findTerminal(terminales, datos[7]).orElseThrow(() -> new NoSuchElementException("Terminal origen no encontrada: " + datos[7])),
+                findTerminal(terminales, datos[8]).orElseThrow(() -> new NoSuchElementException("Terminal destino no encontrada: " + datos[8]))
+        );
+        out.add(viaje);
+    }
+    private void empresas(String linea){
+        String[] datos = linea.split(";");
+        Empresa emp = new Empresa(Rut.of(datos[0]), datos[1]);
+        emp.setUrl(datos[2]);
+        empresas.add(emp);
+        out.add(emp);
+    }
+
+    private void tripulantes(String linea){
+        String[] datos = linea.split(";");
+        switch(datos[0]){
+            case "A":
+                Optional<Empresa> empA = findEmpresa(empresas, Rut.of(datos[9]));
+                Auxiliar aux = new Auxiliar(getIdpersona(datos[1]), getNombre(Tratamiento.valueOf(datos[2]), datos[3], datos[4], datos[5]), getDireccion(datos[6], Integer.parseInt(datos[7]), datos[8]));
+                empA.get().addAuxiliar(aux.getIdPersona(), aux.getNombreCompleto(), aux.getDireccion());
+                out.add(aux);
+                tripulantes.add(aux);
+                break;
+            case "C":
+                Optional<Empresa> empC = findEmpresa(empresas, Rut.of(datos[9]));
+                Conductor cond = new Conductor(getIdpersona(datos[1]), getNombre(Tratamiento.valueOf(datos[2]), datos[3], datos[4], datos[5]), getDireccion(datos[6], Integer.parseInt(datos[7]), datos[8]));
+
+                empC.get().addConductor(cond.getIdPersona(), cond.getNombreCompleto(), cond.getDireccion());
+
+                out.add(cond);
+                tripulantes.add(cond);
+                break;
+        }
+    }
 
 
-        ArrayList<Cliente> clientes = new ArrayList<>();
-        ArrayList<Pasajero> pasajeros = new ArrayList<>();
-        ArrayList<Empresa> empresas = new ArrayList<>();
-        ArrayList<Terminal> terminales = new ArrayList<>();
-        ArrayList<Viaje> viajes = new ArrayList<>();
 
+    private void buses(String linea){
+        String[] datos = linea.split(";");
+        Bus bus  = new Bus(formatPatente(datos[0]), Integer.parseInt(datos[3]), findEmpresa(empresas, Rut.of(datos[4])).get());
+        bus.setMarca(datos[1]);
+        bus.setModelo(datos[2]);
+        out.add(bus);
+        buses.add(bus);
+    }
+
+
+
+    public void saveControladores(Object[] controladores) throws SVPException {
+        File file = new File("src/Persistencia/SVPObjetos.obj");
         try {
-            InputStream is = IOSVP.class.getResourceAsStream("SVPDatosIniciales.txt");
-
-            if (is == null) {
-                throw new SistemaVentaPasajesException("No se encontró SVPDatosIniciales.txt");
-            }
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
-            String linea;
-            int bloque = 0;
-            DateTimeFormatter fechaFormato = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-
-            while ((linea = br.readLine()) != null) {
-
-                if (linea.equals("+")) {
-                    bloque++;
-                    continue;
-                }
-
-                String[] datos = linea.split(";");
-
-                switch (bloque) {
-
-                    case 0 -> {
-                        Nombre nombre = crearNombre(datos[2], datos[3], datos[4], datos[5]);
-                        IdPersona id = Rut.of(datos[1]);
-
-                        if (datos[0].equals("C") || datos[0].equals("CP")) {
-                            Cliente cliente = new Cliente(id, nombre, datos[6], datos[7]);
-                            clientes.add(cliente);
-                        }
-
-                        if (datos[0].equals("P") || datos[0].equals("CP")) {
-                            Nombre contacto;
-
-                            if (datos[0].equals("CP")) {
-                                contacto = crearNombre(datos[8], datos[9], datos[10], datos[11]);
-                                Pasajero pasajero = new Pasajero(id, nombre, datos[6], contacto, datos[12]);
-                                pasajeros.add(pasajero);
-                            } else {
-                                contacto = crearNombre(datos[7], datos[8], datos[9], datos[10]);
-                                Pasajero pasajero = new Pasajero(id, nombre, datos[6], contacto, datos[11]);
-                                pasajeros.add(pasajero);
-                            }
-                        }
-                    }
-
-                    case 1 -> {
-                        Empresa empresa = new Empresa(
-                                Rut.of(datos[0]),
-                                datos[1],
-                                datos[2]
-                        );
-                        empresas.add(empresa);
-                    }
-
-                    case 2 -> {
-                        Empresa empresa = findEmpresa(empresas, Rut.of(datos[9]))
-                                .orElseThrow(() -> new SistemaVentaPasajesException("Empresa no encontrada"));
-
-                        Nombre nombre = crearNombre(datos[2], datos[3], datos[4], datos[5]);
-
-                        Direccion direccion = new Direccion(
-                                datos[6],
-                                Integer.parseInt(datos[7]),
-                                datos[8]
-                        );
-
-                        if (datos[0].equals("A")) {
-                            empresa.addAuxiliar(Rut.of(datos[1]), nombre, direccion);
-                        } else if (datos[0].equals("C")) {
-                            empresa.addConductor(Rut.of(datos[1]), nombre, direccion);
-                        }
-                    }
-
-                    case 3 -> {
-                        Terminal terminal = new Terminal(
-                                new Direccion(
-                                        datos[1],
-                                        Integer.parseInt(datos[2]),
-                                        datos[3]
-                                ),
-                                datos[0]
-                        );
-                        terminales.add(terminal);
-                    }
-
-                    case 4 -> {
-                        Empresa empresa = findEmpresa(empresas, Rut.of(datos[4]))
-                                .orElseThrow(() -> new SistemaVentaPasajesException("Empresa no encontrada"));
-
-                        Bus bus = new Bus(datos[0], Integer.parseInt(datos[3]), empresa);
-                        bus.setMarca(datos[1]);
-                        bus.setModelo(datos[2]);
-
-                        empresa.addBus(bus);
-                    }
-
-                    case 5 -> {
-                        Bus bus = findBus(empresas, datos[4])
-                                .orElseThrow(() -> new SistemaVentaPasajesException("Bus no encontrado"));
-
-                        Empresa empresa = bus.getEmpresa();
-
-                        Auxiliar auxiliar = (Auxiliar) findTripulante(empresa, Rut.of(datos[5]))
-                                .orElseThrow(() -> new SistemaVentaPasajesException("Auxiliar no encontrado"));
-
-                        Conductor conductor = (Conductor) findTripulante(empresa, Rut.of(datos[6]))
-                                .orElseThrow(() -> new SistemaVentaPasajesException("Conductor no encontrado"));
-
-                        Terminal salida = findTerminal(terminales, datos[7])
-                                .orElseThrow(() -> new SistemaVentaPasajesException("Terminal salida no encontrado"));
-
-                        Terminal llegada = findTerminal(terminales, datos[8])
-                                .orElseThrow(() -> new SistemaVentaPasajesException("Terminal llegada no encontrado"));
-
-                        Viaje viaje = new Viaje(
-                                LocalDate.parse(datos[0], fechaFormato),
-                                LocalTime.parse(datos[1]),
-                                Integer.parseInt(datos[2]),
-                                Integer.parseInt(datos[3]),
-                                bus,
-                                auxiliar,
-                                new Conductor[]{conductor},
-                                salida,
-                                llegada
-                        );
-
-                        viajes.add(viaje);
-                    }
-                }
-            }
-
-            br.close();
-
-        } catch (IOException e) {
-            throw new SistemaVentaPasajesException(e.getMessage());
+            ObjectOutputStream outStream = new ObjectOutputStream(new FileOutputStream(file));
+            outStream.writeObject(controladores);
+            outStream.close();
+        } catch (FileNotFoundException e) {
+            throw new SVPException("No se puede abrir o crear el archivo \"SVPObjetos.obj\" ");
+        } catch (IOException e){
+            throw new SVPException("No se puede grabar en el archivo SVPObjetos.obj");
         }
-
-        imprimirDatosIniciales(clientes, pasajeros, empresas, terminales, viajes);
-
-        return new Object[]{
-                clientes,
-                pasajeros,
-                empresas,
-                terminales,
-                viajes
-        };
     }
 
-    // imprime lo de arriba
-    private void imprimirDatosIniciales(ArrayList<Cliente> clientes,
-                                        ArrayList<Pasajero> pasajeros,
-                                        ArrayList<Empresa> empresas,
-                                        ArrayList<Terminal> terminales,
-                                        ArrayList<Viaje> viajes) {
-
-        System.out.println("\n==============================");
-        System.out.println("   DATOS INICIALES CARGADOS");
-        System.out.println("==============================");
-
-        System.out.println("\n--- CLIENTES ---");
-        for (Cliente c : clientes) {
-            System.out.printf("%-15s | %-35s | %-18s | %s%n",
-                    c.getIdPersona(),
-                    c.getNombreCompleto(),
-                    c.getTelefono(),
-                    c.getEmail());
+    public Object[] readControladores() throws SVPException {
+        File file = new File("src/Persistencia/SVPObjetos.obj");
+        Object[] objetos;
+        try {
+            ObjectInputStream input = new ObjectInputStream(new FileInputStream(file));
+            objetos = (Object[]) input.readObject();
+            input.close();
+            return objetos;
+        } catch (IOException e){
+            throw new SVPException("No existe o no se puede abrir el archivo SVPObjetos.obj ");
+        } catch (ClassNotFoundException e ){
+            throw new SVPException("No se puede leer el archivo SVPObjetos.obj .");
         }
-
-        System.out.println("\n--- PASAJEROS ---");
-        for (Pasajero p : pasajeros) {
-            System.out.printf("%-15s | %-35s | Tel: %-18s | Contacto: %-35s | %s%n",
-                    p.getIdPersona(),
-                    p.getNombreCompleto(),
-                    p.getTelefono(),
-                    p.getNomContacto(),
-                    p.getFonoContacto());
-        }
-
-        System.out.println("\n--- EMPRESAS ---");
-        for (Empresa e : empresas) {
-            System.out.printf("%-15s | %-20s | %-30s | Buses: %-2d | Tripulantes: %-2d%n",
-                    e.getRut(),
-                    e.getNombre(),
-                    e.getUrl(),
-                    e.getBuses().length,
-                    e.getTripulantes().length);
-        }
-
-        System.out.println("\n--- TERMINALES ---");
-        for (Terminal t : terminales) {
-            System.out.printf("%-20s | %s%n",
-                    t.getNombre(),
-                    t.getDireccion());
-        }
-
-        System.out.println("\n--- VIAJES ---");
-        for (Viaje v : viajes) {
-            System.out.printf("%-10s | %-5s | $%-6d | Bus: %-8s | %-20s -> %-20s%n",
-                    v.getFecha(),
-                    v.getHora(),
-                    v.getPrecio(),
-                    v.getBus().getPatente(),
-                    v.getTerminalSalida().getNombre(),
-                    v.getTerminalLlegada().getNombre());
-        }
-
-        System.out.println("\n==============================\n");
     }
 
-    private Nombre crearNombre(String tratamiento, String nombres,
-                               String apellidoPaterno, String apellidoMaterno) {
-        Nombre nombre = new Nombre();
-        nombre.setTratamiento(Tratamiento.valueOf(tratamiento));
-        nombre.setNombres(nombres);
-        nombre.setApellidoPaterno(apellidoPaterno);
-        nombre.setApellidoMaterno(apellidoMaterno);
-        return nombre;
-    }
+    public void savePasajesDeVenta(Pasaje[] pasajes, String nombreArchivo) throws FileNotFoundException {
+        File file = new File(nombreArchivo);
+        PrintStream printStream = new PrintStream(new FileOutputStream(file));
 
-    private Optional<Empresa> findEmpresa(List<Empresa> empresas, Rut rut) {
-        for (Empresa e : empresas) {
-            if (e.getRut().equals(rut)) {
-                return Optional.of(e);
-            }
+        for (Pasaje pasaje : pasajes) {
+            printStream.print(pasaje.toString());
         }
-        return Optional.empty();
+        printStream.flush();
+        printStream.close();
     }
 
-    private Optional<Bus> findBus(List<Empresa> empresas, String patente) {
-        for (Empresa e : empresas) {
-            for (Bus b : e.getBuses()) {
-                if (b.getPatente().equals(patente)) {
-                    return Optional.of(b);
-                }
-            }
+    private Optional<Empresa> findEmpresa(List<Empresa> empresas, Rut rut){
+        return empresas.stream().filter(x -> x.getRut().equals(rut)).findFirst();
+    }
+    private Optional<Tripulante> findTripulante(List<Tripulante> tripulantes, IdPersona id){
+        return tripulantes.stream().filter(x -> x.getIdPersona().equals(id)).findFirst();
+    }
+    private Optional<Bus> findBus(List<Bus> buses, String patente){
+        return buses.stream().filter(x -> x.getPatente().equalsIgnoreCase(patente)).findFirst();
+    }
+    private Optional<Terminal> findTerminal(List<Terminal> terminals, String nombre ){
+        return terminals.stream().filter(x -> x.getNombre().equalsIgnoreCase(nombre)).findFirst();
+    }
+
+    private String formatPatente(String patente){
+        return patente.charAt(0) + "" + patente.charAt(1) + "." + patente.charAt(2) + patente.charAt(3) + "-" + patente.charAt(4) + patente.charAt(5);
+    }
+
+    private IdPersona getIdpersona(String dato){
+        IdPersona idPersona = null;
+        try {
+            idPersona = Rut.of(dato);
+        } catch (SVPException e) {
+            String[] pasaporte = dato.split(" ");
+            idPersona = Pasaporte.of(pasaporte[0], pasaporte[1]);
         }
-        return Optional.empty();
+        return idPersona;
     }
 
-    private Optional<Tripulante> findTripulante(Empresa empresa, IdPersona id) {
-        for (Tripulante t : empresa.getTripulantes()) {
-            if (t.getIdPersona().equals(id)) {
-                return Optional.of(t);
-            }
-        }
-        return Optional.empty();
+    private Direccion getDireccion(String calle, int numero, String comuna){
+        return new Direccion(calle, numero, comuna);
     }
 
-    private Optional<Terminal> findTerminal(List<Terminal> terminales, String nombre) {
-        for (Terminal t : terminales) {
-            if (t.getNombre().equals(nombre)) {
-                return Optional.of(t);
-            }
-        }
-        return Optional.empty();
-    }
-
-
-
-    /*
-    =================
-    SIN COMPLETAR
-    =================
-    */
-    public void savePasajesDeVenta(Pasaje[] pasajes, String nombreArchivo) {
-    }
-
-    public void saveControladores(Object[] controladores) {
-    }
-
-    public Object[] readControladores() {
-        return new Object[0];
+    private Nombre getNombre(Tratamiento tratamiento, String nombre, String apellidoPaterno, String apellidoMaterno){
+        return new Nombre(tratamiento, nombre, apellidoPaterno, apellidoMaterno);
     }
 }

@@ -1,12 +1,10 @@
 package Vista;
-//Clase hecha por benjamin vivanco y tellez
 import Modelo.TipoDocumento;
 import Utilidades.*;
 import Controlador.*;
 
-import Excepciones.SistemaVentaPasajesException;
+import Excepciones.SVPException;
 
-import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -50,8 +48,11 @@ public class UISVP {
             System.out.println(" 11) Listar empresas");
             System.out.println(" 12) Listar llegadas/salidas del terminal");
             System.out.println(" 13) Listar ventas de empresa");
-            System.out.println(" 14) AUTORUN");
-            System.out.println(" 15) Cargar Datos Iniciales");
+            System.out.println(" 14) Generar pasajes venta");
+            System.out.println(" 15) Leer datos iniciales");
+            System.out.println(" 16) Guardar datos del sistema");
+            System.out.println(" 17) Leer datos del sistema");
+
             System.out.println(" 0) Salir");
             System.out.println("____________________________");
             System.out.print("..:: Ingrese número de opción: ");
@@ -73,11 +74,16 @@ public class UISVP {
                 case 11 -> listEmpresas();
                 case 12 -> listLlegadasSalidasTerminal();
                 case 13 -> listVentasEmpresas();
-                case 14 -> autoRun();
-                case 15 -> cargarDatosIniciales();
-                case 0 -> System.out.println("Saliendo del programa");
+                case 14 ->
+                case 15 ->
+                case 16 ->
+                case 17 ->
+
+                // FALTAN COSAS ACA
+                case 50 -> autoRun();
+                case 18 -> System.out.println("Saliendo del programa");
             }
-        } while (opcion != 0);
+        } while (opcion != 18);
     }
 
     // 1) Crear empresa
@@ -92,7 +98,7 @@ public class UISVP {
 
             System.out.println("...:::: Empresa guardada exitosamente ::::...");
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("...::::Error : " + e.getMessage());
         }
     }
@@ -171,7 +177,7 @@ public class UISVP {
                     System.out.println("\n...:::: Conductor contratado exitosamente ::::....");
                     break;
             }
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("\t\t...::: Error : " + e.getMessage());
         }
     }
@@ -190,7 +196,7 @@ public class UISVP {
             CE.createTerminal(nombre, dir);
 
             System.out.println("...:::: Terminal guardado exitosamente ::::....");
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("\t\t...::: Error : " + e.getMessage());
         }
     }
@@ -254,7 +260,7 @@ public class UISVP {
             SVP.createCliente(idPersona, nombreCliente, telefono, email);
             System.out.println("\n....:::: Cliente guardado exitosamente ::::....\n");
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("..:: Error : " + e.getMessage());
         }
 
@@ -283,7 +289,7 @@ public class UISVP {
         try {
             CE.createBus(patente, marca, modelo, nroAsientos, rutEmpresa);
             System.out.println("...:::: Bus guardado exitosamente ::::....");
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.err.println("..:: Error : " + e.getMessage());
         }
     }
@@ -366,7 +372,7 @@ public class UISVP {
             SVP.createViaje(fecha, hora, precio, duracion, patente, idTripulantesArray, comunas);
             System.out.println("\n...:::: Viaje guardado exitosamente ::::....");
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("..:: Error : " + e.getMessage());
         }
 
@@ -652,7 +658,7 @@ public class UISVP {
             for (String s : boleta) {
                 System.out.println(s);
             }
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
@@ -740,7 +746,7 @@ public class UISVP {
             } else {
                 System.out.println("...::: No existen pasajeros en el viaje indicado");
             }
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.err.println(e.getMessage());
         }
     }
@@ -791,7 +797,7 @@ public class UISVP {
                 System.out.println("...::: No existen llegadas/salidas del terminal indicado");
             }
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.err.println(e.getMessage());
         }
     }
@@ -823,7 +829,7 @@ public class UISVP {
             } else {
                 System.out.println("...::: No existen ventas registradas en la empresa");
             }
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("...::: Error : " + e.getMessage());
         }
     }
@@ -956,7 +962,7 @@ public class UISVP {
                     email
             );
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("Error creando cliente: " + e.getMessage());
         }
 
@@ -1013,7 +1019,7 @@ public class UISVP {
                     TipoDocumento.BOLETA
             );
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
 
             System.out.println(
                     "Error creando venta automática: "
@@ -1032,7 +1038,7 @@ public class UISVP {
             try {
                 opc = sc.nextInt();
 
-                if (opc >= 0 && opc <= cantOpciones) {
+                if (opc > 0 && opc <= cantOpciones) {
                     valido = true;
                 } else {
                     System.out.print("..:: Opcion fuera de rango, intente denuevo : ");
@@ -1103,14 +1109,5 @@ public class UISVP {
             }
         }
         return false;
-    }
-
-    private void cargarDatosIniciales() {
-        try {
-            SVP.readDatosIniciales();
-            System.out.println("...:::: Datos iniciales cargados exitosamente ::::...");
-        } catch (SistemaVentaPasajesException e) {
-            System.out.println("...:::: Error: " + e.getMessage());
-        }
     }
 }
