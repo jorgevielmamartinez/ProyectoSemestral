@@ -57,7 +57,7 @@ public class SistemaVentaPasajes{
         }
     }
 
-    public void createViaje(LocalDate fecha, LocalTime hora, int precio, int duracion,  String patBus, IdPersona[] idTripulantes, String[] comunas) throws SistemaVentaPasajesException {
+    public void createViaje(LocalDate fecha, LocalTime hora, int precio, int duracion,ArrayList<Bus> buses,  String patBus, IdPersona[] idTripulantes, String[] comunas) throws SistemaVentaPasajesException {
         Optional<Viaje> viajeOptional = findViaje(fecha, hora, patBus);
         if (viajeOptional.isPresent()) {
             throw new SistemaVentaPasajesException("Ya existe viaje con fecha, hora y patente indicados");
@@ -73,8 +73,8 @@ public class SistemaVentaPasajes{
         }
         Terminal salida  = ctrlEmpresas.findTerminalPorComuna(comunas[0]).orElseThrow(() -> new SistemaVentaPasajesException("No existe terminal de salida en la comuna indicada"));
         Terminal llegada = ctrlEmpresas.findTerminalPorComuna(comunas[1]).orElseThrow(() -> new SistemaVentaPasajesException("No existe terminal de llegada en la comuna indicada"));
-
-        Viaje viaje = new Viaje(fecha, hora, precio, duracion, findBus(buses), auxiliar, conductores, salida, llegada);
+        Optional<Bus> bus=findBus(buses, patBus);
+        Viaje viaje = new Viaje(fecha, hora, precio, duracion,bus , auxiliar, conductores, salida, llegada);
         viajes.add(viaje);
     }
     public void iniciaVenta(String idDoc, TipoDocumento tipo, LocalDate fechaViaje, String comSalida, String comLlegada,IdPersona idCliente, int nroPasajes) throws SistemaVentaPasajesException {

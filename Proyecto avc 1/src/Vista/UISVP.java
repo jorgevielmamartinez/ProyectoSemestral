@@ -1,5 +1,4 @@
 package Vista;
-//Clase hecha por benjamin vivanco y tellez
 import Modelo.TipoDocumento;
 import Utilidades.*;
 import Controlador.*;
