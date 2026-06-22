@@ -1,4 +1,5 @@
 package Vista;
+//Clase hecha por benjamin vivanco y tellez
 import Modelo.TipoDocumento;
 import Utilidades.*;
 import Controlador.*;
@@ -48,11 +49,13 @@ public class UISVP {
             System.out.println(" 11) Listar empresas");
             System.out.println(" 12) Listar llegadas/salidas del terminal");
             System.out.println(" 13) Listar ventas de empresa");
-            System.out.println(" 14) Generar pasajes venta");
-            System.out.println(" 15) Leer datos iniciales");
-            System.out.println(" 16) Guardar datos del sistema");
-            System.out.println(" 17) Leer datos del sistema");
+            System.out.println(" 14) Listar llegadas/salidas del terminal");
+            System.out.println(" 15) Listar ventas de empresa");
+            System.out.println(" 16) Listar llegadas/salidas del terminal");
+            System.out.println(" 17) Listar ventas de empresa");
             System.out.println(" 18) Salir");
+            System.out.println("\n");
+            System.out.println(" 50) AUTORUN: parte de avance 2");
             System.out.println("____________________________");
             System.out.print("..:: Ingrese número de opción: ");
             opcion = elegirOpc(15);
@@ -73,14 +76,13 @@ public class UISVP {
                 case 11 -> listEmpresas();
                 case 12 -> listLlegadasSalidasTerminal();
                 case 13 -> listVentasEmpresas();
-                case 14 ->
-                case 15 ->
-                case 16 ->
-                case 17 -> 
-
-                // FALTAN COSAS ACA
-                case 50 -> autoRun();
+                case 14 -> generatePasajesVenta();
+                case 15 -> readDatosIniciales();
+                case 16 -> saveDatosSistema();
+                case 17 -> readDatosSistema();
                 case 18 -> System.out.println("Saliendo del programa");
+
+                case 50 -> autoRun();
             }
         } while (opcion != 18);
     }
@@ -662,21 +664,6 @@ public class UISVP {
         }
     }
 
-    private void pagaVentaPasajes(String idDocumento, TipoDocumento tipo) {
-        System.out.println(":::: Pago de la venta");
-        int opcPago = leeOpc("Efectivo[1] o Tarjeta[2]", 2);
-
-        if (opcPago == 1) {
-            SVP.pagaVenta(idDocumento, tipo);
-
-        } else {
-            long nroTarjeta = Long.parseLong(leeString("Ingrese numero de Tarjeta"));
-            SVP.pagaVenta(idDocumento, tipo, nroTarjeta);
-        }
-        System.out.println();
-        System.out.println("\n...:::: Venta realizada exitosamente ::::....\n\n");
-    }
-
     private void listVentas() {
         DateTimeFormatter formatoOriginal = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         DateTimeFormatter nuevoFormato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -849,7 +836,89 @@ public class UISVP {
     }
 
 
+    private void pagaVentaPasajes(String idDocumento, TipoDocumento tipo) {
+        System.out.println(":::: Pago de la venta");
+        int opcPago = leeOpc("Efectivo[1] o Tarjeta[2]", 2);
 
+        if (opcPago == 1) {
+            SVP.pagaVenta(idDocumento, tipo);
+
+        } else {
+            long nroTarjeta = Long.parseLong(leeString("Ingrese numero de Tarjeta"));
+            SVP.pagaVenta(idDocumento, tipo, nroTarjeta);
+        }
+        System.out.println();
+        System.out.println("\n...:::: Venta realizada exitosamente ::::....\n\n");
+    }
+
+
+    private void generatePasajesVenta() {
+        try {
+            System.out.println("...:::: Generar pasajes de venta ::::....");
+
+            String idDocumento = leeString("ID Documento");
+
+            int tipo = leeOpc("Tipo Documento: Boleta[1] o Factura[2]", 2);
+
+            TipoDocumento tipoDocumento = switch (tipo) {
+                case 1 -> TipoDocumento.BOLETA;
+                case 2 -> TipoDocumento.FACTURA;
+                default -> null;
+            };
+
+            SVP.generatePasajesVenta(idDocumento, tipoDocumento);
+
+            System.out.println("...:::: Pasajes generados exitosamente ::::....");
+
+        } catch (SVPException e) {
+            System.out.println("..:: Error : " + e.getMessage());
+        }
+    }
+
+    private void readDatosIniciales() {
+        try {
+            System.out.println("...:::: Leyendo datos iniciales ::::....");
+
+            SVP.readDatosIniciales();
+
+            System.out.println("...:::: Datos iniciales cargados exitosamente ::::....");
+
+        } catch (SVPException e) {
+            System.out.println("..:: Error : " + e.getMessage());
+        }
+    }
+
+    private void saveDatosSistema() {
+        try {
+            System.out.println("...:::: Guardando datos del sistema ::::....");
+
+            SVP.saveDatosSistema();
+
+            System.out.println("...:::: Datos del sistema guardados exitosamente ::::....");
+
+        } catch (SVPException e) {
+            System.out.println("..:: Error : " + e.getMessage());
+        }
+    }
+
+    private void readDatosSistema() {
+        try {
+            System.out.println("...:::: Leyendo datos del sistema ::::....");
+
+            SVP.readDatosSistema();
+
+            System.out.println("...:::: Datos del sistema cargados exitosamente ::::....");
+
+        } catch (SVPException e) {
+            System.out.println("..:: Error : " + e.getMessage());
+        }
+    }
+
+    /*
+    ===========
+    Metodos extras
+    ===========
+    */
     // Opcion 50) correr automaticamente
     private void autoRun() {
         System.out.println("=== AUTORUN INICIADO ===");
@@ -1111,4 +1180,6 @@ public class UISVP {
         }
         return false;
     }
+
+
 }
