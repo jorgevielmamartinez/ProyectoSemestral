@@ -3,9 +3,8 @@ import Modelo.TipoDocumento;
 import Utilidades.*;
 import Controlador.*;
 
-import Excepciones.SistemaVentaPasajesException;
+import Excepciones.SVPException;
 
-import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -89,7 +88,7 @@ public class UISVP {
 
             System.out.println("...:::: Empresa guardada exitosamente ::::...");
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("...::::Error : " + e.getMessage());
         }
     }
@@ -168,7 +167,7 @@ public class UISVP {
                     System.out.println("\n...:::: Conductor contratado exitosamente ::::....");
                     break;
             }
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("\t\t...::: Error : " + e.getMessage());
         }
     }
@@ -187,7 +186,7 @@ public class UISVP {
             CE.createTerminal(nombre, dir);
 
             System.out.println("...:::: Terminal guardado exitosamente ::::....");
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("\t\t...::: Error : " + e.getMessage());
         }
     }
@@ -251,7 +250,7 @@ public class UISVP {
             SVP.createCliente(idPersona, nombreCliente, telefono, email);
             System.out.println("\n....:::: Cliente guardado exitosamente ::::....\n");
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("..:: Error : " + e.getMessage());
         }
 
@@ -280,7 +279,7 @@ public class UISVP {
         try {
             CE.createBus(patente, marca, modelo, nroAsientos, rutEmpresa);
             System.out.println("...:::: Bus guardado exitosamente ::::....");
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.err.println("..:: Error : " + e.getMessage());
         }
     }
@@ -363,7 +362,7 @@ public class UISVP {
             SVP.createViaje(fecha, hora, precio, duracion, patente, idTripulantesArray, comunas);
             System.out.println("\n...:::: Viaje guardado exitosamente ::::....");
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("..:: Error : " + e.getMessage());
         }
 
@@ -649,7 +648,7 @@ public class UISVP {
             for (String s : boleta) {
                 System.out.println(s);
             }
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
@@ -737,7 +736,7 @@ public class UISVP {
             } else {
                 System.out.println("...::: No existen pasajeros en el viaje indicado");
             }
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.err.println(e.getMessage());
         }
     }
@@ -788,7 +787,7 @@ public class UISVP {
                 System.out.println("...::: No existen llegadas/salidas del terminal indicado");
             }
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.err.println(e.getMessage());
         }
     }
@@ -820,7 +819,7 @@ public class UISVP {
             } else {
                 System.out.println("...::: No existen ventas registradas en la empresa");
             }
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("...::: Error : " + e.getMessage());
         }
     }
@@ -953,7 +952,7 @@ public class UISVP {
                     email
             );
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("Error creando cliente: " + e.getMessage());
         }
 
@@ -1010,7 +1009,7 @@ public class UISVP {
                     TipoDocumento.BOLETA
             );
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
 
             System.out.println(
                     "Error creando venta automática: "

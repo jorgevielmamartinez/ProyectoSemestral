@@ -1,6 +1,5 @@
 package Persistencia;
 
-import Controlador.*;
 import Modelo.*;
 import Excepciones.*;
 import Utilidades.IdPersona;
@@ -101,12 +100,10 @@ public class IOSVP {
     private void terminales(String linea){
         String[] datos = linea.split(";");
 
-        // LIMPIEZA CLAVE
         for (int i = 0; i < datos.length; i++) {
             datos[i] = datos[i].trim();
         }
 
-        // Ahora Integer.parseInt no fallará por espacios vacíos
         Terminal ter = new Terminal( getDireccion(datos[1], Integer.parseInt(datos[2]), datos[3]),datos[0]);
         out.add(ter);
         terminales.add(ter);
@@ -115,13 +112,11 @@ public class IOSVP {
     private void viajes(String linea){
         String[] datos = linea.split(";");
 
-        // LIMPIEZA CLAVE
         for (int i = 0; i < datos.length; i++) {
             datos[i] = datos[i].trim();
         }
         //    public Viaje(LocalDate fecha, LocalTime hora, int precio, int dur, Bus bus,Auxiliar aux, Conductor[] cond, Terminal sale, Terminal llega) {
 
-        // Se usa orElseThrow en vez de .get() para identificar fácilmente en consola qué objeto falta si hay error
         Viaje viaje = new Viaje(
                 LocalDate.parse(datos[0], DateTimeFormatter.ofPattern("dd-MM-yyyy")),
                 LocalTime.parse(datos[1], DateTimeFormatter.ofPattern("HH:mm")),
@@ -178,20 +173,20 @@ public class IOSVP {
 
 
 
-    public void saveControladores(Object[] controladores) throws SistemaVentaPasajesException{
+    public void saveControladores(Object[] controladores) throws SVPException {
         File file = new File("src/Persistencia/SVPObjetos.obj");
         try {
             ObjectOutputStream outStream = new ObjectOutputStream(new FileOutputStream(file));
             outStream.writeObject(controladores);
             outStream.close();
         } catch (FileNotFoundException e) {
-            throw new SistemaVentaPasajesException("No se puede abrir o crear el archivo \"SVPObjetos.obj\" ");
+            throw new SVPException("No se puede abrir o crear el archivo \"SVPObjetos.obj\" ");
         } catch (IOException e){
-            throw new SistemaVentaPasajesException("No se puede grabar en el archivo SVPObjetos.obj");
+            throw new SVPException("No se puede grabar en el archivo SVPObjetos.obj");
         }
     }
 
-    public Object[] readControladores() throws SistemaVentaPasajesException{
+    public Object[] readControladores() throws SVPException {
         File file = new File("src/Persistencia/SVPObjetos.obj");
         Object[] objetos;
         try {
@@ -200,9 +195,9 @@ public class IOSVP {
             input.close();
             return objetos;
         } catch (IOException e){
-            throw new SistemaVentaPasajesException("No existe o no se puede abrir el archivo SVPObjetos.obj ");
+            throw new SVPException("No existe o no se puede abrir el archivo SVPObjetos.obj ");
         } catch (ClassNotFoundException e ){
-            throw new SistemaVentaPasajesException("No se puede leer el archivo SVPObjetos.obj .");
+            throw new SVPException("No se puede leer el archivo SVPObjetos.obj .");
         }
     }
 
@@ -238,7 +233,7 @@ public class IOSVP {
         IdPersona idPersona = null;
         try {
             idPersona = Rut.of(dato);
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             String[] pasaporte = dato.split(" ");
             idPersona = Pasaporte.of(pasaporte[0], pasaporte[1]);
         }
@@ -250,7 +245,6 @@ public class IOSVP {
     }
 
     private Nombre getNombre(Tratamiento tratamiento, String nombre, String apellidoPaterno, String apellidoMaterno){
-        // CORRECCIÓN: Se cambió 'treatment' por 'tratamiento'
         return new Nombre(tratamiento, nombre, apellidoPaterno, apellidoMaterno);
     }
 }
