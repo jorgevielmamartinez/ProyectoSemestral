@@ -52,7 +52,7 @@ public class UISVP {
             System.out.println(" 15) Leer datos iniciales");
             System.out.println(" 16) Guardar datos del sistema");
             System.out.println(" 17) Leer datos del sistema");
-            System.out.println(" 50) AUTORUN");
+
             System.out.println(" 0) Salir");
             System.out.println("____________________________");
             System.out.print("..:: Ingrese número de opción: ");
