@@ -189,30 +189,31 @@ public class IOSVP {
             datos[i] = datos[i].trim();
         }
 
-        System.out.println("Buscando auxiliar: " + getIdpersona(datos[5]));
-        System.out.println("Buscando conductor: " + getIdpersona(datos[6]));
+        Bus bus = findBus(buses, formatPatente(datos[4]))
+                .orElseThrow(() -> new NoSuchElementException("Bus no encontrado: " + datos[4]));
 
-        System.out.println("Tripulantes cargados:");
-        for (Tripulante t : tripulantes) {
-            System.out.println(t.getIdPersona() + " - " + t.getClass().getSimpleName());
-        }
+        Auxiliar auxiliar = (Auxiliar) findTripulante(tripulantes, getIdpersona(datos[5]))
+                .orElseThrow(() -> new NoSuchElementException("Auxiliar no encontrado: " + datos[5]));
+
+        Conductor conductor = (Conductor) findTripulante(tripulantes, getIdpersona(datos[6]))
+                .orElseThrow(() -> new NoSuchElementException("Conductor no encontrado: " + datos[6]));
+
+        Terminal terminalSalida = findTerminal(terminales, datos[7])
+                .orElseThrow(() -> new NoSuchElementException("Terminal origen no encontrada: " + datos[7]));
+
+        Terminal terminalLlegada = findTerminal(terminales, datos[8])
+                .orElseThrow(() -> new NoSuchElementException("Terminal destino no encontrada: " + datos[8]));
 
         Viaje viaje = new Viaje(
                 LocalDate.parse(datos[0], DateTimeFormatter.ofPattern("dd-MM-yyyy")),
                 LocalTime.parse(datos[1], DateTimeFormatter.ofPattern("HH:mm")),
                 Integer.parseInt(datos[2]),
                 Integer.parseInt(datos[3]),
-                findBus(buses, formatPatente(datos[4])),
-                (Auxiliar) findTripulante(tripulantes, getIdpersona(datos[5]))
-                        .orElseThrow(() -> new NoSuchElementException("Auxiliar no encontrado: " + datos[5])),
-                new Conductor[]{
-                        (Conductor) findTripulante(tripulantes, getIdpersona(datos[6]))
-                                .orElseThrow(() -> new NoSuchElementException("Conductor no encontrado: " + datos[6]))
-                },
-                findTerminal(terminales, datos[7])
-                        .orElseThrow(() -> new NoSuchElementException("Terminal origen no encontrada: " + datos[7])),
-                findTerminal(terminales, datos[8])
-                        .orElseThrow(() -> new NoSuchElementException("Terminal destino no encontrada: " + datos[8]))
+                bus,
+                auxiliar,
+                new Conductor[]{conductor},
+                terminalSalida,
+                terminalLlegada
         );
 
         out.add(viaje);

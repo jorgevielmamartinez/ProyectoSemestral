@@ -74,7 +74,17 @@ public class SistemaVentaPasajes{
         Terminal salida  = ctrlEmpresas.findTerminalPorComuna(comunas[0]).orElseThrow(() -> new SVPException("No existe terminal de salida en la comuna indicada"));
         Terminal llegada = ctrlEmpresas.findTerminalPorComuna(comunas[1]).orElseThrow(() -> new SVPException("No existe terminal de llegada en la comuna indicada"));
 
-        Viaje viaje = new Viaje(fecha, hora, precio, duracion, busOptional, auxiliar, conductores, salida, llegada);
+        Viaje viaje = new Viaje(
+                fecha,
+                hora,
+                precio,
+                duracion,
+                bus,
+                auxiliar,
+                conductores,
+                salida,
+                llegada
+        );
         viajes.add(viaje);
     }
 
