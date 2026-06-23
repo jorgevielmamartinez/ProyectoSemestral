@@ -58,7 +58,7 @@ public class UISVP {
             System.out.println(" 50) AUTORUN: parte de avance 2");
             System.out.println("____________________________");
             System.out.print("..:: Ingrese número de opción: ");
-            opcion = elegirOpc(18);
+            opcion = elegirOpc(50);
             System.out.println();
 
 

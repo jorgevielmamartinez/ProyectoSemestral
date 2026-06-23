@@ -1,0 +1,11 @@
+--------------------- PASAJE ELECTRÓNICO ---------------------
+Nombre Empresa            Número de pasaje
+Las Brisas de Oriente     1
+Nombre Pasajero                          RUT/Pasaporte
+Jorge Alexis,SR,Vielma,Sanchez           22.222.222-2
+Patente bus     Asiento         Valor Pagado
+AZYB12          10              4300
+Terminal origen      Terminal destino     Fecha           Hora
+Fray Silvano         Terminal Pinto       2024-10-21      10:40
+--------------------------------------------------------------
+

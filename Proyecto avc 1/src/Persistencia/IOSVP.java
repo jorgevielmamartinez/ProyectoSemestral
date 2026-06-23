@@ -106,13 +106,12 @@ public class IOSVP {
     }
 
     public void savePasajesDeVenta(Pasaje[] pasajes, String nombreArchivo) throws FileNotFoundException {
-        File file = new File(nombreArchivo);
-        PrintStream printStream = new PrintStream(new FileOutputStream(file));
+        PrintStream printStream = new PrintStream(new FileOutputStream(nombreArchivo));
 
         for (Pasaje pasaje : pasajes) {
-            printStream.print(pasaje.toString());
+            printStream.println(pasaje.toString());
         }
-        printStream.flush();
+
         printStream.close();
     }
 
