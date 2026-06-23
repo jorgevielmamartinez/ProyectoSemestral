@@ -1,6 +1,8 @@
 package Modelo;
 
-public class Pasaje {
+import java.io.Serializable;
+
+public class Pasaje implements Serializable {
     private static int contadorNumero = 1;
 
     private int numero;

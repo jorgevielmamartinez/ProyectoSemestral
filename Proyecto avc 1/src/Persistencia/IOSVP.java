@@ -72,30 +72,36 @@ public class IOSVP {
 
 
     public void saveControladores(Object[] controladores) throws SVPException {
-        File file = new File("src/Persistencia/SVPObjetos.obj");
+        File file = new File("SVPObjetos.obj");
+
         try {
             ObjectOutputStream outStream = new ObjectOutputStream(new FileOutputStream(file));
             outStream.writeObject(controladores);
             outStream.close();
+
         } catch (FileNotFoundException e) {
-            throw new SVPException("No se puede abrir o crear el archivo \"SVPObjetos.obj\" ");
-        } catch (IOException e){
+            e.printStackTrace();
+            throw new SVPException("No se puede abrir o crear el archivo SVPObjetos.obj");
+
+        } catch (IOException e) {
+            e.printStackTrace();
             throw new SVPException("No se puede grabar en el archivo SVPObjetos.obj");
         }
     }
 
     public Object[] readControladores() throws SVPException {
-        File file = new File("src/Persistencia/SVPObjetos.obj");
-        Object[] objetos;
+        File file = new File("SVPObjetos.obj");
+
         try {
             ObjectInputStream input = new ObjectInputStream(new FileInputStream(file));
-            objetos = (Object[]) input.readObject();
+            Object[] objetos = (Object[]) input.readObject();
             input.close();
             return objetos;
-        } catch (IOException e){
-            throw new SVPException("No existe o no se puede abrir el archivo SVPObjetos.obj ");
-        } catch (ClassNotFoundException e ){
-            throw new SVPException("No se puede leer el archivo SVPObjetos.obj .");
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new SVPException("No se puede grabar en el archivo SVPObjetos.obj");
+        } catch (ClassNotFoundException e) {
+            throw new SVPException("No se puede leer el archivo SVPObjetos.obj");
         }
     }
 

@@ -7,24 +7,24 @@ import Utilidades.Nombre;
 import Excepciones.SVPException;
 import Utilidades.Rut;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.Optional;
 
 import java.io.FileNotFoundException;
 
 //Trabajamos Benja Vivanco,Tellez y Jorge
-public class SistemaVentaPasajes{
+public class SistemaVentaPasajes implements Serializable {
     private static SistemaVentaPasajes instance=new SistemaVentaPasajes();
     ArrayList<Cliente> clientes = new ArrayList<>();
     ArrayList<Pasajero> pasajeros = new ArrayList<>();
     ArrayList<Viaje> viajes = new ArrayList<>();
     ArrayList<Venta> ventas = new ArrayList<>();
     private ControladorEmpresas ctrlEmpresas=ControladorEmpresas.getInstance();
-    private DateTimeFormatter formatter=DateTimeFormatter.ofPattern("dd/MM/yy");
     public SistemaVentaPasajes() {
         this.clientes = new ArrayList<>();
         this.pasajeros = new ArrayList<>();

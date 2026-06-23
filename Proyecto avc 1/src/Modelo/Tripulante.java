@@ -4,9 +4,10 @@ import Utilidades.Direccion;
 import Utilidades.IdPersona;
 import Utilidades.Nombre;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class Tripulante extends Persona {
+public abstract class Tripulante extends Persona implements Serializable {
     Direccion direccion;
     public  Tripulante(IdPersona idPersona, Nombre nombre, Direccion direccion){
         super(idPersona,nombre, String.valueOf(direccion));

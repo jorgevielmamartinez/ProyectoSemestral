@@ -1,9 +1,10 @@
 package Modelo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 //Clase hecha por Jacob Mercado
-public class Bus {
+public class Bus implements Serializable {
     private String patente;
     private String marca;
     private String modelo;

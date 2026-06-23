@@ -3,8 +3,10 @@ package Modelo;
 import Utilidades.Direccion;
 import Utilidades.IdPersona;
 import Utilidades.Nombre;
+
+import java.io.Serializable;
 import java.util.ArrayList;
-public class Conductor extends Tripulante{
+public class Conductor extends Tripulante implements Serializable {
     public Conductor(IdPersona id, Nombre nombre, Direccion direccion){
         super(id,nombre,direccion);
     }

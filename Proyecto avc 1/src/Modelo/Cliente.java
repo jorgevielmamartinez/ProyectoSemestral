@@ -3,9 +3,10 @@ package Modelo;
 import Utilidades.IdPersona;
 import Utilidades.Nombre;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Cliente extends Persona {
+public class Cliente extends Persona implements Serializable {
 
     private String email;
 

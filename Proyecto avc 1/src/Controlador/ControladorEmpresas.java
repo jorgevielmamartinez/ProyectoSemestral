@@ -3,9 +3,10 @@ import Modelo.*;
 import Utilidades.*;
 import Excepciones.SVPException;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
-public class ControladorEmpresas {
+public class ControladorEmpresas implements Serializable {
     private ArrayList<Empresa> empresas=new ArrayList<>();
     private ArrayList<Bus> buses = new ArrayList<>();
     private ArrayList<Terminal> terminales=new ArrayList<>();

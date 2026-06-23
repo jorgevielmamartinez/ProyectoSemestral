@@ -3,7 +3,9 @@ package Modelo;
 import Utilidades.IdPersona;
 import Utilidades.Nombre;
 
-public abstract class Persona {
+import java.io.Serializable;
+
+public abstract class Persona implements Serializable {
 
     private IdPersona idPersona;
     private Nombre nombreCompleto;

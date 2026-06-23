@@ -1,12 +1,13 @@
 package Modelo;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
 
-public class Viaje {
+public class Viaje implements Serializable {
     private LocalDate fecha;
     private LocalTime hora;
     private int precio;
