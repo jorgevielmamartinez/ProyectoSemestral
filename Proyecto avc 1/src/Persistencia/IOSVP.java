@@ -35,37 +35,37 @@ public class IOSVP {
     private List<Object> out = new ArrayList<>();
 
     public Object[] readDatosIniciales() throws FileNotFoundException {
-        Scanner sc = new Scanner(new File("SVPDatosIniciales.txt")).useDelimiter("[\t\r\n]+");
+        out.clear();
+        empresas.clear();
+        tripulantes.clear();
+        buses.clear();
+        terminales.clear();
+
+        File archivo = new File("Proyecto avc 1/SVPDatosIniciales.txt");
+
+        Scanner sc = new Scanner(archivo)
+                .useDelimiter("[\t\r\n]+");
+
         int secc = 1;
-        while(sc.hasNext()){
+
+        while (sc.hasNext()) {
             String linea = sc.next();
+
             if (linea.equals("+")) {
                 secc++;
-                if (sc.hasNext()) linea = sc.next();
+                continue;
             }
 
-            switch (secc){
-                case 1:
-                    clientePasajeros(linea);
-                    break;
-                case 2:
-                    empresas(linea);
-                    break;
-                case 3:
-                    tripulantes(linea);
-                    break;
-                case 4:
-                    terminales(linea);
-                    break;
-                case 5:
-                    buses(linea);
-                    break;
-                case 6:
-                    viajes(linea);
-                    break;
+            switch (secc) {
+                case 1 -> clientePasajeros(linea);
+                case 2 -> empresas(linea);
+                case 3 -> tripulantes(linea);
+                case 4 -> terminales(linea);
+                case 5 -> buses(linea);
+                case 6 -> viajes(linea);
             }
-            if(secc == 7) break;
         }
+
         sc.close();
         return out.toArray(new Object[0]);
     }
@@ -182,50 +182,90 @@ public class IOSVP {
         terminales.add(ter);
     }
 
-    private void viajes(String linea){
+    private void viajes(String linea) {
         String[] datos = linea.split(";");
 
         for (int i = 0; i < datos.length; i++) {
             datos[i] = datos[i].trim();
         }
-        //    public Viaje(LocalDate fecha, LocalTime hora, int precio, int dur, Bus bus,Auxiliar aux, Conductor[] cond, Terminal sale, Terminal llega) {
+
+        System.out.println("Buscando auxiliar: " + getIdpersona(datos[5]));
+        System.out.println("Buscando conductor: " + getIdpersona(datos[6]));
+
+        System.out.println("Tripulantes cargados:");
+        for (Tripulante t : tripulantes) {
+            System.out.println(t.getIdPersona() + " - " + t.getClass().getSimpleName());
+        }
 
         Viaje viaje = new Viaje(
                 LocalDate.parse(datos[0], DateTimeFormatter.ofPattern("dd-MM-yyyy")),
                 LocalTime.parse(datos[1], DateTimeFormatter.ofPattern("HH:mm")),
                 Integer.parseInt(datos[2]),
                 Integer.parseInt(datos[3]),
-                findBus(buses,formatPatente(datos[4])),
-                (Auxiliar) findTripulante(tripulantes, getIdpersona(datos[5])).orElseThrow(() -> new NoSuchElementException("Auxiliar no encontrado: " + datos[5])),
-                new Conductor[]{(Conductor) findTripulante(tripulantes, getIdpersona(datos[6])).orElseThrow(() -> new NoSuchElementException("Conductor no encontrado: " + datos[6]))},
-                findTerminal(terminales, datos[7]).orElseThrow(() -> new NoSuchElementException("Terminal origen no encontrada: " + datos[7])),
-                findTerminal(terminales, datos[8]).orElseThrow(() -> new NoSuchElementException("Terminal destino no encontrada: " + datos[8]))
+                findBus(buses, formatPatente(datos[4])),
+                (Auxiliar) findTripulante(tripulantes, getIdpersona(datos[5]))
+                        .orElseThrow(() -> new NoSuchElementException("Auxiliar no encontrado: " + datos[5])),
+                new Conductor[]{
+                        (Conductor) findTripulante(tripulantes, getIdpersona(datos[6]))
+                                .orElseThrow(() -> new NoSuchElementException("Conductor no encontrado: " + datos[6]))
+                },
+                findTerminal(terminales, datos[7])
+                        .orElseThrow(() -> new NoSuchElementException("Terminal origen no encontrada: " + datos[7])),
+                findTerminal(terminales, datos[8])
+                        .orElseThrow(() -> new NoSuchElementException("Terminal destino no encontrada: " + datos[8]))
         );
+
         out.add(viaje);
     }
-    private void empresas(String linea){
+
+    private void empresas(String linea) {
         String[] datos = linea.split(";");
+
+        for (int i = 0; i < datos.length; i++) {
+            datos[i] = datos[i].trim();
+        }
+
         Empresa emp = new Empresa(Rut.of(datos[0]), datos[1]);
         emp.setUrl(datos[2]);
         empresas.add(emp);
         out.add(emp);
     }
 
-    private void tripulantes(String linea){
+    private void tripulantes(String linea) {
         String[] datos = linea.split(";");
-        switch(datos[0]){
+
+        for (int i = 0; i < datos.length; i++) {
+            datos[i] = datos[i].trim();
+        }
+
+        switch (datos[0]) {
             case "A":
-                Optional<Empresa> empA = findEmpresa(empresas, Rut.of(datos[9]));
-                Auxiliar aux = new Auxiliar(getIdpersona(datos[1]), getNombre(Tratamiento.valueOf(datos[2]), datos[3], datos[4], datos[5]), getDireccion(datos[6], Integer.parseInt(datos[7]), datos[8]));
-                empA.get().addAuxiliar(aux.getIdPersona(), aux.getNombreCompleto(), aux.getDireccion());
+                Auxiliar aux = new Auxiliar(
+                        getIdpersona(datos[1]),
+                        getNombre(Tratamiento.valueOf(datos[2]), datos[3], datos[4], datos[5]),
+                        getDireccion(datos[6], Integer.parseInt(datos[7]), datos[8])
+                );
+
+                Empresa empA = findEmpresa(empresas, Rut.of(datos[9]))
+                        .orElseThrow(() -> new NoSuchElementException("Empresa no encontrada: " + datos[9]));
+
+                empA.addAuxiliar(aux.getIdPersona(), aux.getNombreCompleto(), aux.getDireccion());
+
                 out.add(aux);
                 tripulantes.add(aux);
                 break;
-            case "C":
-                Optional<Empresa> empC = findEmpresa(empresas, Rut.of(datos[9]));
-                Conductor cond = new Conductor(getIdpersona(datos[1]), getNombre(Tratamiento.valueOf(datos[2]), datos[3], datos[4], datos[5]), getDireccion(datos[6], Integer.parseInt(datos[7]), datos[8]));
 
-                empC.get().addConductor(cond.getIdPersona(), cond.getNombreCompleto(), cond.getDireccion());
+            case "C":
+                Conductor cond = new Conductor(
+                        getIdpersona(datos[1]),
+                        getNombre(Tratamiento.valueOf(datos[2]), datos[3], datos[4], datos[5]),
+                        getDireccion(datos[6], Integer.parseInt(datos[7]), datos[8])
+                );
+
+                Empresa empC = findEmpresa(empresas, Rut.of(datos[9]))
+                        .orElseThrow(() -> new NoSuchElementException("Empresa no encontrada: " + datos[9]));
+
+                empC.addConductor(cond.getIdPersona(), cond.getNombreCompleto(), cond.getDireccion());
 
                 out.add(cond);
                 tripulantes.add(cond);
@@ -235,8 +275,13 @@ public class IOSVP {
 
 
 
-    private void buses(String linea){
+    private void buses(String linea) {
         String[] datos = linea.split(";");
+
+        for (int i = 0; i < datos.length; i++) {
+            datos[i] = datos[i].trim();
+        }
+
         Bus bus  = new Bus(formatPatente(datos[0]), Integer.parseInt(datos[3]), findEmpresa(empresas, Rut.of(datos[4])).get());
         bus.setMarca(datos[1]);
         bus.setModelo(datos[2]);

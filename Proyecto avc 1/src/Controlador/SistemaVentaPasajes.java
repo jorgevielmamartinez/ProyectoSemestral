@@ -297,11 +297,27 @@ public class SistemaVentaPasajes{
         try {
             Object[] datos = IOSVP.getInstance().readDatosIniciales();
 
-            ctrlEmpresas.setDatosIniciales(datos);
+            for (Object obj : datos) {
+                if (obj instanceof Cliente cliente) {
+                    if (findCliente(cliente.getIdPersona()).isEmpty()) {
+                        clientes.add(cliente);
+                    }
+                }
 
-            this.clientes = (ArrayList<Cliente>) datos[0];
-            this.pasajeros = (ArrayList<Pasajero>) datos[1];
-            this.viajes = (ArrayList<Viaje>) datos[2];
+                if (obj instanceof Pasajero pasajero) {
+                    if (findPasajero(pasajero.getIdPersona()).isEmpty()) {
+                        pasajeros.add(pasajero);
+                    }
+                }
+
+                if (obj instanceof Viaje viaje) {
+                    if (findViaje(viaje.getFecha(), viaje.getHora(), viaje.getBus().getPatente()).isEmpty()) {
+                        viajes.add(viaje);
+                    }
+                }
+            }
+
+            ctrlEmpresas.setDatosIniciales(datos);
 
         } catch (FileNotFoundException e) {
             throw new SVPException("No existe o no se puede abrir el archivo SVPDatosIniciales.txt");
