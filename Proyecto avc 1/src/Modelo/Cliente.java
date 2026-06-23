@@ -11,7 +11,10 @@ public class Cliente extends Persona {
 
     private ArrayList<Venta> ventas = new ArrayList<>();
 
-    public Cliente(IdPersona id, Nombre nom, String telefono) {
+    public Cliente(IdPersona id,
+                   Nombre nom,
+                   String telefono,
+                   String email) {
 
         super(id, nom, telefono);
 

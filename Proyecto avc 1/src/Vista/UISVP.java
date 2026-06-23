@@ -49,16 +49,16 @@ public class UISVP {
             System.out.println(" 11) Listar empresas");
             System.out.println(" 12) Listar llegadas/salidas del terminal");
             System.out.println(" 13) Listar ventas de empresa");
-            System.out.println(" 14) Listar llegadas/salidas del terminal");
-            System.out.println(" 15) Listar ventas de empresa");
-            System.out.println(" 16) Listar llegadas/salidas del terminal");
-            System.out.println(" 17) Listar ventas de empresa");
+            System.out.println(" 14) Generar pasajes venta");
+            System.out.println(" 15) Leer datos iniciales");
+            System.out.println(" 16) Guardar datos del sistema");
+            System.out.println(" 17) Leer datos del sistema");
             System.out.println(" 18) Salir");
             System.out.println("\n");
             System.out.println(" 50) AUTORUN: parte de avance 2");
             System.out.println("____________________________");
             System.out.print("..:: Ingrese número de opción: ");
-            opcion = elegirOpc(15);
+            opcion = elegirOpc(18);
             System.out.println();
 
 
@@ -747,7 +747,7 @@ public class UISVP {
             } else {
                 System.out.println("...::: No existen pasajeros en el viaje indicado");
             }
-        } catch (SVPException e) {
+        } catch (Exception e) {
             System.err.println(e.getMessage());
         }
     }
@@ -836,17 +836,17 @@ public class UISVP {
     }
 
 
-    private void pagaVentaPasajes(String idDocumento, TipoDocumento tipo) {
+    private void pagaVentaPasajes(String idDocumento, TipoDocumento tipo) throws SVPException {
         System.out.println(":::: Pago de la venta");
         int opcPago = leeOpc("Efectivo[1] o Tarjeta[2]", 2);
 
         if (opcPago == 1) {
             SVP.pagaVenta(idDocumento, tipo);
-
         } else {
             long nroTarjeta = Long.parseLong(leeString("Ingrese numero de Tarjeta"));
             SVP.pagaVenta(idDocumento, tipo, nroTarjeta);
         }
+
         System.out.println();
         System.out.println("\n...:::: Venta realizada exitosamente ::::....\n\n");
     }
@@ -994,7 +994,8 @@ public class UISVP {
         // 5. se crea el viaje
 
         IdPersona[] trip = {
-                Rut.of("10.350.582-8")
+                Rut.of("10.350.582-8"),
+                Rut.of("11.111.111-1")
         };
 
         String[] comunas = {

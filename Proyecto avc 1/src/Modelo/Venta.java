@@ -112,4 +112,12 @@ public class Venta {
             pasajes.add(pasaje);
         }
     }
+
+    public Pago getPago() {
+        return pago;
+    }
+
+    public void setPago(Pago pago) {
+        this.pago = pago;
+    }
 }

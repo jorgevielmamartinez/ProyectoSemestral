@@ -7,13 +7,14 @@ import Utilidades.Nombre;
 import Excepciones.SVPException;
 import Utilidades.Rut;
 
-import java.io.FileNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
+
+import java.io.FileNotFoundException;
 
 //Trabajamos Benja Vivanco,Tellez y Jorge
 public class SistemaVentaPasajes{
@@ -33,8 +34,8 @@ public class SistemaVentaPasajes{
     public static SistemaVentaPasajes getInstance(){
         return instance;
     }
-    public void createCliente(IdPersona id, Nombre nom, String fono, String email) {
-        Cliente cliente = new Cliente(id, nom,fono,email);
+    public void createCliente(IdPersona id, Nombre nom, String fono, String email) throws SVPException {
+        Cliente cliente = new Cliente(id, nom, fono, email);
 
         if (findCliente(id).isEmpty()) {
             clientes.add(cliente);
@@ -45,10 +46,7 @@ public class SistemaVentaPasajes{
 
     public void createPasajero(IdPersona id, Nombre nom, String fono, Nombre nomContacto, String fonoContacto)throws SVPException {
 
-        Pasajero pasajero=new Pasajero(id,nom,fono,nomContacto,fonoContacto);
-        pasajero.setTelefono(fono);
-        pasajero.setNomContacto(nomContacto);
-        pasajero.setFonoContacto(fonoContacto);
+        Pasajero pasajero = new Pasajero(id, nom, fono, nomContacto, fonoContacto);
         if (findPasajero(id).isEmpty()) {
             pasajeros.add(pasajero);
         }else {
@@ -61,13 +59,16 @@ public class SistemaVentaPasajes{
         if (viajeOptional.isPresent()) {
             throw new SVPException("Ya existe viaje con fecha, hora y patente indicados");
         }
-        Bus busOptional = ctrlEmpresas.findBus(patBus).orElseThrow(() -> new SVPException("No existe un bus con la patente indicada"));
-        String rutEmpresa = busOptional.getEmpresa().getRut() + "";
+        Optional<Bus> busOptional = ctrlEmpresas.findBus(patBus);
+
+        Bus bus = busOptional.orElseThrow(() ->
+                new SVPException("No existe un bus con la patente indicada"));
+        String rutEmpresa = bus.getEmpresa().getRut() + "";
         Auxiliar auxiliar = ctrlEmpresas.findAuxliar(idTripulantes[0], Rut.of(rutEmpresa))
                 .orElseThrow(() -> new SVPException("No existe Auxiliar con el id indicado en la empresa con el rut indicado"));
         Conductor[] conductores = new Conductor[idTripulantes.length - 1];
-        for (int i = 1; i < conductores.length; i++) {
-            conductores[i] = ctrlEmpresas.findConductor(idTripulantes[i], Rut.of(rutEmpresa))
+        for (int i = 1; i < idTripulantes.length; i++) {
+            conductores[i - 1] = ctrlEmpresas.findConductor(idTripulantes[i], Rut.of(rutEmpresa))
                     .orElseThrow(() -> new SVPException("No existe conductor con el id indicado en la empresa con el rut indicado"));
         }
         Terminal salida  = ctrlEmpresas.findTerminalPorComuna(comunas[0]).orElseThrow(() -> new SVPException("No existe terminal de salida en la comuna indicada"));
@@ -76,41 +77,44 @@ public class SistemaVentaPasajes{
         Viaje viaje = new Viaje(fecha, hora, precio, duracion, busOptional, auxiliar, conductores, salida, llegada);
         viajes.add(viaje);
     }
-    public void iniciaVenta(String idDoc, TipoDocumento tipo, LocalDate fechaViaje, String comSalida, String comLlegada,IdPersona idCliente, int nroPasajes) throws SVPException {
 
-        Cliente cliente = findCliente(idCliente).orElseThrow(() ->
-                new SVPException("No existe cliente con el id indicado"));
+
+    public void iniciaVenta(String idDoc, TipoDocumento tipo, LocalDate fechaViaje,
+                            String comSalida, String comLlegada, IdPersona idCliente,
+                            int nroPasajes) throws SVPException {
+
+        if (findVenta(idDoc, tipo).isPresent()) {
+            throw new SVPException("Ya existe venta con el id y tipo de documento indicados");
+        }
+
+        Cliente cliente = findCliente(idCliente)
+                .orElseThrow(() -> new SVPException("No existe cliente con id indicado"));
 
         ArrayList<Viaje> viajesDisponibles = new ArrayList<>();
 
         for (Viaje v : viajes) {
-            if((v.getFecha().equals(fechaViaje) &&
-                    v.getTerminalSalida().getDireccion().getComuna().equals(comSalida) &&
-                    v.getTerminalLlegada().getDireccion().getComuna().equals(comLlegada))){
+            if (v.getFecha().equals(fechaViaje)
+                    && v.getTerminalSalida().getDireccion().getComuna().equalsIgnoreCase(comSalida)
+                    && v.getTerminalLlegada().getDireccion().getComuna().equalsIgnoreCase(comLlegada)) {
                 viajesDisponibles.add(v);
             }
         }
 
-        if(viajesDisponibles.isEmpty()){
-            throw new SVPException("No existen viajes disponibles en la fecha y con terminales en las comunas de\n" +
-                    "salida y llegada indicados");
+        if (viajesDisponibles.isEmpty()) {
+            throw new SVPException("No existen viajes disponibles en la fecha y con terminales en las comunas de salida y llegada indicados");
         }
-
-        if (findVenta(idDoc, tipo).isPresent()) {
-            throw new SVPException("Ya existe una venta con el id y tipo de documento indicados");
-        }
-
-        Venta venta = new Venta(idDoc, tipo, LocalDate.now(), cliente);
 
         for (Viaje viaje : viajesDisponibles) {
-            if(viaje.existeDisponibilidad(nroPasajes)){
+            if (viaje.existeDisponibilidad(nroPasajes)) {
+                Venta venta = new Venta(idDoc, tipo, LocalDate.now(), cliente);
                 ventas.add(venta);
                 return;
             }
         }
 
-
+        throw new SVPException("No hay asientos disponibles suficientes para la cantidad de pasajes solicitada");
     }
+
     public String[][] getHorariosDisponibles(LocalDate fechaViaje) {
         ArrayList<Viaje> encontrados = new ArrayList<>();
         for (Viaje v : viajes) {
@@ -148,31 +152,30 @@ public class SistemaVentaPasajes{
         return 0;
     }
 
-    public void vendePasaje(String idDoc, TipoDocumento tipo, LocalDate fecha, LocalTime hora, String patBus, int asiento, IdPersona idPasajero){
-        Venta venta=findVenta(idDoc,tipo).orElseThrow(()->new SVPException("No existe una venta con el id y tipo de documento indicado"));
+    public void vendePasaje(String idDoc, TipoDocumento tipo, LocalDate fecha,
+                            LocalTime hora, String patBus, int asiento,
+                            IdPersona idPasajero) throws SVPException {
 
-        Viaje viaje = findViaje(fecha, hora, patBus).orElseThrow(() ->
-                new SVPException("No existe viaje con la fecha, hora y patente del bus indicados"));
-        Pasajero pasajero = findPasajero(idPasajero).orElseThrow(() ->
-                new SVPException("No existe pasajero con el id indicado"));
+        Venta venta = findVenta(idDoc, tipo)
+                .orElseThrow(() -> new SVPException("No existe venta con el id y tipo de documento indicados"));
+
+        Viaje viaje = findViaje(fecha, hora, patBus)
+                .orElseThrow(() -> new SVPException("No existe viaje con la fecha, hora y patente de bus indicados"));
+
+        Pasajero pasajero = findPasajero(idPasajero)
+                .orElseThrow(() -> new SVPException("No existe pasajero con el id indicado"));
 
         Pasaje pasaje = new Pasaje(asiento, viaje, pasajero, venta);
-        //venta.addPasaje(pasaje);
-        viaje.addPasaje(pasaje);
+
+        venta.addPasaje(pasaje);
     }
 
-    public void pagaVenta(String idDocumento, TipoDocumento tipo) {
+    public void pagaVenta(String idDocumento, TipoDocumento tipo) throws SVPException {
+        Venta venta = findVenta(idDocumento, tipo)
+                .orElseThrow(() -> new SVPException("No existe venta con el id y tipo de documento indicados"));
 
-        for (Venta v : ventas) {
-
-            if (v.getIdDocumento().equals(idDocumento)
-                    && v.getTipo().equals(tipo)) {
-
-                Pago pago = new PagoEfectivo(v.getMonto());
-
-                return;
-            }
-        }
+        Pago pago = new PagoEfectivo(venta.getMonto());
+        venta.setPago(pago);
     }
 
     public void pagaVenta(String idDocumento,
@@ -239,8 +242,8 @@ public class SistemaVentaPasajes{
 
 
     public String[][] listPasajeros(LocalDate fecha,LocalTime hora,String patente)throws SVPException {
-        Viaje v = findViaje(fecha, hora, patente).orElseThrow(()->new SVPException("No existe viaje con la fecha,hora y patente"));
-        if (v == null) return new String[0][0];
+        Viaje v = findViaje(fecha, hora, patente)
+                .orElseThrow(() -> new SVPException("No existe viaje con la fecha, hora y patente"));
 
         return v.getListaPasajeros();
     }
@@ -275,87 +278,85 @@ public class SistemaVentaPasajes{
         return new String[0][0];
     }
 
-    public void generatePasajesVenta(String idDocumento,TipoDocumento tipo) throws SVPException, FileNotFoundException {
-        Venta venta=null;
-        for (Venta v:ventas) {
-            if (v.getIdDocumento().equals(idDocumento)&& v.getTipo().equals(tipo)) {
-                venta = v;
-                break;
-            }
-        }
-        if (venta==null){
-            throw new SVPException("No existe una venta con los datos");
-        }
-        IOSVP iosvp=IOSVP.getInstance();
-        final String ventaPasajes="ventaPasajes.txt";
-        iosvp.savePasajesDeVenta(venta.getPasajes(),ventaPasajes);
-    }
+    public void generatePasajesVenta(String idDocumento, TipoDocumento tipo) throws SVPException {
+        Venta venta = findVenta(idDocumento, tipo)
+                .orElseThrow(() -> new SVPException("No existe venta con el id y tipo de documento indicados"));
 
+        String nombreArchivo = idDocumento + tipo.toString().toLowerCase() + ".txt";
 
-
-    public void readDatosIniciales() throws SVPException, FileNotFoundException {
-        Object datos[]=IOSVP.getInstance().readDatosIniciales();
-        readDatosSistema(datos);
-        ctrlEmpresas.setDatosIniciales(datos);
-    }
-
-    public void saveDatosSistema()throws SVPException {
-        IOSVP.getInstance().saveDatosSistema(new Object[]{this,ctrlEmpresas});
-    }
-
-
-    public void readDatosSistema()throws SVPException {
-        Object[] controladores=IOSVP.getInstance().readControladores();
-        for (Object controlador:controladores){
-            if(controlador instanceof SistemaVentaPasajes){
-                SistemaVentaPasajes svp=(SistemaVentaPasajes)controlador;
-                this.ventas=svp.ventas;
-                this.clientes=svp.clientes;
-                this.viajes=svp.viajes;
-                this.pasajeros=svp.pasajeros;
-            }
-            if (controlador instanceof ControladorEmpresas){
-                ctrlEmpresas.setInstanciaPersistente(ControladorEmpresas) controlador);
-            }
+        try {
+            IOSVP.getInstance().savePasajesDeVenta(venta.getPasajes(), nombreArchivo);
+        } catch (FileNotFoundException e) {
+            throw new SVPException("No se puede abrir o crear el archivo " + nombreArchivo);
         }
     }
 
-    private Optional<Cliente> findCliente(IdPersona id){
-        for (Cliente c:clientes){
-            if (c.getIdPersona().equals(id)){
-                return Optional.of(c);
-            }
-        }
-        return Optional.empty();
-    }
-    private Optional<Venta> findVenta(String idDocumento, TipoDocumento tipoDocumento){
-        for (Venta v:ventas){
-            if (v.getIdDocumento().equals(idDocumento)&&v.getTipo().equals(tipoDocumento)){
-                return Optional.of(v);
-            }
-        }
-        return Optional.empty();
-    }
 
-    private Optional<Viaje> findViaje(LocalDate fecha, LocalTime hora, String patenteBus){
-        for (Viaje v : viajes){
-            if (v.getFecha().equals(fecha) &&
-                    v.getHora().equals(hora) &&
-                    v.getBus().getPatente().equals(patenteBus)) {
 
-                return Optional.of(v);
-            }
+    public void readDatosIniciales() throws SVPException {
+        try {
+            Object[] datos = IOSVP.getInstance().readDatosIniciales();
+
+            ctrlEmpresas.setDatosIniciales(datos);
+
+            this.clientes = (ArrayList<Cliente>) datos[0];
+            this.pasajeros = (ArrayList<Pasajero>) datos[1];
+            this.viajes = (ArrayList<Viaje>) datos[2];
+
+        } catch (FileNotFoundException e) {
+            throw new SVPException("No existe o no se puede abrir el archivo SVPDatosIniciales.txt");
         }
-        return Optional.empty();
     }
 
-    private Optional<Pasajero> findPasajero(IdPersona idPersona){
-        for (Pasajero p:pasajeros){
-            if (p.getIdPersona().equals(idPersona)){
-                return Optional.of(p);
+    public void saveDatosSistema() throws SVPException {
+        IOSVP.getInstance().saveControladores(new Object[]{this, ctrlEmpresas});
+    }
+
+
+    public void readDatosSistema() throws SVPException {
+        Object[] controladores = IOSVP.getInstance().readControladores();
+
+        for (Object controlador : controladores) {
+            if (controlador instanceof SistemaVentaPasajes svp) {
+                this.ventas = svp.ventas;
+                this.clientes = svp.clientes;
+                this.viajes = svp.viajes;
+                this.pasajeros = svp.pasajeros;
+            }
+
+            if (controlador instanceof ControladorEmpresas ce) {
+                // ctrlEmpresas.setInstanciaPersistente(ce);
             }
         }
-        return Optional.empty();
+    }
+
+    private Optional<Cliente> findCliente(IdPersona id) {
+        return clientes.stream()
+                .filter(c -> c.getIdPersona().equals(id))
+                .findFirst();
+    }
+
+
+    private Optional<Venta> findVenta(String idDocumento, TipoDocumento tipoDocumento) {
+        return ventas.stream()
+                .filter(v -> v.getIdDocumento().equals(idDocumento)
+                        && v.getTipo().equals(tipoDocumento))
+                .findFirst();
+    }
+
+
+    private Optional<Viaje> findViaje(LocalDate fecha, LocalTime hora, String patenteBus) {
+        return viajes.stream()
+                .filter(v -> v.getFecha().equals(fecha)
+                        && v.getHora().equals(hora)
+                        && v.getBus().getPatente().equals(patenteBus))
+                .findFirst();
+    }
+
+    private Optional<Pasajero> findPasajero(IdPersona idPersona) {
+        return pasajeros.stream()
+                .filter(p -> p.getIdPersona().equals(idPersona))
+                .findFirst();
     }
 
     /*

@@ -136,8 +136,12 @@ public class IOSVP {
 
         switch(datos[0]){
             case "C":
-                Cliente cliente = new Cliente( getIdpersona(datos[1]),getNombre(Tratamiento.valueOf(datos[2]), datos[3], datos[4], datos[5]), datos[6]);
-                if (datos.length > 7) cliente.setEmail(datos[7]); // Prevención de OutOfBounds
+                Cliente cliente = new Cliente(
+                        getIdpersona(datos[1]),
+                        getNombre(Tratamiento.valueOf(datos[2]), datos[3], datos[4], datos[5]),
+                        datos[6],
+                        datos[7]
+                );
                 out.add(cliente);
                 break;
             case "P":
@@ -146,10 +150,21 @@ public class IOSVP {
                 out.add(pasajero);
                 break;
             case "CP":
-                Cliente cliente2 = new Cliente(getIdpersona(datos[1]),getNombre(Tratamiento.valueOf(datos[2]), datos[3], datos[4], datos[5]), datos[6]);
-                if (datos.length > 7) cliente2.setEmail(datos[7]); // Prevención de OutOfBounds
+                Cliente cliente2 = new Cliente(
+                        getIdpersona(datos[1]),
+                        getNombre(Tratamiento.valueOf(datos[2]), datos[3], datos[4], datos[5]),
+                        datos[6],
+                        datos[7]
+                );
                 out.add(cliente2);
-                Pasajero pasajero2 = new Pasajero( getIdpersona(datos[1]),getNombre(Tratamiento.valueOf(datos[2]), datos[3], datos[4], datos[5]),datos[6],getNombre(Tratamiento.valueOf(datos[7]), datos[8], datos[9], datos[10]),datos[11]);
+
+                Pasajero pasajero2 = new Pasajero(
+                        getIdpersona(datos[1]),
+                        getNombre(Tratamiento.valueOf(datos[2]), datos[3], datos[4], datos[5]),
+                        datos[6],
+                        getNombre(Tratamiento.valueOf(datos[8]), datos[9], datos[10], datos[11]),
+                        datos[12]
+                );
                 out.add(pasajero2);
                 break;
         }
