@@ -3,6 +3,7 @@ import Modelo.*;
 import Utilidades.*;
 import Excepciones.SVPException;
 
+import java.util.Arrays;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
@@ -217,92 +218,51 @@ public class ControladorEmpresas implements Serializable {
 
 
     protected Optional<Empresa> findEmpresa(Rut rut) {
-
-        for(Empresa n:empresas){
-            if(n.getRut().equals(rut)){
-                return Optional.of(n);
-            }
-        }
-
-        return Optional.empty();
-
+        return empresas.stream()
+                .filter(e -> e.getRut().equals(rut))
+                .findFirst();
     }
 
 
 
 
-    protected Optional<Terminal> findTerminal(String nombre){
-
-        for (Terminal n:terminales){
-            if(n.getNombre().equalsIgnoreCase(nombre)){
-                return Optional.of(n);
-            }
-
-        }
-
-        return Optional.empty();
+    protected Optional<Terminal> findTerminal(String nombre) {
+        return terminales.stream()
+                .filter(t -> t.getNombre().equalsIgnoreCase(nombre))
+                .findFirst();
     }
 
     protected Optional<Terminal> findTerminalPorComuna(String comuna) {
-
-        for(Terminal n: terminales){
-            if((n.getDireccion().getComuna()).equalsIgnoreCase(comuna)){
-                return Optional.of(n);
-            }
-        }
-
-        return Optional.empty();
-
+        return terminales.stream()
+                .filter(t -> t.getDireccion().getComuna().equalsIgnoreCase(comuna))
+                .findFirst();
     }
 
 
     protected Optional<Bus> findBus(String patente) {
-        for (Bus n:buses){
-            if(n.getPatente().equalsIgnoreCase(patente)){
-                return Optional.of(n);
-            }
-        }
-        return Optional.empty();
+        return buses.stream()
+                .filter(b -> b.getPatente().equalsIgnoreCase(patente))
+                .findFirst();
     }
 
     protected Optional<Conductor> findConductor(IdPersona id, Rut rutEmpresa) {
-
-        Optional<Empresa> empre =findEmpresa(rutEmpresa);
-
-        if(empre.isEmpty()){
-            return Optional.empty();
-        }
-
-        Tripulante[] arregloTripulantes=empre.get().getTripulantes();
-
-        for (Tripulante n:arregloTripulantes){
-            if(n.getIdPersona().equals(id)){
-                return Optional.of((Conductor) n);
-            }
-        }
-
-        return Optional.empty();
-
+        return findEmpresa(rutEmpresa)
+                .stream()
+                .flatMap(e -> Arrays.stream(e.getTripulantes()))
+                .filter(t -> t instanceof Conductor)
+                .map(t -> (Conductor) t)
+                .filter(c -> c.getIdPersona().equals(id))
+                .findFirst();
     }
 
     protected Optional<Auxiliar> findAuxliar(IdPersona id, Rut rutEmpresa) {
-
-        Optional<Empresa> empre =findEmpresa(rutEmpresa);
-
-        if(empre.isEmpty()){
-            return Optional.empty();
-        }
-
-        Tripulante[] arregloTripulantes=empre.get().getTripulantes();
-
-        for (Tripulante n:arregloTripulantes){
-            if(n.getIdPersona().equals(id)){
-                return Optional.of((Auxiliar) n);
-            }
-        }
-
-        return Optional.empty();
-
+        return findEmpresa(rutEmpresa)
+                .stream()
+                .flatMap(e -> Arrays.stream(e.getTripulantes()))
+                .filter(t -> t instanceof Auxiliar)
+                .map(t -> (Auxiliar) t)
+                .filter(a -> a.getIdPersona().equals(id))
+                .findFirst();
     }
 
     public void setInstanciaPersistente(ControladorEmpresas ce) {
