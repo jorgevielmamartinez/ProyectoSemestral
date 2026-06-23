@@ -14,7 +14,7 @@ public class Empresa {
     ArrayList<Bus>buses=new ArrayList();
     ArrayList<Conductor>conductores=new ArrayList();
     ArrayList<Auxiliar>auxiliares=new ArrayList();
-    public Empresa(Rut rut, String nombre, String url) {
+    public Empresa(Rut rut, String nombre) {
         this.rut = rut;
         this.nombre = nombre;
         this.url = url;
@@ -22,6 +22,7 @@ public class Empresa {
         this.conductores=new ArrayList();
         this.auxiliares=new ArrayList();
     }
+
     public Rut getRut(){
         return this.rut;
     }

@@ -2,13 +2,15 @@ package Modelo;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Objects;
+
 //clase hecha por Jorge Vielma
 public class Venta {
     private String idDocumento;
     private TipoDocumento tipo;
     private LocalDate fecha;
     private Cliente cliente;
-
+    private Pago pago;
     private ArrayList<Pasaje> pasajes;
 
     public Venta(String id, TipoDocumento tipo, LocalDate fecha, Cliente cliente) {
@@ -17,7 +19,7 @@ public class Venta {
         this.fecha = fecha;
         this.cliente = cliente;
         this.pasajes = new ArrayList<Pasaje>();
-
+        this.pago=null;
         cliente.addVenta(this);
     }
 
@@ -42,6 +44,8 @@ public class Venta {
         Pasaje pasaje = new Pasaje(asiento, viaje, pasajero, this);
 
         this.pasajes.add(pasaje);
+
+        viaje.addVenta(this);
     }
 
     public Pasaje[] getPasajes() {
@@ -53,20 +57,55 @@ public class Venta {
         return arregloPasajes;
     }
 
-    public int getMonto() {
-        int total = 0;
 
+    public int getMontoPagado(){
+        if (pago != null) {
+            return pago.getMonto();
+        }
+        return 0;
+    }
+    public boolean pagaMonto(){
+        if (pago == null) {
+            int montoTotal = getMonto();
+            pago = new PagoEfectivo(montoTotal);
+            return true;
+        }
+        return false;
+    }
+    public boolean pagaMonto(long nroTarjeta){
+        if (pago == null) {
+            int montoTotal = getMonto();
+            pago = new PagoTarjeta((long) montoTotal, (int) nroTarjeta);
+            return true;
+        }
+        return false;
+    }
+    public String getTipoPago(){
+        if (pago instanceof PagoEfectivo){
+            return "Efectivo";
+
+        } else if (pago instanceof PagoTarjeta) {
+            return "Tarjeta";
+        }
+
+        return null;
+    }
+
+    public int getMonto(){
+        int monto = 0;
         for (Pasaje pasaje : pasajes) {
-            total = total + pasaje.getViaje().getPrecio();
+            monto += pasaje.getViaje().getPrecio();
         }
-        return total;
+        return monto;
     }
 
-    public int getTotalVenta() {
-        int total = 0;
-        for (Pasaje p : pasajes) {
-            total = total + p.getViaje().getPrecio();
-        }
-        return total;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Venta venta = (Venta) o;
+        return Objects.equals(idDocumento, venta.idDocumento) && tipo == venta.tipo && Objects.equals(fecha, venta.fecha) && Objects.equals(cliente, venta.cliente) && Objects.equals(pago, venta.pago) && Objects.equals(pasajes, venta.pasajes);
     }
+
+
 }

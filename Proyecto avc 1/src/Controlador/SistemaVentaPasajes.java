@@ -1,88 +1,115 @@
 package Controlador;
 
-import Modelo.Cliente;
-import Modelo.Pasajero;
+import Modelo.*;
 import Utilidades.IdPersona;
 import Utilidades.Nombre;
+import Excepciones.SVPException;
+import Utilidades.Rut;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 //Trabajamos Benja Vivanco,Tellez y Jorge
 public class SistemaVentaPasajes{
+    private static SistemaVentaPasajes instance=new SistemaVentaPasajes();
     ArrayList<Cliente> clientes = new ArrayList<>();
     ArrayList<Pasajero> pasajeros = new ArrayList<>();
-    ArrayList<Bus> buses = new ArrayList<>();
     ArrayList<Viaje> viajes = new ArrayList<>();
     ArrayList<Venta> ventas = new ArrayList<>();
+    private ControladorEmpresas ctrlEmpresas=ControladorEmpresas.getInstance();
    private DateTimeFormatter formatter=DateTimeFormatter.ofPattern("dd/MM/yy");
     public SistemaVentaPasajes() {
         this.clientes = new ArrayList<>();
         this.pasajeros = new ArrayList<>();
         this.ventas = new ArrayList<>();
         this.viajes = new ArrayList<>();
-        this.buses = new ArrayList<>();
     }
-    public boolean createCliente(IdPersona id, Nombre nom, String fono, String email) {
-        if (findCliente(id)!=null){
-            System.out.println(">>Ya existe cliente con esa id<<");
-            return false;
-        }
-            Cliente cliente = new Cliente(id, nom, fono, email);
+    public static SistemaVentaPasajes getInstance(){
+        return instance;
+    }
+    public void createCliente(IdPersona id, Nombre nom, String fono,String email) throws SVPException {
+        Cliente cliente = new Cliente(id, nom,fono);
+        cliente.setEmail(email);
+
+        if (findCliente(id).isEmpty()) {
             clientes.add(cliente);
-            return true;
+        } else{
+            throw new SVPException("Ya existe cliente con el id indicado");
+        }
         }
 
-    public boolean createPasajero(IdPersona id, Nombre nom, String fono, Nombre nomContacto, String fonoContacto){
-          if(findPasajero(id)!=null){
-              System.out.println(">>No se puede agregar un pasajero con el mismo id<<");
-              return false;
-          }
+    public void createPasajero(IdPersona id, Nombre nom, String fono, Nombre nomContacto, String fonoContacto)throws SVPException {
+
         Pasajero pasajero=new Pasajero(id,nom,fono,nomContacto,fonoContacto);
-        pasajeros.add(pasajero);
-        return true;
+        pasajero.setTelefono(fono);
+        pasajero.setNomContacto(nomContacto);
+        pasajero.setFonoContacto(fonoContacto);
+        if (findPasajero(id).isEmpty()) {
+            pasajeros.add(pasajero);
+        }else {
+            throw new SVPException("Ya existe pasajero con el id indicado");
+        }
     }
-    public boolean createBus(String patente,String marca,String modelo,int nroAsientos){
-        if(findBus(patente)!=null){
-            System.out.println(">>No se puede agregar un bus con la misma patente<<");
-            return false;
+
+    public void createViaje(LocalDate fecha, LocalTime hora, int precio, int duracion,ArrayList<Bus> buses,  String patBus, IdPersona[] idTripulantes, String[] comunas) throws SVPException {
+        Optional<Viaje> viajeOptional = findViaje(fecha, hora, patBus);
+        if (viajeOptional.isPresent()) {
+            throw new SVPException("Ya existe viaje con fecha, hora y patente indicados");
+        }
+        Bus busOptional = ctrlEmpresas.findBus(patBus).orElseThrow(() -> new SVPException("No existe un bus con la patente indicada"));
+        String rutEmpresa = busOptional.getEmpresa().getRut() + "";
+        Auxiliar auxiliar = ctrlEmpresas.findAuxliar(idTripulantes[0], Rut.of(rutEmpresa))
+                .orElseThrow(() -> new SVPException("No existe Auxiliar con el id indicado en la empresa con el rut indicado"));
+        Conductor[] conductores = new Conductor[idTripulantes.length - 1];
+        for (int i = 1; i < conductores.length; i++) {
+            conductores[i] = ctrlEmpresas.findConductor(idTripulantes[i], Rut.of(rutEmpresa))
+                    .orElseThrow(() -> new SVPException("No existe conductor con el id indicado en la empresa con el rut indicado"));
+        }
+        Terminal salida  = ctrlEmpresas.findTerminalPorComuna(comunas[0]).orElseThrow(() -> new SVPException("No existe terminal de salida en la comuna indicada"));
+        Terminal llegada = ctrlEmpresas.findTerminalPorComuna(comunas[1]).orElseThrow(() -> new SVPException("No existe terminal de llegada en la comuna indicada"));
+        Optional<Bus> bus=findBus(buses, patBus);
+        Viaje viaje = new Viaje(fecha, hora, precio, duracion,bus , auxiliar, conductores, salida, llegada);
+        viajes.add(viaje);
+    }
+    public void iniciaVenta(String idDoc, TipoDocumento tipo, LocalDate fechaViaje, String comSalida, String comLlegada,IdPersona idCliente, int nroPasajes) throws SVPException {
+
+        Cliente cliente = findCliente(idCliente).orElseThrow(() ->
+                new SVPException("No existe cliente con el id indicado"));
+
+        ArrayList<Viaje> viajesDisponibles = new ArrayList<>();
+
+        for (Viaje v : viajes) {
+            if((v.getFecha().equals(fechaViaje) &&
+                    v.getTerminalSalida().getDireccion().getComuna().equals(comSalida) &&
+                    v.getTerminalLlegada().getDireccion().getComuna().equals(comLlegada))){
+                viajesDisponibles.add(v);
+            }
         }
 
-     Bus bus=new Bus(patente,nroAsientos);
-     bus.setMarca(marca);
-     bus.setModelo(modelo);
-     buses.add(bus);
-        return true;
-    }
-    public boolean createViaje(LocalDate fecha,LocalTime hora,int precio,String patBus){
-        if (findViaje(fecha.toString(),hora.toString(),patBus)!=null){
-            System.out.println(">>No se puede agregar un viaje con la misma fecha y hora<<");
-            return false;
+        if(viajesDisponibles.isEmpty()){
+            throw new SVPException("No existen viajes disponibles en la fecha y con terminales en las comunas de\n" +
+                    "salida y llegada indicados");
         }
-        Bus bus=findBus(patBus);
-        if (bus==null){
-            System.out.println(">>Modelo.Bus no existente<<");
-            return false;
+
+        if (findVenta(idDoc, tipo).isPresent()) {
+            throw new SVPException("Ya existe una venta con el id y tipo de documento indicados");
         }
-      Viaje viaje=new Viaje(fecha,hora,precio,bus);
-      viajes.add(viaje);
-      return true;
-    }
-    public boolean iniciaVenta(String idDoc, TipoDocumento tipo, LocalDate fechaVenta, IdPersona idCliente){
-     Cliente bandera=findCliente(idCliente);
-        if (bandera==null){
-            System.out.println(">>No se encontro al cliente<<");
-            return false;
+
+        Venta venta = new Venta(idDoc, tipo, LocalDate.now(), cliente);
+
+        for (Viaje viaje : viajesDisponibles) {
+            if(viaje.existeDisponibilidad(nroPasajes)){
+                ventas.add(venta);
+                return;
+            }
         }
-        Venta venta=findVenta(idDoc,tipo);
-        if (venta!=null){
-            System.out.println(">>No se puede iniciar la venta,ya existe una con este Id");
-            return false;
-        }
-     venta=new Venta(idDoc,tipo,fechaVenta,bandera);
-     ventas.add(venta);
-     return true;
+
+
     }
     public String[][] getHorariosDisponibles(LocalDate fechaViaje) {
         ArrayList<Viaje> encontrados = new ArrayList<>();
@@ -127,41 +154,31 @@ public class SistemaVentaPasajes{
                return String.valueOf(p.getNombreCompleto());
            }
        }
-       return null;
+       return "";
     }
-    public boolean vendePasaje(String idDoc, TipoDocumento tipo, LocalDate fecha, LocalTime hora, String patBus, int asiento, IdPersona idPasajero){
-     Venta venta=findVenta(idDoc,tipo);
-     if (venta==null){
-         return false;
-     }
-      Viaje viaje=findViaje(fecha.toString(),hora.toString(),patBus);
-      if (viaje==null){
-          return false;
-      }
-      Pasajero pasajero=findPasajero(idPasajero);
-      if (pasajero==null){
-          return false;
-      }
-      if(!viaje.existeDisponibilidad()){
-          return false;
-      }
-      String[][]asientos=viaje.getAsientos();
-      if (asientos[asiento-1][1].equals("Ocupado")){
-          return false;
-      }
-      Pasaje pasaje=new Pasaje(asiento,viaje,pasajero,venta);
-      viaje.addPasaje(pasaje);
-      venta.createPasaje(asiento,viaje,pasajero);
-      return true;
+    public void vendePasaje(String idDoc, TipoDocumento tipo, LocalDate fecha, LocalTime hora, String patBus, int asiento, IdPersona idPasajero){
+     Venta venta=findVenta(idDoc,tipo).orElseThrow(()->new SVPException("No existe una venta con el id y tipo de documento indicado"));
+
+        Viaje viaje = findViaje(fecha, hora, patBus).orElseThrow(() ->
+                new SVPException("No existe viaje con la fecha, hora y patente del bus indicados"));
+        Pasajero pasajero = findPasajero(idPasajero).orElseThrow(() ->
+                new SVPException("No existe pasajero con el id indicado"));
+
+        Pasaje pasaje = new Pasaje(asiento, viaje, pasajero, venta);
+        //venta.addPasaje(pasaje);
+        viaje.addPasaje(pasaje);
     }
     public String[][] listVentas(){
-        String[][] lista = new String[ventas.size()][4];
+        String[][] lista = new String[ventas.size()][7];
         for (int i = 0; i < ventas.size(); i++) {
             Venta v = ventas.get(i);
-            lista[i][0] = v.getIdDocumento();
-            lista[i][1] = v.getCliente().getNombreCompleto().toString();
-            lista[i][2] = String.valueOf(v.getTotalVenta());
-            lista[i][3] = v.getFecha().toString();
+            lista[i][0]=""+ventas.get(i).getIdDocumento();
+            lista[i][1]=""+ventas.get(i).getTipo();
+            lista[i][2]=""+ventas.get(i).getFecha();
+            lista[i][3]=""+ventas.get(i).getCliente().getIdPersona();
+            lista[i][4]=""+ventas.get(i).getCliente().getNombreCompleto();
+            lista[i][5]=""+ventas.get(i).getPasajes().length;
+            lista[i][6]=""+ventas.get(i).getMonto();
         }
         return lista;
     }
@@ -169,63 +186,221 @@ public class SistemaVentaPasajes{
       if (viajes.size()==0){
           return new String[0][0];
       }
-      String[][]lista=new String[viajes.size()][6];
+      String[][]lista=new String[viajes.size()][8];
       int i;
       for (i=0;i<viajes.size();i++){
           Viaje v=viajes.get(i);
-          lista[i][0]= v.getFecha().toString();
-          lista[i][1]=v.getHora().toString();
-          lista[i][2]= v.getBus().getPatente();
-          lista[i][3]=String.valueOf(v.getBus().getNroAsientos());
-          lista[i][4]=String.valueOf(v.getNroAsientosOcupados());
-          lista[i][5]=String.valueOf(v.getNroAsientosDisponibles())     ;
+          lista[i][0]=""+viajes.get(i).getFecha();
+          lista[i][1]=""+viajes.get(i).getHora();
+          LocalDateTime horaLlegada = viajes.get(i).getFechaHoraTermino();
+          lista[i][2]=String.format("%02d:%02d", horaLlegada.getHour(), horaLlegada.getMinute());
+          lista[i][3]=""+viajes.get(i).getPrecio();
+          lista[i][4]=""+viajes.get(i).getNroAsientosDisponibles();
+          lista[i][5]=viajes.get(i).getBus().getPatente();
+          lista[i][6]=viajes.get(i).getTerminalSalida().getDireccion().getComuna();
+          lista[i][7]=viajes.get(i).getTerminalLlegada().getDireccion().getComuna();
       }
       return lista;
     }
-    public String[][] listPasajeros(LocalDate fecha,LocalTime hora,String patente){
-        Viaje v = findViaje(fecha.toString(), hora.toString(), patente);
+    public String[][] listPasajeros(LocalDate fecha,LocalTime hora,String patente)throws SVPException {
+        Viaje v = findViaje(fecha, hora, patente).orElseThrow(()->new SVPException("No existe viaje con la fecha,hora y patente"));
         if (v == null) return new String[0][0];
 
         return v.getListaPasajeros();
     }
-    private Cliente findCliente(IdPersona id){
+    private Optional<Cliente> findCliente(IdPersona id){
    for (Cliente c:clientes){
        if (c.getIdPersona().equals(id)){
-           return c;
+           return Optional.of(c);
        }
    }
-   return null;
+   return Optional.empty();
     }
-    private Venta findVenta(String idDocumento, TipoDocumento tipoDocumento){
+    private Optional<Venta> findVenta(String idDocumento, TipoDocumento tipoDocumento){
      for (Venta v:ventas){
          if (v.getIdDocumento().equals(idDocumento)&&v.getTipo().equals(tipoDocumento)){
-             return v;
+             return Optional.of(v);
          }
      }
-     return null;
+     return Optional.empty();
     }
-    private Bus findBus(String patente){
-     for (Bus b:buses){
-         if (b.getPatente().equals(patente)){
-             return b;
-         }
-     }
-     return null;
-    }
-    private Viaje findViaje(String fecha, String hora, String patenteBus){
-    for (Viaje v:viajes){
-        if (v.getFecha().equals(fecha)&& v.getHora().equals(hora)&& v.getBus().getPatente().equals(patenteBus)){
-            return v;
-        }
-    }
-    return null;
-    }
-    private Pasajero findPasajero(IdPersona idPersona){
-        for (Pasajero p:pasajeros){
-            if (p.getIdPersona().equals(idPersona)){
-                return p;
+
+    // nuevo cambio
+    private Optional<Viaje> findViaje(LocalDate fecha, LocalTime hora, String patenteBus){
+        for (Viaje v : viajes){
+            if (v.getFecha().equals(fecha) &&
+                    v.getHora().equals(hora) &&
+                    v.getBus().getPatente().equals(patenteBus)) {
+
+                return Optional.of(v);
             }
         }
+        return Optional.empty();
+    }
+
+    private Optional<Pasajero> findPasajero(IdPersona idPersona){
+        for (Pasajero p:pasajeros){
+            if (p.getIdPersona().equals(idPersona)){
+                return Optional.of(p);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public String getNombreCliente(IdPersona idPersona) {
+
+        for (Cliente c : clientes) {
+
+            if (c.getIdPersona().equals(idPersona)) {
+                return c.getNombreCompleto().toString();
+            }
+        }
+
         return null;
     }
+
+    public String[][] listPasajerosViaje(LocalDate fecha,
+                                         LocalTime hora,
+                                         String patenteBus) {
+
+        Optional<Viaje> viajeOptional =
+                findViaje(fecha, hora, patenteBus);
+
+        if (viajeOptional.isPresent()) {
+
+            Viaje viaje = viajeOptional.get();
+
+            return viaje.getListaPasajeros();
+        }
+
+        return new String[0][0];
+    }
+
+    public void pagaVenta(String idDocumento, TipoDocumento tipo) {
+
+        for (Venta v : ventas) {
+
+            if (v.getIdDocumento().equals(idDocumento)
+                    && v.getTipo().equals(tipo)) {
+
+                Pago pago = new PagoEfectivo(v.getMonto());
+
+                return;
+            }
+        }
+    }
+
+    public void pagaVenta(String idDocumento,
+                          TipoDocumento tipo,
+                          long nroTarjeta) {
+
+        for (Venta v : ventas) {
+
+            if (v.getIdDocumento().equals(idDocumento)
+                    && v.getTipo().equals(tipo)) {
+
+                Pago pago = new PagoTarjeta(v.getMonto(), nroTarjeta);
+
+                return;
+            }
+        }
+    }
+
+
+    public String[] pasajesAImprimir(String idDocumento, TipoDocumento tipoDocumento) {
+
+        ArrayList<String> lista = new ArrayList<>();
+
+        for (Venta v : ventas) {
+
+            if (v.getIdDocumento().equals(idDocumento)
+                    && v.getTipo().equals(tipoDocumento)) {
+
+                lista.add("===== BOLETA =====");
+
+                for (Pasaje p : v.getPasajes()) {
+
+                    lista.add("Asiento: " + p.getAsiento());
+
+                    lista.add("Bus: " +
+                            p.getViaje().getBus().getPatente());
+
+                    lista.add("Hora: " +
+                            p.getViaje().getHora());
+
+                    lista.add("Precio: $" +
+                            p.getViaje().getPrecio());
+                }
+
+                return lista.toArray(new String[0]);
+            }
+        }
+
+        return new String[0];
+    }
+
+    public String[][] getHorariosDisponibles(LocalDate fechaV,
+                                             String origen,
+                                             String destino,
+                                             int cant) {
+
+        ArrayList<Viaje> encontrados = new ArrayList<>();
+
+        for (Viaje v : viajes) {
+
+            boolean mismaFecha =
+                    v.getFecha().equals(fechaV);
+
+            boolean mismoOrigen =
+                    v.getTerminalSalida()
+                            .getDireccion()
+                            .getComuna()
+                            .equalsIgnoreCase(origen);
+
+            boolean mismoDestino =
+                    v.getTerminalLlegada()
+                            .getDireccion()
+                            .getComuna()
+                            .equalsIgnoreCase(destino);
+
+            boolean disponible =
+                    v.existeDisponibilidad(cant);
+
+            if (mismaFecha
+                    && mismoOrigen
+                    && mismoDestino
+                    && disponible) {
+
+                encontrados.add(v);
+            }
+        }
+
+        String[][] matriz =
+                new String[encontrados.size()][4];
+
+        for (int i = 0; i < encontrados.size(); i++) {
+
+            Viaje v = encontrados.get(i);
+
+            matriz[i][0] =
+                    v.getBus().getPatente();
+
+            matriz[i][1] =
+                    v.getHora().toString();
+
+            matriz[i][2] =
+                    String.valueOf(v.getPrecio());
+
+            matriz[i][3] =
+                    String.valueOf(
+                            v.getNroAsientosDisponibles()
+                    );
+        }
+
+        return matriz;
+    }
+    private Optional<Bus> findBus(List<Bus> buses, String patente){
+        return buses.stream().filter(x -> x.getPatente().equalsIgnoreCase(patente)).findFirst();
+    }
 }
+

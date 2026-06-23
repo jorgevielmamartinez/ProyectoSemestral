@@ -7,6 +7,9 @@ public abstract class Pago {
         this.monto = monto;
     }
 
+    public Pago() {
+    }
+
     public int getMonto() {
         return monto;
     }
