@@ -5,16 +5,17 @@ import Utilidades.IdPersona;
 import Utilidades.Nombre;
 import Utilidades.Rut;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Empresa {
+public class Empresa implements Serializable {
     private Rut rut;
     private String nombre;
     private String url;
     ArrayList<Bus>buses=new ArrayList();
     ArrayList<Conductor>conductores=new ArrayList();
     ArrayList<Auxiliar>auxiliares=new ArrayList();
-    public Empresa(Rut rut, String nombre, String url) {
+    public Empresa(Rut rut, String nombre) {
         this.rut = rut;
         this.nombre = nombre;
         this.url = url;
