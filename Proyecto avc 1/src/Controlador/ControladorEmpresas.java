@@ -305,4 +305,9 @@ public class ControladorEmpresas implements Serializable {
 
     }
 
+    public void setInstanciaPersistente(ControladorEmpresas ce) {
+        this.empresas = ce.empresas;
+        this.terminales = ce.terminales;
+    }
+
 }
