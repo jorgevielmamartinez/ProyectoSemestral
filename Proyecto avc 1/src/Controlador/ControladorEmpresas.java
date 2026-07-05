@@ -6,7 +6,6 @@ import Excepciones.SVPException;
 import java.util.Arrays;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.*;
 public class ControladorEmpresas implements Serializable {
     private ArrayList<Empresa> empresas=new ArrayList<>();
