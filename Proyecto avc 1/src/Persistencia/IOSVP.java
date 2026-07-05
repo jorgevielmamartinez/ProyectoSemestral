@@ -41,7 +41,7 @@ public class IOSVP {
         buses.clear();
         terminales.clear();
 
-        File archivo = new File("Proyecto avc 1/SVPDatosIniciales.txt");
+        File archivo = new File("SVPDatosIniciales.txt");
 
         Scanner sc = new Scanner(archivo)
                 .useDelimiter("[\t\r\n]+");
