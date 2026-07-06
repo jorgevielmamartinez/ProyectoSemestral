@@ -272,5 +272,9 @@ public class ControladorEmpresas implements Serializable {
         this.empresas = ce.empresas;
         this.terminales = ce.terminales;
     }
+    //metodo para gui
+    public ArrayList<Bus> getBuses() {
+        return this.buses;
+    }
 
 }

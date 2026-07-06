@@ -67,6 +67,11 @@ public class IOSVP {
         }
 
         sc.close();
+
+        if (Controlador.ControladorEmpresas.getInstance().getBuses() != null) {
+            Controlador.ControladorEmpresas.getInstance().getBuses().clear();
+            Controlador.ControladorEmpresas.getInstance().getBuses().addAll(this.buses);
+        }
         return out.toArray(new Object[0]);
     }
 

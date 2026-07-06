@@ -485,4 +485,8 @@ public class SistemaVentaPasajes implements Serializable {
 
         return matriz;
     }
+    //metodo para la tabla gui
+    public String[][] buscarViajes(java.time.LocalDate fecha, String origen, String destino, int cantidadAsientos) {
+        return new String[0][0];
+    }
 }
