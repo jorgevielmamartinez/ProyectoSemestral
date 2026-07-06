@@ -1,5 +1,7 @@
 package Persistencia;
 
+import Controlador.ControladorEmpresas;
+import Controlador.SistemaVentaPasajes;
 import Modelo.*;
 import Excepciones.*;
 import Utilidades.IdPersona;
@@ -10,7 +12,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
 
 //Hecha totalmente por benja Vivanco
 public class IOSVP {
@@ -68,10 +69,11 @@ public class IOSVP {
 
         sc.close();
 
-        if (Controlador.ControladorEmpresas.getInstance().getBuses() != null) {
-            Controlador.ControladorEmpresas.getInstance().getBuses().clear();
-            Controlador.ControladorEmpresas.getInstance().getBuses().addAll(this.buses);
-        }
+        ControladorEmpresas ce = ControladorEmpresas.getInstance();
+
+        ce.getBuses().clear();
+        ce.getBuses().addAll(this.buses);
+
         return out.toArray(new Object[0]);
     }
 
@@ -94,7 +96,7 @@ public class IOSVP {
         }
     }
 
-    public Object[] readControladores() throws SVPException {
+    public static Object[] readControladores() throws SVPException {
         File file = new File("SVPObjetos.obj");
 
         try {
@@ -299,16 +301,6 @@ public class IOSVP {
         out.add(bus);
         buses.add(bus);
     }
-
-
-
-
-
-
-
-
-
-
 
     private String formatPatente(String patente){
         return patente.charAt(0) + "" + patente.charAt(1) + "." + patente.charAt(2) + patente.charAt(3) + "-" + patente.charAt(4) + patente.charAt(5);
