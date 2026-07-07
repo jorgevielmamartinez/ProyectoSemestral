@@ -26,8 +26,8 @@ public class UISVP {
         return INSTANCE;
     }
 
-    private final static ControladorEmpresas CE = ControladorEmpresas.getInstance();
-    private final static SistemaVentaPasajes SVP = SistemaVentaPasajes.getInstance();
+    private static ControladorEmpresas CE = ControladorEmpresas.getInstance();
+    private static SistemaVentaPasajes SVP = SistemaVentaPasajes.getInstance();
 
     // MENU
     public void menu() {
@@ -694,27 +694,45 @@ public class UISVP {
     }
 
     private void listViajes() {
-        DateTimeFormatter formatoOriginal = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        DateTimeFormatter nuevoFormato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        System.out.println("\n==================================================");
+        System.out.println("...::::        LISTADO DE VIAJES               ::::...");
+        System.out.println("==================================================");
 
-        String[][] lista = SVP.listViajes();
+        java.util.ArrayList<Modelo.Viaje> listaViajes = new java.util.ArrayList<>();
+        try {
+            Controlador.SistemaVentaPasajes svp = Controlador.SistemaVentaPasajes.getInstance();
+            java.lang.reflect.Field field = svp.getClass().getDeclaredField("viajes");
+            field.setAccessible(true);
+            java.util.ArrayList<Modelo.Viaje> viajesSVP = (java.util.ArrayList<Modelo.Viaje>) field.get(svp);
+            if (viajesSVP != null) listaViajes.addAll(viajesSVP);
 
-        if (lista.length != 0) {
-            System.out.printf("\n%44s\n", "...:::: Listado de Viajes ::::....\n");
-            System.out.printf(" *--------------*--------------*---------------*--------*----------------*---------------*----------------*-----------------*%n");
-            System.out.printf(" | FECHA        |    HORA SALE |    HORA LLEGA | PRECIO | ASIENTOS DISP. | PATENTE       | ORIGEN         | DESTINO         |%n");
-            System.out.printf(" *--------------*--------------*---------------*--------*----------------*---------------*----------------*-----------------*%n");
+            if (listaViajes.isEmpty()) {
+                Controlador.ControladorEmpresas ce = Controlador.ControladorEmpresas.getInstance();
+                java.lang.reflect.Field fieldT = ce.getClass().getDeclaredField("terminales");
 
-            for (String[] strings : lista) {
-                String fechaOriginal = strings[0];
-                LocalDate fecha = LocalDate.parse(fechaOriginal, formatoOriginal);
-                String fechaFormateada = fecha.format(nuevoFormato);
-                System.out.printf(" | %-10s   |       %-6s |        %-6s | %-6s |             %-2s | %-8s      | %-12s   | %-12s    |%n",
-                        fechaFormateada, strings[1], strings[2], strings[3], strings[4], strings[5], strings[6], strings[7]);
-                System.out.printf(" *--------------*--------------*---------------*--------*----------------*---------------*----------------*-----------------*%n");
+                fieldT.setAccessible(true);
+
+                for (Modelo.Terminal t : (java.util.ArrayList<Modelo.Terminal>) fieldT.get(ce)) {
+                    if (t.getSalidas() != null) listaViajes.addAll(java.util.Arrays.asList(t.getSalidas()));
+                }
             }
-        } else {
-            System.out.println("...::: No existen viajes registrados");
+        } catch (Exception e) { }
+
+        if (listaViajes.isEmpty()) {
+            System.out.println("No hay viajes registrados.");
+            return;
+        }
+
+        for (Modelo.Viaje v : listaViajes) {
+            System.out.println("Fecha: " + v.getFecha() + " | Hora: " + v.getHora() + " | Precio: $" + v.getPrecio());
+            System.out.println("Origen: " + v.getSalida().getNombre() + " -> Destino: " + v.getLlegada().getNombre());
+            System.out.println("Bus Patente: " + v.getBus().getPatente() + " | Asientos Libres: " + v.getNroAsientosDisponibles());
+            System.out.println("Tripulantes:");
+
+            for (Modelo.Tripulante t : v.getTripulantes()) {
+                if (t != null) System.out.println(" - " + t.getNombreCompleto());
+            }
+            System.out.println("--------------------------------------------------");
         }
     }
 
@@ -904,11 +922,12 @@ public class UISVP {
     private void readDatosSistema() {
         try {
             System.out.println("...:::: Leyendo datos del sistema ::::....");
-
             SVP.readDatosSistema();
 
-            System.out.println("...:::: Datos del sistema cargados exitosamente ::::....");
+            CE = ControladorEmpresas.getInstance();
+            SVP = SistemaVentaPasajes.getInstance();
 
+            System.out.println("...:::: Datos del sistema cargados exitosamente ::::....");
         } catch (SVPException e) {
             System.out.println("..:: Error : " + e.getMessage());
         }

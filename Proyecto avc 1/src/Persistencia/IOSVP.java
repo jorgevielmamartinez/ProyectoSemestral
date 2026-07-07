@@ -69,10 +69,44 @@ public class IOSVP {
 
         sc.close();
 
-        ControladorEmpresas ce = ControladorEmpresas.getInstance();
+        try {
+            Controlador.ControladorEmpresas ce = Controlador.ControladorEmpresas.getInstance();
 
-        ce.getBuses().clear();
-        ce.getBuses().addAll(this.buses);
+            java.lang.reflect.Field fEmp = ce.getClass().getDeclaredField("empresas");
+            fEmp.setAccessible(true);
+            ((java.util.ArrayList<Modelo.Empresa>) fEmp.get(ce)).addAll(this.empresas);
+
+            java.lang.reflect.Field fBus = ce.getClass().getDeclaredField("buses");
+            fBus.setAccessible(true);
+            ((java.util.ArrayList<Modelo.Bus>) fBus.get(ce)).addAll(this.buses);
+
+            java.lang.reflect.Field fTer = ce.getClass().getDeclaredField("terminales");
+            fTer.setAccessible(true);
+            ((java.util.ArrayList<Modelo.Terminal>) fTer.get(ce)).addAll(this.terminales);
+
+            java.lang.reflect.Field fTrip = ce.getClass().getDeclaredField("tripulaciones");
+            fTrip.setAccessible(true);
+            ((java.util.ArrayList<Modelo.Tripulante>) fTrip.get(ce)).addAll(this.tripulantes);
+        } catch (Exception e) {
+            System.out.println("Sincronización CE: " + e.getMessage());
+        }
+
+        try {
+            Controlador.SistemaVentaPasajes svp = Controlador.SistemaVentaPasajes.getInstance();
+            java.util.ArrayList<Modelo.Viaje> viajesList = new java.util.ArrayList<>();
+
+            for (Object obj : out) {
+                if (obj instanceof Modelo.Viaje) viajesList.add((Modelo.Viaje) obj);
+            }
+
+            java.lang.reflect.Field fViajes = svp.getClass().getDeclaredField("viajes");
+            fViajes.setAccessible(true);
+
+            ((java.util.ArrayList<Modelo.Viaje>) fViajes.get(svp)).addAll(viajesList);
+
+        } catch (Exception e) {
+            System.out.println("Sincronización SVP: " + e.getMessage());
+        }
 
         return out.toArray(new Object[0]);
     }
