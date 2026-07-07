@@ -127,12 +127,6 @@ public class Viaje implements Serializable {
         return MatrizPasajero;
     }
 
-    public int getNroAsientosDisponibles(){
-        int total=this.bus.getNroAsientos();
-        total-= Listapasajes.size();
-        return total;
-    }
-
     public int getPrecio() {
         return precio;
     }
@@ -150,8 +144,17 @@ public class Viaje implements Serializable {
         return ventasLista.toArray(ventasArray);
     }
 
+    public Terminal getSalida() {
+        return this.salida;
+    }
 
+    public Terminal getLlegada() {
+        return this.llegada;
+    }
 
+    public int getDuracion() {
+        return this.duracion;
+    }
 
     public void addConductor(Conductor conductor){
         if(conductores.size() < 2) {
@@ -176,6 +179,11 @@ public class Viaje implements Serializable {
 
     public Terminal getTerminalSalida(){
         return salida;
+    }
+    public int getNroAsientosDisponibles(){
+        int total = this.bus.getNroAsientos();
+        total -= Listapasajes.size();
+        return total;
     }
 
 }

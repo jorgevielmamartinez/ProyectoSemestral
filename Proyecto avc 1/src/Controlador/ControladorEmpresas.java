@@ -198,9 +198,6 @@ public class ControladorEmpresas implements Serializable {
 
     }
 
-    protected void setInstanciPersistente(ControladorEmpresas instanciPersistente){
-        instance=instanciPersistente;
-    }
     protected void setDatosIniciales(Object[] objetos){
         empresas.clear();
         terminales.clear();
@@ -271,10 +268,31 @@ public class ControladorEmpresas implements Serializable {
     public void setInstanciaPersistente(ControladorEmpresas ce) {
         this.empresas = ce.empresas;
         this.terminales = ce.terminales;
+        this.buses = ce.buses;
+        this.tripulaciones = ce.tripulaciones;
     }
     //metodo para gui
     public ArrayList<Bus> getBuses() {
         return this.buses;
     }
 
+    //otro para gui
+    public java.util.ArrayList<Modelo.Viaje> buscarViajes(String origen, String destino, java.time.LocalDate fecha) {
+        java.util.ArrayList<Modelo.Viaje> encontrados = new java.util.ArrayList<>();
+        java.util.Optional<Modelo.Terminal> terminalOrigen = findTerminalPorComuna(origen);
+
+        if (terminalOrigen.isPresent()) {
+            Modelo.Viaje[] salidas = terminalOrigen.get().getSalidas();
+            for (Modelo.Viaje v : salidas) {
+                if (v.getFecha().equals(fecha)) {
+                    encontrados.add(v);
+                }
+            }
+        }
+        return encontrados;
+    }
+
+    public boolean registrarVenta(String rutCliente, String rutPasajero, String nomPasajero, int nroAsiento, String medioPago, String tarjeta, String patente, String fecha, String hora) {
+        return true;
+    }
 }
