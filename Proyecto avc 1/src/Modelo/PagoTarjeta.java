@@ -1,6 +1,8 @@
 package Modelo;
 
-public class PagoTarjeta extends Pago {
+import java.io.Serializable;
+
+public class PagoTarjeta extends Pago implements Serializable {
     private long nroTarjeta;
     public PagoTarjeta(long nroTarjeta,int monto) {
         super(monto);

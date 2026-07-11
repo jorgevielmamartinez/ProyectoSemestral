@@ -1,6 +1,8 @@
 package Utilidades;
 
-public class Direccion {
+import java.io.Serializable;
+
+public class Direccion implements Serializable {
     private String calle;
     private int numero;
     private String comuna;
@@ -18,6 +20,7 @@ public class Direccion {
     public String getComuna(){
         return comuna;
     }
+
     @Override
     public String toString() {
         return calle + ";" + numero + ";" + comuna;

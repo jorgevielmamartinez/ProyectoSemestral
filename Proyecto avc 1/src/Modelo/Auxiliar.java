@@ -4,9 +4,10 @@ import Utilidades.Direccion;
 import Utilidades.*;
 import Utilidades.Nombre;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 //hecho por benjamín vivanco
-public class Auxiliar extends Tripulante {
+public class Auxiliar extends Tripulante implements Serializable {
     private ArrayList<Viaje> auxiliarViajes;
 
     public Auxiliar(IdPersona id, Nombre nom, Direccion dir) {

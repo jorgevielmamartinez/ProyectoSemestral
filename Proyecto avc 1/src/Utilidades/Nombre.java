@@ -1,16 +1,23 @@
 package Utilidades;
 
-public class Nombre{
+import java.io.Serializable;
+
+public class Nombre implements Serializable {
     private Tratamiento tratamiento;
     private String nombres;
     private String apellidoMaterno;
     private String apellidoPaterno;
-    public Nombre(Tratamiento tratamiento, String nombre, String apellidoPaterno, String apellidoMaterno){
+
+    public Nombre() {
+    }
+
+    public Nombre(Tratamiento tratamiento, String nombre, String apellidoPaterno, String apellidoMaterno) {
         this.tratamiento = tratamiento;
         this.nombres = nombre;
         this.apellidoPaterno = apellidoPaterno;
         this.apellidoMaterno = apellidoMaterno;
     }
+
     public Tratamiento getTratamiento() {
         return tratamiento;
     }

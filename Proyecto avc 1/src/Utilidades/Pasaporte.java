@@ -1,6 +1,8 @@
 package Utilidades;
 
-public class Pasaporte implements IdPersona {
+import java.io.Serializable;
+
+public class Pasaporte implements IdPersona, Serializable {
     private String numero;
     private String nacionalidad;
     public Pasaporte(String numero, String nacionalidad) {
@@ -19,11 +21,15 @@ public class Pasaporte implements IdPersona {
         if (nacionalidad==null || numero==null) return null;
         return new Pasaporte(numero,nacionalidad);
     }
-    public boolean equals(Pasaporte pasaporte) {
-        this.numero.equals(pasaporte.getNumero());
-        this.nacionalidad.equals(pasaporte.getNacionalidad());
-        return true;
+
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Pasaporte pasaporte = (Pasaporte) obj;
+
+        return numero.equals(pasaporte.numero) && nacionalidad.equals(pasaporte.nacionalidad);
     }
+
     public String toString(){
         return numero+"   "+nacionalidad;
     }

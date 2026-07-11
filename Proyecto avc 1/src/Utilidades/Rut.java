@@ -1,47 +1,63 @@
 package Utilidades;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Rut implements IdPersona {
-    private final long numero;
+public class Rut implements IdPersona, Serializable {
+
+    private final int numero;
     private final char dv;
 
-    private Rut(long numero, char dv) {
+    private Rut(int numero, char dv) {
         this.numero = numero;
         this.dv = dv;
     }
-    public static Rut of(String rutStr) {
-        String rutLimpio=rutStr.replace(".","").replace("-","");
-        String rutLong= rutLimpio.substring(0,rutLimpio.length()-1);
-        String rutDV=rutLimpio.substring(rutLimpio.length()-1);
-        long numero;
-        char dv;
-        numero = Long.parseLong(rutLong);
-        dv=rutDV.charAt(0);
-        return new Rut(numero,dv);
+
+    public int getNumero() {
+        return numero;
     }
+
+    public char getDv() {
+        return dv;
+    }
+
+    public static Rut of(String rutConDv) {
+
+        String rutLimpio = rutConDv.replace(".", "")
+                .replace("-", "");
+
+        String rutNumero = rutLimpio.substring(0, rutLimpio.length() - 1);
+        char dv = rutLimpio.charAt(rutLimpio.length() - 1);
+
+        int numero = Integer.parseInt(rutNumero);
+
+        return new Rut(numero, dv);
+    }
+
     @Override
     public String toString() {
         String numeroStr = String.valueOf(numero);
-        String newNumeroStr = "";
-        char digito;
-        int conDigitos = 0;
-        for (int x = numeroStr.length() - 1; x >= 0; x--) {
-            digito = numeroStr.charAt(x);
-            newNumeroStr = newNumeroStr + digito;
-            conDigitos++;
-            if (conDigitos % 3 == 0 && x !=0) {
-                newNumeroStr = newNumeroStr + ".";
+        String nuevoNumero = "";
+        int contador = 0;
+
+        for (int i = numeroStr.length() - 1; i >= 0; i--) {
+            nuevoNumero += numeroStr.charAt(i);
+            contador++;
+
+            if (contador % 3 == 0 && i != 0) {
+                nuevoNumero += ".";
             }
         }
-        newNumeroStr = new StringBuilder(newNumeroStr).reverse().toString();
-        return newNumeroStr+"-"+dv;
+
+        nuevoNumero = new StringBuilder(nuevoNumero).reverse().toString();
+
+        return nuevoNumero + "-" + dv;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Rut rut = (Rut) o;
+        if (this == o) return true;
+        if (!(o instanceof Rut rut)) return false;
         return numero == rut.numero && dv == rut.dv;
     }
 
