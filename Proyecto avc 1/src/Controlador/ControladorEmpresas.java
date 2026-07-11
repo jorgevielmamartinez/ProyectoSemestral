@@ -3,11 +3,10 @@ import Modelo.*;
 import Utilidades.*;
 import Excepciones.SVPException;
 
-import java.util.Arrays;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
-public class ControladorEmpresas implements Serializable {
+
+public class ControladorEmpresas {
     private ArrayList<Empresa> empresas=new ArrayList<>();
     private ArrayList<Bus> buses = new ArrayList<>();
     private ArrayList<Terminal> terminales=new ArrayList<>();
@@ -35,9 +34,6 @@ public class ControladorEmpresas implements Serializable {
         }
     }
 
-    public String[][] listLlegadasSalidasTerminal(String nombreTerminal, String fecha) {
-        return new String[0][0];
-    }
 
 
 
@@ -198,101 +194,123 @@ public class ControladorEmpresas implements Serializable {
 
     }
 
-    protected void setDatosIniciales(Object[] objetos){
-        empresas.clear();
-        terminales.clear();
-        buses.clear();
-        tripulaciones.clear();
-        for (Object o:objetos){
-            if(o instanceof Empresa){
-                empresas.add((Empresa) o);
-            }if (o instanceof Terminal){
-                terminales.add((Terminal) o);
-            }if (o instanceof Bus) {
-                buses.add((Bus) o);
-            }if (o instanceof Tripulante){
-                tripulaciones.add((Tripulante) o);
-            }
-        }
-    }
+
 
 
     protected Optional<Empresa> findEmpresa(Rut rut) {
-        return empresas.stream()
-                .filter(e -> e.getRut().equals(rut))
-                .findFirst();
+
+        for(Empresa n:empresas){
+            if(n.getRut().equals(rut)){
+                return Optional.of(n);
+            }
+        }
+
+        return Optional.empty();
+
     }
 
 
 
 
-    protected Optional<Terminal> findTerminal(String nombre) {
-        return terminales.stream()
-                .filter(t -> t.getNombre().equalsIgnoreCase(nombre))
-                .findFirst();
+    protected Optional<Terminal> findTerminal(String nombre){
+
+        for (Terminal n:terminales){
+            if(n.getNombre().equalsIgnoreCase(nombre)){
+                return Optional.of(n);
+            }
+
+        }
+
+        return Optional.empty();
     }
 
     protected Optional<Terminal> findTerminalPorComuna(String comuna) {
-        return terminales.stream()
-                .filter(t -> t.getDireccion().getComuna().equalsIgnoreCase(comuna))
-                .findFirst();
+
+        for(Terminal n: terminales){
+            if((n.getDireccion().getComuna()).equalsIgnoreCase(comuna)){
+                return Optional.of(n);
+            }
+        }
+
+        return Optional.empty();
+
     }
 
 
     protected Optional<Bus> findBus(String patente) {
-        return buses.stream()
-                .filter(b -> b.getPatente().equalsIgnoreCase(patente))
-                .findFirst();
+        for (Bus n:buses){
+            if(n.getPatente().equalsIgnoreCase(patente)){
+                return Optional.of(n);
+            }
+        }
+        return Optional.empty();
     }
 
     protected Optional<Conductor> findConductor(IdPersona id, Rut rutEmpresa) {
-        return findEmpresa(rutEmpresa)
-                .stream()
-                .flatMap(e -> Arrays.stream(e.getTripulantes()))
-                .filter(t -> t instanceof Conductor)
-                .map(t -> (Conductor) t)
-                .filter(c -> c.getIdPersona().equals(id))
-                .findFirst();
+
+        Optional<Empresa> empre =findEmpresa(rutEmpresa);
+
+        if(empre.isEmpty()){
+            return Optional.empty();
+        }
+
+        Tripulante[] arregloTripulantes=empre.get().getTripulantes();
+
+        for (Tripulante n:arregloTripulantes){
+            if(n.getIdPersona().equals(id)){
+                return Optional.of((Conductor) n);
+            }
+        }
+
+        return Optional.empty();
+
     }
 
     protected Optional<Auxiliar> findAuxliar(IdPersona id, Rut rutEmpresa) {
-        return findEmpresa(rutEmpresa)
-                .stream()
-                .flatMap(e -> Arrays.stream(e.getTripulantes()))
-                .filter(t -> t instanceof Auxiliar)
-                .map(t -> (Auxiliar) t)
-                .filter(a -> a.getIdPersona().equals(id))
-                .findFirst();
-    }
 
-    public void setInstanciaPersistente(ControladorEmpresas ce) {
-        this.empresas = ce.empresas;
-        this.terminales = ce.terminales;
-        this.buses = ce.buses;
-        this.tripulaciones = ce.tripulaciones;
-    }
-    //metodo para gui
-    public ArrayList<Bus> getBuses() {
-        return this.buses;
-    }
+        Optional<Empresa> empre =findEmpresa(rutEmpresa);
 
-    //otro para gui
-    public java.util.ArrayList<Modelo.Viaje> buscarViajes(String origen, String destino, java.time.LocalDate fecha) {
-        java.util.ArrayList<Modelo.Viaje> encontrados = new java.util.ArrayList<>();
-        java.util.Optional<Modelo.Terminal> terminalOrigen = findTerminalPorComuna(origen);
+        if(empre.isEmpty()){
+            return Optional.empty();
+        }
 
-        if (terminalOrigen.isPresent()) {
-            Modelo.Viaje[] salidas = terminalOrigen.get().getSalidas();
-            for (Modelo.Viaje v : salidas) {
-                if (v.getFecha().equals(fecha)) {
-                    encontrados.add(v);
-                }
+        Tripulante[] arregloTripulantes=empre.get().getTripulantes();
+
+        for (Tripulante n:arregloTripulantes){
+            if(n.getIdPersona().equals(id)){
+                return Optional.of((Auxiliar) n);
             }
         }
-        return encontrados;
+
+        return Optional.empty();
+
+    }
+   protected void setInstanciPersistente(ControladorEmpresas instanciPersistente){
+    instance=instanciPersistente;
+   }
+  protected void setDatosIniciales(Object[] objetos){
+     empresas.clear();
+     terminales.clear();
+     buses.clear();
+     tripulaciones.clear();
+     for (Object o:objetos){
+         if(o instanceof Empresa){
+             empresas.add((Empresa) o);
+         }if (o instanceof Terminal){
+             terminales.add((Terminal) o);
+         }if (o instanceof Bus) {
+             buses.add((Bus) o);
+         }if (o instanceof Tripulante){
+             tripulaciones.add((Tripulante) o);
+         }
+     }
+  }
+
+    public Iterable<? extends Bus> getBuses() {
+        return buses;
     }
 
-    public boolean registrarVenta(String rutCliente, String rutPasajero, String nomPasajero, int nroAsiento, String medioPago, String tarjeta, String patente, String fecha, String hora) {
-        return true;
+    public void setBuses(Iterable<? extends Bus> buses) {
+        this.buses = (ArrayList<Bus>) buses;
     }
 }

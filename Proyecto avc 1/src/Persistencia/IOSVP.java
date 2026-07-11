@@ -44,6 +44,7 @@ public class IOSVP {
 
         File archivo = new File("SVPDatosIniciales.txt");
 
+
         Scanner sc = new Scanner(archivo)
                 .useDelimiter("[\t\r\n]+");
 
