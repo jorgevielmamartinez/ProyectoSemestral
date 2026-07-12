@@ -11,6 +11,7 @@ public class VentanaConsultas extends JFrame {
     private JTable tablaViajes;
     private JButton btnConsultarEmpresas;
     private JButton btnConsultarTerminales;
+    private JButton salirButton;
 
     public VentanaConsultas() {
         setTitle("Módulo de Auditoría y Consultas");
@@ -72,6 +73,12 @@ public class VentanaConsultas extends JFrame {
 
         btnConsultarTerminales.addActionListener(e -> {
             new VentanaConsultaTerminales().setVisible(true);
+        });
+        salirButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
         });
     }
 }
