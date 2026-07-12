@@ -1,15 +1,16 @@
 package Vista;
 
 import javax.swing.*;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import Controlador.ControladorEmpresas;
-import Modelo.Bus;
 
 public class VentanaConsultas extends JFrame {
     private JPanel panelConsultas;
     private JButton btnGenerarReporte;
-    private JTextArea txtAreaReporte;
+    private JTable tablaViajes;
+    private JButton btnConsultarEmpresas;
+    private JButton btnConsultarTerminales;
 
     public VentanaConsultas() {
         setTitle("Módulo de Auditoría y Consultas");
@@ -18,47 +19,59 @@ public class VentanaConsultas extends JFrame {
         setLocationRelativeTo(null);
         setContentPane(panelConsultas);
 
-        btnGenerarReporte.addActionListener(new java.awt.event.ActionListener() {
+        btnGenerarReporte.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {
 
-                StringBuilder sb = new StringBuilder();
-                sb.append("========== REPORTE COMPLETO DE VIAJES ==========\n\n");
+                String[] columnas = {
+                        "Fecha",
+                        "Hora salida",
+                        "Hora llegada",
+                        "Precio",
+                        "Asientos disponibles",
+                        "Patente",
+                        "Origen",
+                        "Destino"
+                };
 
-                try {
-                    Controlador.ControladorEmpresas ce = Controlador.ControladorEmpresas.getInstance();
+                String[][] datos =
+                        Controlador.SistemaVentaPasajes
+                                .getInstance()
+                                .listViajes();
 
-                    java.lang.reflect.Field fieldT = ce.getClass().getDeclaredField("terminales");
-                    fieldT.setAccessible(true);
-
-                    java.util.ArrayList<Modelo.Terminal> terminales = (java.util.ArrayList<Modelo.Terminal>) fieldT.get(ce);
-
-                    boolean encontro = false;
-                    for (Modelo.Terminal t : terminales) {
-                        for (Modelo.Viaje v : t.getSalidas()) {
-                            encontro = true;
-
-                            sb.append("Ruta: ").append(t.getDireccion().getComuna()).append(" -> ")
-                                    .append(v.getLlegada().getDireccion().getComuna()).append("\n");
-                            sb.append("Fecha: ").append(v.getFecha()).append(" | Hora: ").append(v.getHora()).append("\n");
-                            sb.append("Precio: $").append(v.getPrecio()).append(" | Duración: ").append(v.getDuracion()).append(" min\n");
-                            sb.append("Bus: ").append(v.getBus().getMarca()).append(" (Patente: ").append(v.getBus().getPatente()).append(")\n");
-                            sb.append("Asientos Disponibles: ").append(v.getNroAsientosDisponibles()).append("\n");
-                            sb.append("Tripulación:\n");
-
-                            for (Modelo.Tripulante trip : v.getTripulantes()) {
-                                if (trip != null) sb.append("  - ").append(trip.getNombreCompleto()).append("\n");
+                javax.swing.table.DefaultTableModel modelo =
+                        new javax.swing.table.DefaultTableModel(
+                                datos,
+                                columnas
+                        ) {
+                            @Override
+                            public boolean isCellEditable(
+                                    int fila,
+                                    int columna
+                            ) {
+                                return false;
                             }
-                            sb.append("--------------------------------------------------\n");
-                        }
-                    }
-                    if (!encontro) sb.append("No hay viajes programados en el sistema actualmente.");
+                        };
 
-                } catch (Exception ex) {
-                    sb.append("Error al generar el reporte: ").append(ex.getMessage());
+                tablaViajes.setModel(modelo);
+
+                if (datos.length == 0) {
+                    JOptionPane.showMessageDialog(
+                            VentanaConsultas.this,
+                            "No hay viajes cargados en el sistema.",
+                            "Sin resultados",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
                 }
-                txtAreaReporte.setText(sb.toString());
             }
+        });
+
+        btnConsultarEmpresas.addActionListener(e -> {
+            new VentanaConsultaEmpresas().setVisible(true);
+        });
+
+        btnConsultarTerminales.addActionListener(e -> {
+            new VentanaConsultaTerminales().setVisible(true);
         });
     }
 }

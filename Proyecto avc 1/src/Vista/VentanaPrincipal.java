@@ -11,6 +11,9 @@ public class VentanaPrincipal extends JFrame {
     private JButton btnVenderPasaje;
     private JButton btnConsultar;
     private JLabel txtTitulo;
+    private JButton btnGuardarDatos;
+    private JButton btnSalir;
+    private JButton btnRecuperarDatos;
 
     public VentanaPrincipal() {
         setTitle("Sistema de Gestión de Pasajes de Buses");
@@ -58,5 +61,61 @@ public class VentanaPrincipal extends JFrame {
                 new VentanaConsultas().setVisible(true);
             }
         });
+
+        // Guardar datos del sistema
+        btnGuardarDatos.addActionListener(e -> {
+            try {
+                Controlador.SistemaVentaPasajes
+                        .getInstance()
+                        .saveDatosSistema();
+
+                JOptionPane.showMessageDialog(
+                        VentanaPrincipal.this,
+                        "Datos guardados correctamente.",
+                        "Guardado exitoso",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+
+            } catch (Excepciones.SVPException ex) {
+                JOptionPane.showMessageDialog(
+                        VentanaPrincipal.this,
+                        ex.getMessage(),
+                        "Error al guardar",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
+
+// Recuperar datos guardados
+        btnRecuperarDatos.addActionListener(e -> {
+            try {
+                Controlador.SistemaVentaPasajes
+                        .getInstance()
+                        .readDatosSistema();
+
+                JOptionPane.showMessageDialog(
+                        VentanaPrincipal.this,
+                        "Datos recuperados correctamente.",
+                        "Recuperación exitosa",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+
+            } catch (Excepciones.SVPException ex) {
+                JOptionPane.showMessageDialog(
+                        VentanaPrincipal.this,
+                        ex.getMessage(),
+                        "Error al recuperar",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
+
+// Salir de la aplicación
+        btnSalir.addActionListener(e -> {
+            dispose();
+            System.exit(0);
+        });
+
+
     }
 }

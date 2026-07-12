@@ -402,6 +402,7 @@ public class SistemaVentaPasajes implements Serializable {
             }
 
             if (controlador instanceof ControladorEmpresas ce) {
+                ctrlEmpresas = ce;
                 ctrlEmpresas.setInstanciPersistente(ce);
             }
         }

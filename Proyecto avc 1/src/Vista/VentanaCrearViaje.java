@@ -55,15 +55,107 @@ public class VentanaCrearViaje extends JFrame {
                     return;
                 }
 
-                Controlador.ControladorEmpresas ce = Controlador.ControladorEmpresas.getInstance();
-
                 try {
                     int precio = Integer.parseInt(precioStr);
                     int duracion = Integer.parseInt(duracionStr);
 
-                    JOptionPane.showMessageDialog(null, "¡Viaje creado y programado exitosamente en el sistema!");
-                    dispose(); // Cierra la ventana tras guardar con éxito
+                    if (precio <= 0 || duracion <= 0) {
+                        JOptionPane.showMessageDialog(
+                                VentanaCrearViaje.this,
+                                "El precio y la duración deben ser mayores que cero.",
+                                "Valores inválidos",
+                                JOptionPane.WARNING_MESSAGE
+                        );
+                        return;
+                    }
 
+                    java.time.LocalDate fecha =
+                            java.time.LocalDate.parse(
+                                    fechaTexto,
+                                    java.time.format.DateTimeFormatter
+                                            .ofPattern("dd/MM/yyyy")
+                            );
+
+                    java.time.LocalTime horaViaje =
+                            java.time.LocalTime.parse(
+                                    hora,
+                                    java.time.format.DateTimeFormatter
+                                            .ofPattern("HH:mm")
+                            );
+
+                    java.util.ArrayList<Utilidades.IdPersona> tripulantes =
+                            new java.util.ArrayList<>();
+
+                    tripulantes.add(
+                            Utilidades.Rut.of(rutAuxiliarSeleccionado)
+                    );
+
+                    tripulantes.add(
+                            Utilidades.Rut.of(rutConductor1Seleccionada)
+                    );
+
+                    if (!rutConductor2Seleccionada
+                            .equals("Sin segundo conductor")) {
+
+                        if (rutConductor1Seleccionada
+                                .equals(rutConductor2Seleccionada)) {
+
+                            JOptionPane.showMessageDialog(
+                                    VentanaCrearViaje.this,
+                                    "Los conductores no pueden ser la misma persona.",
+                                    "Conductores repetidos",
+                                    JOptionPane.WARNING_MESSAGE
+                            );
+                            return;
+                        }
+
+                        tripulantes.add(
+                                Utilidades.Rut.of(rutConductor2Seleccionada)
+                        );
+                    }
+
+                    String[] comunas = {
+                            comunaOrigenSeleccionada,
+                            comunaDestinoSeleccionada
+                    };
+
+                    Controlador.SistemaVentaPasajes
+                            .getInstance()
+                            .createViaje(
+                                    fecha,
+                                    horaViaje,
+                                    precio,
+                                    duracion,
+                                    patenteSeleccionada,
+                                    tripulantes.toArray(
+                                            new Utilidades.IdPersona[0]
+                                    ),
+                                    comunas
+                            );
+
+                    JOptionPane.showMessageDialog(
+                            VentanaCrearViaje.this,
+                            "¡Viaje creado correctamente!",
+                            "Viaje creado",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+
+                    dispose();
+                } catch (java.time.format.DateTimeParseException ex) {
+                    JOptionPane.showMessageDialog(
+                            VentanaCrearViaje.this,
+                            "La fecha debe usar DD/MM/AAAA y la hora HH:MM.",
+                            "Fecha u hora inválida",
+                            JOptionPane.WARNING_MESSAGE
+                    );
+
+                } catch (Excepciones.SVPException ex) {
+                    JOptionPane.showMessageDialog(
+                            VentanaCrearViaje.this,
+                            ex.getMessage(),
+                            "No se pudo crear el viaje",
+                            JOptionPane.WARNING_MESSAGE
+                    );
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(null, "Error: El precio y la duración deben ser valores numéricos enteros.");
                 } catch (Exception ex) {
@@ -78,6 +170,8 @@ public class VentanaCrearViaje extends JFrame {
         comboRutAuxiliar.removeAllItems();
         comboRutConductor1.removeAllItems();
         comboRutConductor2.removeAllItems();
+        comboRutConductor2.addItem("Sin segundo conductor");
+
         comboComunaOrigen.removeAllItems();
         comboComunaDestino.removeAllItems();
 
