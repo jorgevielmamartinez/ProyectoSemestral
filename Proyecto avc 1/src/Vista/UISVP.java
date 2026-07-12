@@ -4,9 +4,8 @@ import Modelo.TipoDocumento;
 import Utilidades.*;
 import Controlador.*;
 
-import Excepciones.SistemaVentaPasajesException;
+import Excepciones.SVPException;
 
-import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -27,8 +26,8 @@ public class UISVP {
         return INSTANCE;
     }
 
-    private final static ControladorEmpresas CE = ControladorEmpresas.getInstance();
-    private final static SistemaVentaPasajes SVP = SistemaVentaPasajes.getInstance();
+    private static ControladorEmpresas CE = ControladorEmpresas.getInstance();
+    private static SistemaVentaPasajes SVP = SistemaVentaPasajes.getInstance();
 
     // MENU
     public void menu() {
@@ -50,11 +49,16 @@ public class UISVP {
             System.out.println(" 11) Listar empresas");
             System.out.println(" 12) Listar llegadas/salidas del terminal");
             System.out.println(" 13) Listar ventas de empresa");
-            System.out.println(" 14) AUTORUN");
-            System.out.println(" 15) Salir");
+            System.out.println(" 14) Generar pasajes venta");
+            System.out.println(" 15) Leer datos iniciales");
+            System.out.println(" 16) Guardar datos del sistema");
+            System.out.println(" 17) Leer datos del sistema");
+            System.out.println(" 18) Salir");
+            System.out.println("\n");
+            System.out.println(" 50) AUTORUN: parte de avance 2");
             System.out.println("____________________________");
             System.out.print("..:: Ingrese número de opción: ");
-            opcion = elegirOpc(15);
+            opcion = elegirOpc(50);
             System.out.println();
 
 
@@ -72,10 +76,15 @@ public class UISVP {
                 case 11 -> listEmpresas();
                 case 12 -> listLlegadasSalidasTerminal();
                 case 13 -> listVentasEmpresas();
-                case 14 -> autoRun();
-                case 15 -> System.out.println("Saliendo del programa");
+                case 14 -> generatePasajesVenta();
+                case 15 -> readDatosIniciales();
+                case 16 -> saveDatosSistema();
+                case 17 -> readDatosSistema();
+                case 18 -> System.out.println("Saliendo del programa");
+
+                case 50 -> autoRun();
             }
-        } while (opcion != 15);
+        } while (opcion != 18);
     }
 
     // 1) Crear empresa
@@ -90,7 +99,7 @@ public class UISVP {
 
             System.out.println("...:::: Empresa guardada exitosamente ::::...");
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("...::::Error : " + e.getMessage());
         }
     }
@@ -169,7 +178,7 @@ public class UISVP {
                     System.out.println("\n...:::: Conductor contratado exitosamente ::::....");
                     break;
             }
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("\t\t...::: Error : " + e.getMessage());
         }
     }
@@ -188,7 +197,7 @@ public class UISVP {
             CE.createTerminal(nombre, dir);
 
             System.out.println("...:::: Terminal guardado exitosamente ::::....");
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("\t\t...::: Error : " + e.getMessage());
         }
     }
@@ -252,7 +261,7 @@ public class UISVP {
             SVP.createCliente(idPersona, nombreCliente, telefono, email);
             System.out.println("\n....:::: Cliente guardado exitosamente ::::....\n");
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("..:: Error : " + e.getMessage());
         }
 
@@ -281,7 +290,7 @@ public class UISVP {
         try {
             CE.createBus(patente, marca, modelo, nroAsientos, rutEmpresa);
             System.out.println("...:::: Bus guardado exitosamente ::::....");
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.err.println("..:: Error : " + e.getMessage());
         }
     }
@@ -364,7 +373,7 @@ public class UISVP {
             SVP.createViaje(fecha, hora, precio, duracion, patente, idTripulantesArray, comunas);
             System.out.println("\n...:::: Viaje guardado exitosamente ::::....");
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("..:: Error : " + e.getMessage());
         }
 
@@ -650,7 +659,7 @@ public class UISVP {
             for (String s : boleta) {
                 System.out.println(s);
             }
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
@@ -685,27 +694,45 @@ public class UISVP {
     }
 
     private void listViajes() {
-        DateTimeFormatter formatoOriginal = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        DateTimeFormatter nuevoFormato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        System.out.println("\n==================================================");
+        System.out.println("...::::        LISTADO DE VIAJES               ::::...");
+        System.out.println("==================================================");
 
-        String[][] lista = SVP.listViajes();
+        java.util.ArrayList<Modelo.Viaje> listaViajes = new java.util.ArrayList<>();
+        try {
+            Controlador.SistemaVentaPasajes svp = Controlador.SistemaVentaPasajes.getInstance();
+            java.lang.reflect.Field field = svp.getClass().getDeclaredField("viajes");
+            field.setAccessible(true);
+            java.util.ArrayList<Modelo.Viaje> viajesSVP = (java.util.ArrayList<Modelo.Viaje>) field.get(svp);
+            if (viajesSVP != null) listaViajes.addAll(viajesSVP);
 
-        if (lista.length != 0) {
-            System.out.printf("\n%44s\n", "...:::: Listado de Viajes ::::....\n");
-            System.out.printf(" *--------------*--------------*---------------*--------*----------------*---------------*----------------*-----------------*%n");
-            System.out.printf(" | FECHA        |    HORA SALE |    HORA LLEGA | PRECIO | ASIENTOS DISP. | PATENTE       | ORIGEN         | DESTINO         |%n");
-            System.out.printf(" *--------------*--------------*---------------*--------*----------------*---------------*----------------*-----------------*%n");
+            if (listaViajes.isEmpty()) {
+                Controlador.ControladorEmpresas ce = Controlador.ControladorEmpresas.getInstance();
+                java.lang.reflect.Field fieldT = ce.getClass().getDeclaredField("terminales");
 
-            for (String[] strings : lista) {
-                String fechaOriginal = strings[0];
-                LocalDate fecha = LocalDate.parse(fechaOriginal, formatoOriginal);
-                String fechaFormateada = fecha.format(nuevoFormato);
-                System.out.printf(" | %-10s   |       %-6s |        %-6s | %-6s |             %-2s | %-8s      | %-12s   | %-12s    |%n",
-                        fechaFormateada, strings[1], strings[2], strings[3], strings[4], strings[5], strings[6], strings[7]);
-                System.out.printf(" *--------------*--------------*---------------*--------*----------------*---------------*----------------*-----------------*%n");
+                fieldT.setAccessible(true);
+
+                for (Modelo.Terminal t : (java.util.ArrayList<Modelo.Terminal>) fieldT.get(ce)) {
+                    if (t.getSalidas() != null) listaViajes.addAll(java.util.Arrays.asList(t.getSalidas()));
+                }
             }
-        } else {
-            System.out.println("...::: No existen viajes registrados");
+        } catch (Exception e) { }
+
+        if (listaViajes.isEmpty()) {
+            System.out.println("No hay viajes registrados.");
+            return;
+        }
+
+        for (Modelo.Viaje v : listaViajes) {
+            System.out.println("Fecha: " + v.getFecha() + " | Hora: " + v.getHora() + " | Precio: $" + v.getPrecio());
+            System.out.println("Origen: " + v.getSalida().getNombre() + " -> Destino: " + v.getLlegada().getNombre());
+            System.out.println("Bus Patente: " + v.getBus().getPatente() + " | Asientos Libres: " + v.getNroAsientosDisponibles());
+            System.out.println("Tripulantes:");
+
+            for (Modelo.Tripulante t : v.getTripulantes()) {
+                if (t != null) System.out.println(" - " + t.getNombreCompleto());
+            }
+            System.out.println("--------------------------------------------------");
         }
     }
 
@@ -738,7 +765,7 @@ public class UISVP {
             } else {
                 System.out.println("...::: No existen pasajeros en el viaje indicado");
             }
-        } catch (SistemaVentaPasajesException e) {
+        } catch (Exception e) {
             System.err.println(e.getMessage());
         }
     }
@@ -789,7 +816,7 @@ public class UISVP {
                 System.out.println("...::: No existen llegadas/salidas del terminal indicado");
             }
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.err.println(e.getMessage());
         }
     }
@@ -821,27 +848,97 @@ public class UISVP {
             } else {
                 System.out.println("...::: No existen ventas registradas en la empresa");
             }
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("...::: Error : " + e.getMessage());
         }
     }
 
-    private void pagaVentaPasajes(String idDocumento, TipoDocumento tipo) {
+
+    private void pagaVentaPasajes(String idDocumento, TipoDocumento tipo) throws SVPException {
         System.out.println(":::: Pago de la venta");
         int opcPago = leeOpc("Efectivo[1] o Tarjeta[2]", 2);
 
         if (opcPago == 1) {
             SVP.pagaVenta(idDocumento, tipo);
-
         } else {
             long nroTarjeta = Long.parseLong(leeString("Ingrese numero de Tarjeta"));
             SVP.pagaVenta(idDocumento, tipo, nroTarjeta);
         }
+
         System.out.println();
         System.out.println("\n...:::: Venta realizada exitosamente ::::....\n\n");
     }
 
-    // Opcion 15) correr automaticamente
+
+    private void generatePasajesVenta() {
+        try {
+            System.out.println("...:::: Generar pasajes de venta ::::....");
+
+            String idDocumento = leeString("ID Documento");
+
+            int tipo = leeOpc("Tipo Documento: Boleta[1] o Factura[2]", 2);
+
+            TipoDocumento tipoDocumento = switch (tipo) {
+                case 1 -> TipoDocumento.BOLETA;
+                case 2 -> TipoDocumento.FACTURA;
+                default -> null;
+            };
+
+            SVP.generatePasajesVenta(idDocumento, tipoDocumento);
+
+            System.out.println("...:::: Pasajes generados exitosamente ::::....");
+
+        } catch (SVPException e) {
+            System.out.println("..:: Error : " + e.getMessage());
+        }
+    }
+
+    private void readDatosIniciales() {
+        try {
+            System.out.println("...:::: Leyendo datos iniciales ::::....");
+
+            SVP.readDatosIniciales();
+
+            System.out.println("...:::: Datos iniciales cargados exitosamente ::::....");
+
+        } catch (SVPException e) {
+            System.out.println("..:: Error : " + e.getMessage());
+        }
+    }
+
+    private void saveDatosSistema() {
+        try {
+            System.out.println("...:::: Guardando datos del sistema ::::....");
+
+            SVP.saveDatosSistema();
+
+            System.out.println("...:::: Datos del sistema guardados exitosamente ::::....");
+
+        } catch (SVPException e) {
+            System.out.println("..:: Error : " + e.getMessage());
+        }
+    }
+
+    private void readDatosSistema() {
+        try {
+            System.out.println("...:::: Leyendo datos del sistema ::::....");
+            SVP.readDatosSistema();
+
+            CE = ControladorEmpresas.getInstance();
+            SVP = SistemaVentaPasajes.getInstance();
+
+            System.out.println("...:::: Datos del sistema cargados exitosamente ::::....");
+        } catch (SVPException e) {
+            System.out.println("..:: Error : " + e.getMessage());
+        }
+    }
+
+    /*
+    ===========
+    Metodos extras
+    ===========
+    */
+    // Opcion 50) correr automaticamente
     private void autoRun() {
         System.out.println("=== AUTORUN INICIADO ===");
 
@@ -916,7 +1013,8 @@ public class UISVP {
         // 5. se crea el viaje
 
         IdPersona[] trip = {
-                Rut.of("10.350.582-8")
+                Rut.of("10.350.582-8"),
+                Rut.of("11.111.111-1")
         };
 
         String[] comunas = {
@@ -954,7 +1052,7 @@ public class UISVP {
                     email
             );
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
             System.out.println("Error creando cliente: " + e.getMessage());
         }
 
@@ -1011,7 +1109,7 @@ public class UISVP {
                     TipoDocumento.BOLETA
             );
 
-        } catch (SistemaVentaPasajesException e) {
+        } catch (SVPException e) {
 
             System.out.println(
                     "Error creando venta automática: "
@@ -1102,4 +1200,6 @@ public class UISVP {
         }
         return false;
     }
+
+
 }

@@ -49,42 +49,42 @@ public class Empresa implements Serializable {
             }
         }
         for (Auxiliar a:auxiliares){
-          if (a.getIdPersona().equals(id)){
-              return false;
-          }
+            if (a.getIdPersona().equals(id)){
+                return false;
+            }
         }
         Conductor conductor=new Conductor(id,nombre,direccion);
         conductores.add(conductor);
         return true;
     }
     public boolean addAuxiliar(IdPersona idPersona, Nombre nombre, Direccion direccion){
-         for (Auxiliar a:auxiliares){
-             if(a.getIdPersona().equals(idPersona)){
-                 return false;
-             }
-         }
-         for(Conductor c:conductores){
-           if(c.getIdPersona().equals(idPersona)){
-               return false;
-           }
-         }
-         Auxiliar auxiliar=new Auxiliar(idPersona,nombre,direccion);
-         auxiliares.add(auxiliar);
-         return true;
+        for (Auxiliar a:auxiliares){
+            if(a.getIdPersona().equals(idPersona)){
+                return false;
+            }
+        }
+        for(Conductor c:conductores){
+            if(c.getIdPersona().equals(idPersona)){
+                return false;
+            }
+        }
+        Auxiliar auxiliar=new Auxiliar(idPersona,nombre,direccion);
+        auxiliares.add(auxiliar);
+        return true;
     }
     ArrayList<Tripulante>tripulantes=new ArrayList<>();
     public Tripulante [] getTripulantes(){
-       for (Conductor c:conductores){
-           if (c instanceof Conductor){
-               tripulantes.add((Tripulante) c);
-           }
-       }
-       for(Auxiliar a:auxiliares){
-           if(a instanceof Auxiliar){
-               tripulantes.add((Tripulante) a);
-           }
-       }
-       return tripulantes.toArray(new Tripulante[0]);
+        for (Conductor c:conductores){
+            if (c instanceof Conductor){
+                tripulantes.add((Tripulante) c);
+            }
+        }
+        for(Auxiliar a:auxiliares){
+            if(a instanceof Auxiliar){
+                tripulantes.add((Tripulante) a);
+            }
+        }
+        return tripulantes.toArray(new Tripulante[0]);
     }
     public Venta[] getVentas(){
         ArrayList<Venta>ventasEmpresa=new ArrayList<>();

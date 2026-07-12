@@ -1,13 +1,13 @@
 package Modelo;
-import Modelo.*;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.List;
 
-public class Viaje {
+
+public class Viaje implements Serializable {
     private LocalDate fecha;
     private LocalTime hora;
     private int precio;
@@ -22,20 +22,23 @@ public class Viaje {
     private ArrayList<Pasajero> Listapasajeros = new ArrayList<>();
     private ArrayList<Conductor> conductores;
 
-    public Viaje(LocalDate fecha, LocalTime hora, int precio, int dur, Bus bus,Auxiliar aux, Conductor[] cond, Terminal sale, Terminal llega) {
-        this.fecha = fecha;;
+    public Viaje(LocalDate fecha, LocalTime hora, int precio, int dur, Bus bus,
+                 Auxiliar aux, Conductor[] cond, Terminal sale, Terminal llega) {
+        this.fecha = fecha;
         this.hora = hora;
         this.precio = precio;
         this.duracion = dur;
+
         this.bus = bus;
         this.bus.addViaje(this);
-        this.auxiliar=aux;
+
+        this.auxiliar = aux;
         aux.addViaje(this);
 
-        this.conductores=new ArrayList<>();
+        this.conductores = new ArrayList<>();
 
         for (Conductor c : cond) {
-            if (c!=null) {
+            if (c != null) {
                 this.addConductor(c);
             }
         }
@@ -46,25 +49,20 @@ public class Viaje {
         this.llegada = llega;
         this.llegada.addLlegada(this);
     }
+
     public LocalDate getFecha() {
         return fecha;
     }
     public LocalTime getHora() {
         return hora;
     }
-    public int getPrecio() {
-        return precio;
-    }
     public void setPrecio(int precio) {
         this.precio = precio;
     }
-    public Bus getBus(){
-        return bus;
-    }
+
     public void setDuracion(int duracion) {
         this.duracion = duracion;
     }
-
     public LocalDateTime getFechaHoraTermino() {
         LocalDateTime fechaHoraSalida = LocalDateTime.of(fecha,hora);
         return fechaHoraSalida.plusMinutes(duracion);
@@ -90,6 +88,14 @@ public class Viaje {
 
     }
 
+    public boolean existeDisponibilidad(int nroAsientos){
+        int asientosBus = bus.getNroAsientos();
+        int asientosVendidos = Listapasajes.size();
+        int asientosLibres = asientosBus - asientosVendidos;
+
+        return asientosLibres >= nroAsientos;
+    }
+
     public String[][] getAsientos(){
         String [][] ListaAsientos=new String[bus.getNroAsientos()][2];
 
@@ -104,6 +110,11 @@ public class Viaje {
 
         return ListaAsientos;
     }
+
+    public Bus getBus(){
+        return bus;
+    }
+
     public String[][] getListaPasajeros(){
         String [][] MatrizPasajero= new String[Listapasajeros.size()][5];
         for(int i=0;i<Listapasajeros.size();i++){
@@ -115,18 +126,9 @@ public class Viaje {
         }
         return MatrizPasajero;
     }
-    public boolean existeDisponibilidad(int nroAsientos){
-        int asientosBus = bus.getNroAsientos();
-        int asientosVendidos = Listapasajes.size();
-        int asientosLibres = asientosBus - asientosVendidos;
 
-        return asientosLibres >= nroAsientos;
-    }
-
-    public int getNroAsientosDisponibles(){
-        int total=this.bus.getNroAsientos();
-        total-= Listapasajes.size();
-        return total;
+    public int getPrecio() {
+        return precio;
     }
 
     public Venta[] getVentas(){
@@ -140,6 +142,18 @@ public class Viaje {
         }
         Venta[] ventasArray=new Venta[ventasLista.size()];
         return ventasLista.toArray(ventasArray);
+    }
+
+    public Terminal getSalida() {
+        return this.salida;
+    }
+
+    public Terminal getLlegada() {
+        return this.llegada;
+    }
+
+    public int getDuracion() {
+        return this.duracion;
     }
 
     public void addConductor(Conductor conductor){
@@ -166,7 +180,10 @@ public class Viaje {
     public Terminal getTerminalSalida(){
         return salida;
     }
-
-    public void addVenta(Venta venta) {
+    public int getNroAsientosDisponibles(){
+        int total = this.bus.getNroAsientos();
+        total -= Listapasajes.size();
+        return total;
     }
+
 }

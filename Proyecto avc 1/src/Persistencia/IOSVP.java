@@ -1,5 +1,7 @@
 package Persistencia;
 
+import Controlador.ControladorEmpresas;
+import Controlador.SistemaVentaPasajes;
 import Modelo.*;
 import Excepciones.*;
 import Utilidades.IdPersona;
@@ -10,7 +12,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
 
 //Hecha totalmente por benja Vivanco
 public class IOSVP {
@@ -41,7 +42,8 @@ public class IOSVP {
         buses.clear();
         terminales.clear();
 
-        File archivo = new File("Proyecto avc 1/SVPDatosIniciales.txt");
+        File archivo = new File("SVPDatosIniciales.txt");
+
 
         Scanner sc = new Scanner(archivo)
                 .useDelimiter("[\t\r\n]+");
@@ -67,6 +69,46 @@ public class IOSVP {
         }
 
         sc.close();
+
+        try {
+            Controlador.ControladorEmpresas ce = Controlador.ControladorEmpresas.getInstance();
+
+            java.lang.reflect.Field fEmp = ce.getClass().getDeclaredField("empresas");
+            fEmp.setAccessible(true);
+            ((java.util.ArrayList<Modelo.Empresa>) fEmp.get(ce)).addAll(this.empresas);
+
+            java.lang.reflect.Field fBus = ce.getClass().getDeclaredField("buses");
+            fBus.setAccessible(true);
+            ((java.util.ArrayList<Modelo.Bus>) fBus.get(ce)).addAll(this.buses);
+
+            java.lang.reflect.Field fTer = ce.getClass().getDeclaredField("terminales");
+            fTer.setAccessible(true);
+            ((java.util.ArrayList<Modelo.Terminal>) fTer.get(ce)).addAll(this.terminales);
+
+            java.lang.reflect.Field fTrip = ce.getClass().getDeclaredField("tripulaciones");
+            fTrip.setAccessible(true);
+            ((java.util.ArrayList<Modelo.Tripulante>) fTrip.get(ce)).addAll(this.tripulantes);
+        } catch (Exception e) {
+            System.out.println("Sincronización CE: " + e.getMessage());
+        }
+
+        try {
+            Controlador.SistemaVentaPasajes svp = Controlador.SistemaVentaPasajes.getInstance();
+            java.util.ArrayList<Modelo.Viaje> viajesList = new java.util.ArrayList<>();
+
+            for (Object obj : out) {
+                if (obj instanceof Modelo.Viaje) viajesList.add((Modelo.Viaje) obj);
+            }
+
+            java.lang.reflect.Field fViajes = svp.getClass().getDeclaredField("viajes");
+            fViajes.setAccessible(true);
+
+            ((java.util.ArrayList<Modelo.Viaje>) fViajes.get(svp)).addAll(viajesList);
+
+        } catch (Exception e) {
+            System.out.println("Sincronización SVP: " + e.getMessage());
+        }
+
         return out.toArray(new Object[0]);
     }
 
@@ -89,7 +131,7 @@ public class IOSVP {
         }
     }
 
-    public Object[] readControladores() throws SVPException {
+    public static Object[] readControladores() throws SVPException {
         File file = new File("SVPObjetos.obj");
 
         try {
@@ -294,16 +336,6 @@ public class IOSVP {
         out.add(bus);
         buses.add(bus);
     }
-
-
-
-
-
-
-
-
-
-
 
     private String formatPatente(String patente){
         return patente.charAt(0) + "" + patente.charAt(1) + "." + patente.charAt(2) + patente.charAt(3) + "-" + patente.charAt(4) + patente.charAt(5);
