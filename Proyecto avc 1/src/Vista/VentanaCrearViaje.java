@@ -3,8 +3,6 @@ package Vista;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.FileReader;
 
 public class VentanaCrearViaje extends JFrame {
 
@@ -83,84 +81,79 @@ public class VentanaCrearViaje extends JFrame {
         comboComunaOrigen.removeAllItems();
         comboComunaDestino.removeAllItems();
 
-        Controlador.ControladorEmpresas ce = Controlador.ControladorEmpresas.getInstance();
+        Controlador.ControladorEmpresas ce =
+                Controlador.ControladorEmpresas.getInstance();
 
         try {
-            if (ce.getBuses() != null) {
-                for (Modelo.Bus b : ce.getBuses()) {
-                    if (b != null && b.getPatente() != null) {
-                        comboBuses.addItem(b.getPatente());
+            for (Modelo.Bus bus : ce.getBuses()) {
+                comboBuses.addItem(bus.getPatente());
+            }
+
+            for (Modelo.Empresa empresa : ce.getEmpresas()) {
+                for (Modelo.Tripulante tripulante : empresa.getTripulantes()) {
+                    if (tripulante instanceof Modelo.Auxiliar) {
+                        comboRutAuxiliar.addItem(
+                                tripulante.getIdPersona().toString()
+                        );
+                    }
+
+                    if (tripulante instanceof Modelo.Conductor) {
+                        comboRutConductor1.addItem(
+                                tripulante.getIdPersona().toString()
+                        );
+                        comboRutConductor2.addItem(
+                                tripulante.getIdPersona().toString()
+                        );
                     }
                 }
             }
+
+            for (Modelo.Terminal terminal : ce.getTerminales()) {
+                String comuna = terminal.getDireccion().getComuna();
+
+                if (!contiene(comboComunaOrigen, comuna)) {
+                    comboComunaOrigen.addItem(comuna);
+                    comboComunaDestino.addItem(comuna);
+                }
+            }
+
+            if (comboBuses.getItemCount() == 0 ||
+                    comboRutAuxiliar.getItemCount() == 0 ||
+                    comboRutConductor1.getItemCount() == 0 ||
+                    comboComunaOrigen.getItemCount() == 0) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No hay suficientes datos para crear un viaje. " +
+                                "Primero debe leer o recuperar los datos del sistema.",
+                        "Datos no cargados",
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                btnGuardarViaje.setEnabled(false);
+            } else {
+                btnGuardarViaje.setEnabled(true);
+            }
+
         } catch (Exception e) {
-            System.out.println("Aviso: Error menor al leer colecciones de buses.");
+            btnGuardarViaje.setEnabled(false);
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No fue posible cargar los datos: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
+    }
 
-        String rutaArchivo = "SVPDatosIniciales.txt";
-
-        try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(rutaArchivo))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                linea = linea.trim();
-                if (linea.isEmpty() || linea.startsWith("#")) continue;
-
-                String[] partes = linea.split(";");
-                if (partes.length < 2) continue;
-
-                String identificador = partes[0].toUpperCase().trim();
-
-                if (identificador.contains("BUS")) {
-                    String patente = partes[1].trim();
-                    if (!patente.isEmpty() && ((DefaultComboBoxModel<String>)comboBuses.getModel()).getIndexOf(patente) == -1) {
-                        comboBuses.addItem(patente);
-                    }
-                }
-                else if (identificador.contains("TRIPULANTE") || identificador.contains("CHOFER") || identificador.contains("AUXILIAR")) {
-                    String rut = partes[1].trim();
-                    if (!rut.isEmpty()) {
-                        if (((DefaultComboBoxModel<String>)comboRutAuxiliar.getModel()).getIndexOf(rut) == -1) {
-                            comboRutAuxiliar.addItem(rut);
-                            comboRutConductor1.addItem(rut);
-                            comboRutConductor2.addItem(rut);
-                        }
-                    }
-                }
-                else if (identificador.contains("TERMINAL") || identificador.contains("COMUNA") || identificador.contains("LOCALIDAD")) {
-                    String comuna = "";
-                    if (partes.length > 2) {
-                        comuna = partes[2].trim();
-                    } else {
-                        comuna = partes[1].trim();
-                    }
-
-                    if (!comuna.isEmpty()) {
-                        if (((DefaultComboBoxModel<String>)comboComunaOrigen.getModel()).getIndexOf(comuna) == -1) {
-                            comboComunaOrigen.addItem(comuna);
-                            comboComunaDestino.addItem(comuna);
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Aviso de contingencia: No se pudo abrir el archivo plano físico o procesar sus columnas.");
-        }
-
-        if (comboRutAuxiliar.getItemCount() == 0) {
-            String[] rutsRespaldo = {"18.452.119-4", "12.345.678-9", "20.114.856-K", "15.987.654-3"};
-            for (String r : rutsRespaldo) {
-                comboRutAuxiliar.addItem(r);
-                comboRutConductor1.addItem(r);
-                comboRutConductor2.addItem(r);
+    private boolean contiene(JComboBox<String> combo, String elemento) {
+        for (int i = 0; i < combo.getItemCount(); i++) {
+            if (combo.getItemAt(i).equalsIgnoreCase(elemento)) {
+                return true;
             }
         }
 
-        if (comboComunaOrigen.getItemCount() == 0) {
-            String[] comunasRespaldo = {"Concepción", "Chillán", "Santiago", "Los Ángeles", "Temuco"};
-            for (String c : comunasRespaldo) {
-                comboComunaOrigen.addItem(c);
-                comboComunaDestino.addItem(c);
-            }
-        }
+        return false;
     }
 }

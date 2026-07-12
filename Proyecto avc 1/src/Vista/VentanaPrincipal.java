@@ -3,7 +3,6 @@ package Vista;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import Persistencia.IOSVP;
 
 public class VentanaPrincipal extends JFrame {
     private JPanel panelPrincipal;
@@ -26,7 +25,9 @@ public class VentanaPrincipal extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    IOSVP.getInstance().readDatosIniciales();
+                    Controlador.SistemaVentaPasajes
+                            .getInstance()
+                            .readDatosIniciales();
                     JOptionPane.showMessageDialog(null, "¡Datos cargados exitosamente!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(null, "Error al cargar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

@@ -68,24 +68,15 @@ public class Viaje implements Serializable {
         return fechaHoraSalida.plusMinutes(duracion);
     }
 
-    public void addPasaje(Pasaje pasaje){
-        boolean agregar =true;
-        if(!Listapasajes.isEmpty()){
-            for (Pasaje listapasaje : Listapasajes) {
-                if (listapasaje.getNumero() == pasaje.getNumero()) {
-                    if (listapasaje.getAsiento() == pasaje.getAsiento()) {
-                        agregar = false;
-                        break;
-                    }
-                }
-            }
+    public void addPasaje(Pasaje pasaje) {
+        if (pasaje == null) {
+            return;
         }
 
-        if(agregar){
-            Listapasajeros.add(pasaje.getPasajero());
+        if (estaAsientoDisponible(pasaje.getAsiento())) {
             Listapasajes.add(pasaje);
+            Listapasajeros.add(pasaje.getPasajero());
         }
-
     }
 
     public boolean existeDisponibilidad(int nroAsientos){
@@ -101,7 +92,7 @@ public class Viaje implements Serializable {
 
         for(int i=0;i< bus.getNroAsientos();i++){
             ListaAsientos[i][0]=""+(i+1);
-            ListaAsientos[i][1]="VacÃ­o";
+            ListaAsientos[i][1] = "Vacío";
         }
 
         for (Pasaje pasaje : Listapasajes) {
@@ -184,6 +175,20 @@ public class Viaje implements Serializable {
         int total = this.bus.getNroAsientos();
         total -= Listapasajes.size();
         return total;
+    }
+
+    public boolean estaAsientoDisponible(int asiento) {
+        if (asiento < 1 || asiento > bus.getNroAsientos()) {
+            return false;
+        }
+
+        for (Pasaje pasaje : Listapasajes) {
+            if (pasaje.getAsiento() == asiento) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }

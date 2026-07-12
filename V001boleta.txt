@@ -1,11 +1,11 @@
 --------------------- PASAJE ELECTRÓNICO ---------------------
 Nombre Empresa            Número de pasaje
-Las Brisas de Oriente     1
+Buses Ñuble               1
 Nombre Pasajero                          RUT/Pasaporte
-Jorge Alexis,SR,Vielma,Sanchez           22.222.222-2
+José Esteban,SR,Cid,Aedo                 11.111.111-1
 Patente bus     Asiento         Valor Pagado
-AZYB12          10              4300
+EF.GH-34        1               3500
 Terminal origen      Terminal destino     Fecha           Hora
-Fray Silvano         Terminal Pinto       2024-10-21      10:40
+El Nevado Alto       El Pinar             2024-12-15      08:00
 --------------------------------------------------------------
 

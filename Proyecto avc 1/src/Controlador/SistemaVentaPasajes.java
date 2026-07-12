@@ -162,20 +162,59 @@ public class SistemaVentaPasajes implements Serializable {
         return 0;
     }
 
-    public void vendePasaje(String idDoc, TipoDocumento tipo, LocalDate fecha,
-                            LocalTime hora, String patBus, int asiento,
-                            IdPersona idPasajero) throws SVPException {
+
+
+    public void vendePasaje(
+            String idDoc,
+            TipoDocumento tipo,
+            LocalDate fecha,
+            LocalTime hora,
+            String patBus,
+            int asiento,
+            IdPersona idPasajero
+    ) throws SVPException {
 
         Venta venta = findVenta(idDoc, tipo)
-                .orElseThrow(() -> new SVPException("No existe venta con el id y tipo de documento indicados"));
+                .orElseThrow(() ->
+                        new SVPException(
+                                "No existe venta con el documento indicado"
+                        )
+                );
 
         Viaje viaje = findViaje(fecha, hora, patBus)
-                .orElseThrow(() -> new SVPException("No existe viaje con la fecha, hora y patente de bus indicados"));
+                .orElseThrow(() ->
+                        new SVPException(
+                                "No existe el viaje seleccionado"
+                        )
+                );
 
         Pasajero pasajero = findPasajero(idPasajero)
-                .orElseThrow(() -> new SVPException("No existe pasajero con el id indicado"));
+                .orElseThrow(() ->
+                        new SVPException(
+                                "No existe pasajero con el ID indicado"
+                        )
+                );
 
-        Pasaje pasaje = new Pasaje(asiento, viaje, pasajero, venta);
+        if (venta.getPago() != null) {
+            throw new SVPException(
+                    "La venta ya fue pagada"
+            );
+        }
+
+        if (asiento < 1 || asiento > viaje.getBus().getNroAsientos()) {
+            throw new SVPException(
+                    "El número de asiento está fuera del rango del bus"
+            );
+        }
+
+        if (!viaje.estaAsientoDisponible(asiento)) {
+            throw new SVPException(
+                    "El asiento seleccionado ya está ocupado"
+            );
+        }
+
+        Pasaje pasaje =
+                new Pasaje(asiento, viaje, pasajero, venta);
 
         venta.addPasaje(pasaje);
     }
@@ -188,20 +227,32 @@ public class SistemaVentaPasajes implements Serializable {
         venta.setPago(pago);
     }
 
-    public void pagaVenta(String idDocumento,
-                          TipoDocumento tipo,
-                          long nroTarjeta) {
+    public void pagaVenta(
+            String idDocumento,
+            TipoDocumento tipo,
+            long nroTarjeta
+    ) throws SVPException {
 
-        for (Venta v : ventas) {
+        Venta venta = findVenta(idDocumento, tipo)
+                .orElseThrow(() ->
+                        new SVPException(
+                                "No existe venta con el documento indicado"
+                        )
+                );
 
-            if (v.getIdDocumento().equals(idDocumento)
-                    && v.getTipo().equals(tipo)) {
-
-                Pago pago = new PagoTarjeta(v.getMonto(), nroTarjeta);
-
-                return;
-            }
+        if (venta.getPago() != null) {
+            throw new SVPException("La venta ya fue pagada");
         }
+
+        if (venta.getPasajes().length == 0) {
+            throw new SVPException(
+                    "No se puede pagar una venta sin pasajes"
+            );
+        }
+
+        venta.setPago(
+                new PagoTarjeta(venta.getMonto(), nroTarjeta)
+        );
     }
 
     public String[][] listVentas(){
@@ -488,5 +539,26 @@ public class SistemaVentaPasajes implements Serializable {
     //metodo para la tabla gui
     public String[][] buscarViajes(java.time.LocalDate fecha, String origen, String destino, int cantidadAsientos) {
         return new String[0][0];
+    }
+
+    public String[] getComunasConViajes() {
+        java.util.Set<String> comunas =
+                new java.util.TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+
+        for (Viaje viaje : viajes) {
+            comunas.add(
+                    viaje.getTerminalSalida()
+                            .getDireccion()
+                            .getComuna()
+            );
+
+            comunas.add(
+                    viaje.getTerminalLlegada()
+                            .getDireccion()
+                            .getComuna()
+            );
+        }
+
+        return comunas.toArray(new String[0]);
     }
 }

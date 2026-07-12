@@ -23,15 +23,16 @@ public class ControladorEmpresas {
         return instance;
     }
 
-    public void createEmpresa(Rut rut,String nombre, String url)throws SVPException {
-        Empresa em=new Empresa(rut, nombre);
-        em.setUrl(url);
+    public void createEmpresa(Rut rut, String nombre, String url)
+            throws SVPException {
 
-        if(!findEmpresa(rut).equals(rut)){
-            empresas.add(em);
-        }else{
+        if (findEmpresa(rut).isPresent()) {
             throw new SVPException("Ya existe una empresa");
         }
+
+        Empresa empresa = new Empresa(rut, nombre);
+        empresa.setUrl(url);
+        empresas.add(empresa);
     }
 
 
@@ -306,11 +307,21 @@ public class ControladorEmpresas {
      }
   }
 
-    public Iterable<? extends Bus> getBuses() {
-        return buses;
+    public List<Empresa> getEmpresas() {
+        return Collections.unmodifiableList(empresas);
     }
 
-    public void setBuses(Iterable<? extends Bus> buses) {
-        this.buses = (ArrayList<Bus>) buses;
+    public List<Bus> getBuses() {
+        return Collections.unmodifiableList(buses);
     }
+
+    public List<Terminal> getTerminales() {
+        return Collections.unmodifiableList(terminales);
+    }
+
+    public List<Tripulante> getTripulaciones() {
+        return Collections.unmodifiableList(tripulaciones);
+    }
+
+
 }

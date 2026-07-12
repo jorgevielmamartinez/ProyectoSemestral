@@ -4,8 +4,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -30,6 +28,8 @@ public class VentanaVentas extends JFrame {
     private JComboBox<String> comboComunaOrigen;
     private JComboBox<String> comboComunaDestino;
     private JLabel txtFecha;
+    private JComboBox<Modelo.TipoDocumento> comboTipoDocumento;
+    private JTextField txtIdDocumento;
 
     // Lista interna para mapear las filas de la tabla con los objetos Viaje reales
     private ArrayList<Modelo.Viaje> viajesList = new ArrayList<>();
@@ -42,6 +42,12 @@ public class VentanaVentas extends JFrame {
         setLocationRelativeTo(null);
 
         btnFinalizarVenta.setEnabled(false);
+
+        comboTipoDocumento.setModel(
+                new DefaultComboBoxModel<>(
+                        Modelo.TipoDocumento.values()
+                )
+        );
 
         cargarComunasBusqueda();
 
@@ -73,14 +79,28 @@ public class VentanaVentas extends JFrame {
                     return;
                 }
 
+                int cantidadAsientos;
+
                 try {
-                    int cantidadAsientos = Integer.parseInt(textoCantidad);
+                    cantidadAsientos = Integer.parseInt(textoCantidad);
+
                     if (cantidadAsientos <= 0) {
-                        JOptionPane.showMessageDialog(null, "La cantidad de asientos debe ser mayor a 0.", "Dato inválido", JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(
+                                VentanaVentas.this,
+                                "La cantidad de asientos debe ser mayor a 0.",
+                                "Dato inválido",
+                                JOptionPane.WARNING_MESSAGE
+                        );
                         return;
                     }
+
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(null, "La cantidad de asientos debe ser un número válido.", "Error de formato", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(
+                            VentanaVentas.this,
+                            "La cantidad de asientos debe ser un número válido.",
+                            "Error de formato",
+                            JOptionPane.ERROR_MESSAGE
+                    );
                     return;
                 }
 
@@ -121,8 +141,10 @@ public class VentanaVentas extends JFrame {
                                 if (salidas != null) {
                                     for (Modelo.Viaje v : salidas) {
                                         // Filtro 2: Validamos la fecha del viaje y que la comuna del terminal de llegada coincida con el destino
-                                        if (v.getFecha().equals(fechaBusqueda) &&
-                                                v.getLlegada().getDireccion().getComuna().equalsIgnoreCase(destino)) {
+                                        if (v.getFecha().equals(fechaBusqueda)
+                                                && v.getLlegada().getDireccion().getComuna()
+                                                .equalsIgnoreCase(destino)
+                                                && v.existeDisponibilidad(cantidadAsientos)) {
 
                                             // Agregamos la fila con la información completa requerida
                                             modeloTabla.addRow(new Object[]{
@@ -147,7 +169,8 @@ public class VentanaVentas extends JFrame {
                     }
 
                     if (!encontrados) {
-                        JOptionPane.showMessageDialog(null, "No se encontraron viajes para la ruta y fecha seleccionada.", "Sin resultados", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "No se encontraron viajes que cumplan con la ruta, fecha " +
+                                "y cantidad de asientos solicitada.", "Sin resultados", JOptionPane.INFORMATION_MESSAGE);
                     }
 
                 } catch (DateTimeParseException ex) {
@@ -171,8 +194,27 @@ public class VentanaVentas extends JFrame {
                 String tarjeta = txtTarjeta.getText().trim();
                 String medioPago = comboPago.getSelectedItem() != null ? comboPago.getSelectedItem().toString() : "";
 
-                if (rutCliente.isEmpty() || rutPasajero.isEmpty() || nomPasajero.isEmpty() || nroAsiento.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Complete todos los campos obligatorios del pasajero y cliente.", "Faltan Datos", JOptionPane.WARNING_MESSAGE);
+                String idDocumento =
+                        txtIdDocumento.getText().trim();
+
+                Modelo.TipoDocumento tipoDocumento =
+                        (Modelo.TipoDocumento)
+                                comboTipoDocumento.getSelectedItem();
+
+                if (idDocumento.isEmpty()
+                        || tipoDocumento == null
+                        || rutCliente.isEmpty()
+                        || rutPasajero.isEmpty()
+                        || nomPasajero.isEmpty()
+                        || nroAsiento.isEmpty()) {
+
+                    JOptionPane.showMessageDialog(
+                            VentanaVentas.this,
+                            "Complete el documento, cliente, pasajero y asiento.",
+                            "Faltan datos",
+                            JOptionPane.WARNING_MESSAGE
+                    );
+
                     return;
                 }
 
@@ -181,8 +223,14 @@ public class VentanaVentas extends JFrame {
                     return;
                 }
 
-                if (tarjeta.isEmpty()) {
-                    tarjeta = "Efectivo/NA";
+                String detalleTarjeta;
+
+                if (medioPago.equalsIgnoreCase("Efectivo")) {
+                    detalleTarjeta = "No aplica";
+                } else {
+                    detalleTarjeta = tarjeta.length() > 4
+                            ? "****" + tarjeta.substring(tarjeta.length() - 4)
+                            : tarjeta;
                 }
 
                 int filaSeleccionada = tablaViajes.getSelectedRow();
@@ -203,14 +251,120 @@ public class VentanaVentas extends JFrame {
                     String precioViaje = modelo.getValueAt(filaSeleccionada, 7).toString();
 
                     // Obtenemos el objeto Viaje correspondiente desde nuestro mapeo dinámico
-                    Modelo.Viaje viajeSeleccionado = viajesList.get(filaSeleccionada);
-                    int asientoNum = Integer.parseInt(nroAsiento);
+                    Modelo.Viaje viajeSeleccionado =
+                            viajesList.get(filaSeleccionada);
 
-                    // Validación lógica de negocio en caliente usando el objeto real de la consulta
-                    if (viajeSeleccionado.getNroAsientosDisponibles() <= 0) {
-                        JOptionPane.showMessageDialog(null, "No quedan asientos disponibles en este viaje.", "Capacidad Máxima", JOptionPane.WARNING_MESSAGE);
+                    int asientoNum =
+                            Integer.parseInt(nroAsiento);
+
+                    if (asientoNum < 1
+                            || asientoNum > viajeSeleccionado.getBus().getNroAsientos()) {
+
+                        JOptionPane.showMessageDialog(
+                                VentanaVentas.this,
+                                "El asiento debe estar entre 1 y "
+                                        + viajeSeleccionado.getBus().getNroAsientos() + ".",
+                                "Asiento inválido",
+                                JOptionPane.WARNING_MESSAGE
+                        );
                         return;
                     }
+
+                    if (!viajeSeleccionado.estaAsientoDisponible(asientoNum)) {
+                        JOptionPane.showMessageDialog(
+                                VentanaVentas.this,
+                                "El asiento seleccionado ya está ocupado.",
+                                "Asiento ocupado",
+                                JOptionPane.WARNING_MESSAGE
+                        );
+                        return;
+                    }
+                    
+                    if (viajeSeleccionado.getNroAsientosDisponibles() <= 0) {
+                        JOptionPane.showMessageDialog(
+                                VentanaVentas.this,
+                                "No quedan asientos disponibles en este viaje.",
+                                "Capacidad máxima",
+                                JOptionPane.WARNING_MESSAGE
+                        );
+                        return;
+                    }
+
+                    /*
+                     * DESDE AQUÍ COMIENZA LA VENTA REAL
+                     */
+
+                    Controlador.SistemaVentaPasajes sistema =
+                            Controlador.SistemaVentaPasajes.getInstance();
+
+// Convertir la fecha mostrada en la tabla
+                    LocalDate fechaSeleccionada =
+                            LocalDate.parse(
+                                    fechaViaje,
+                                    DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                            );
+
+// Convertir la hora mostrada en la tabla
+                    java.time.LocalTime horaSeleccionada =
+                            java.time.LocalTime.parse(horaViaje);
+
+// Convertir los RUT a IdPersona
+                    Utilidades.IdPersona idCliente =
+                            Utilidades.Rut.of(rutCliente);
+
+                    Utilidades.IdPersona idPasajero =
+                            Utilidades.Rut.of(rutPasajero);
+
+// 1. Iniciar la venta
+                    sistema.iniciaVenta(
+                            idDocumento,
+                            tipoDocumento,
+                            fechaSeleccionada,
+                            origenViaje,
+                            destinoViaje,
+                            idCliente,
+                            1
+                    );
+
+// 2. Registrar el pasaje
+                    sistema.vendePasaje(
+                            idDocumento,
+                            tipoDocumento,
+                            fechaSeleccionada,
+                            horaSeleccionada,
+                            patenteBus,
+                            asientoNum,
+                            idPasajero
+                    );
+
+// 3. Registrar el pago
+                    if (medioPago.equalsIgnoreCase("Efectivo")) {
+
+                        sistema.pagaVenta(
+                                idDocumento,
+                                tipoDocumento
+                        );
+
+                    } else {
+
+                        String tarjetaLimpia =
+                                tarjeta.replaceAll("[^0-9]", "");
+
+                        long numeroTarjeta =
+                                Long.parseLong(tarjetaLimpia);
+
+                        sistema.pagaVenta(
+                                idDocumento,
+                                tipoDocumento,
+                                numeroTarjeta
+                        );
+                    }
+
+// 4. Generar el archivo del pasaje
+                    sistema.generatePasajesVenta(
+                            idDocumento,
+                            tipoDocumento
+                    );
 
                     // GENERACIÓN DEL INFORME DETALLADO DE VENTA EXITOSA (TICKET)
                     String informeVenta = "====== INFORME DE VENTA EXITOSA ======\n\n" +
@@ -226,10 +380,10 @@ public class VentanaVentas extends JFrame {
                             "Hora de salida: " + horaViaje + "\n" +
                             "Bus (Patente): " + patenteBus + "\n" +
                             "Asiento N°: " + asientoNum + "\n\n" +
-                            "🔹 DETALLE DE PAGO\n" +
+                            "Tarjeta: " + detalleTarjeta + "\n\n" +
                             "Monto total: " + precioViaje + "\n" +
                             "Medio de pago: " + medioPago + "\n" +
-                            "Tarjeta finalizada en: " + (tarjeta.length() > 4 ? "****" + tarjeta.substring(tarjeta.length() - 4) : tarjeta) + "\n\n" +
+                            "Tarjeta: " + detalleTarjeta + "\n\n" +
                             "======================================";
 
                     JOptionPane.showMessageDialog(null, informeVenta, "Comprobante de Venta", JOptionPane.INFORMATION_MESSAGE);
@@ -243,9 +397,32 @@ public class VentanaVentas extends JFrame {
                     btnBuscarViajes.doClick(); // Refresca dinámicamente el stock de asientos libres en la grilla
 
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(null, "El número de asiento debe ser un valor numérico válido.", "Error de formato", JOptionPane.ERROR_MESSAGE);
+
+                    JOptionPane.showMessageDialog(
+                            VentanaVentas.this,
+                            "El asiento y el número de tarjeta deben contener solamente números.",
+                            "Error de formato",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+
+                } catch (Excepciones.SVPException ex) {
+
+                    JOptionPane.showMessageDialog(
+                            VentanaVentas.this,
+                            ex.getMessage(),
+                            "No se pudo completar la venta",
+                            JOptionPane.WARNING_MESSAGE
+                    );
+
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, "Error al procesar la transacción: " + ex.getMessage(), "Excepción", JOptionPane.ERROR_MESSAGE);
+
+                    JOptionPane.showMessageDialog(
+                            VentanaVentas.this,
+                            "Error al procesar la transacción: "
+                                    + ex.getMessage(),
+                            "Error inesperado",
+                            JOptionPane.ERROR_MESSAGE
+                    );
                 }
             }
         });
@@ -255,38 +432,33 @@ public class VentanaVentas extends JFrame {
         comboComunaOrigen.removeAllItems();
         comboComunaDestino.removeAllItems();
 
-        String rutaArchivo = "SVPDatosIniciales.txt";
+        Controlador.SistemaVentaPasajes sistema =
+                Controlador.SistemaVentaPasajes.getInstance();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                linea = linea.trim();
-                if (linea.isEmpty() || linea.startsWith("#")) continue;
+        String[] comunas = sistema.getComunasConViajes();
 
-                String[] partes = linea.split(";");
-                if (partes.length < 2) continue;
+        if (comunas.length == 0) {
+            btnBuscarViajes.setEnabled(false);
 
-                String identificador = partes[0].toUpperCase().trim();
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No hay viajes cargados. Primero debe leer los datos iniciales.",
+                    "Datos no cargados",
+                    JOptionPane.WARNING_MESSAGE
+            );
 
-                if (identificador.contains("TERMINAL") || identificador.contains("COMUNA")) {
-                    String comuna = (partes.length > 2) ? partes[2].trim() : partes[1].trim();
-
-                    if (!comuna.isEmpty()) {
-                        if (((DefaultComboBoxModel<String>)comboComunaOrigen.getModel()).getIndexOf(comuna) == -1) {
-                            comboComunaOrigen.addItem(comuna);
-                            comboComunaDestino.addItem(comuna);
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {}
-
-        if (comboComunaOrigen.getItemCount() == 0) {
-            String[] comunasRespaldo = {"Concepción", "Chillán", "Santiago", "Los Ángeles", "Temuco"};
-            for (String c : comunasRespaldo) {
-                comboComunaOrigen.addItem(c);
-                comboComunaDestino.addItem(c);
-            }
+            return;
         }
+
+        for (String comuna : comunas) {
+            comboComunaOrigen.addItem(comuna);
+            comboComunaDestino.addItem(comuna);
+        }
+
+        btnBuscarViajes.setEnabled(true);
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
     }
 }
