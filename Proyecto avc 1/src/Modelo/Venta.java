@@ -1,27 +1,26 @@
 package Modelo;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Objects;
 
-public class Venta implements Serializable {
-
+//clase hecha por Jorge Vielma
+public class Venta {
     private String idDocumento;
     private TipoDocumento tipo;
     private LocalDate fecha;
     private Cliente cliente;
-
-    private ArrayList<Pasaje> pasajes;
     private Pago pago;
+    private ArrayList<Pasaje> pasajes;
 
-    public Venta(String idDoc, TipoDocumento tipo, LocalDate fec, Cliente cli) {
-        this.idDocumento = idDoc;
+    public Venta(String id, TipoDocumento tipo, LocalDate fecha, Cliente cliente) {
+        this.idDocumento = id;
         this.tipo = tipo;
-        this.fecha = fec;
-        this.cliente = cli;
-        this.pasajes = new ArrayList<>();
-
-        cli.addVenta(this);
+        this.fecha = fecha;
+        this.cliente = cliente;
+        this.pasajes = new ArrayList<Pasaje>();
+        this.pago=null;
+        cliente.addVenta(this);
     }
 
     public String getIdDocumento() {
@@ -36,89 +35,77 @@ public class Venta implements Serializable {
         return fecha;
     }
 
-    public int getMonto() {
-        int total = 0;
-
-        for (Pasaje p : pasajes) {
-            total += p.getViaje().getPrecio();
-        }
-
-        return total;
-    }
-
     public Cliente getCliente() {
         return cliente;
     }
 
     public void createPasaje(int asiento, Viaje viaje, Pasajero pasajero) {
+
         Pasaje pasaje = new Pasaje(asiento, viaje, pasajero, this);
-        pasajes.add(pasaje);
-        viaje.addPasaje(pasaje);
+
+        this.pasajes.add(pasaje);
+
+        viaje.addVenta(this);
     }
 
     public Pasaje[] getPasajes() {
-        return pasajes.toArray(new Pasaje[0]);
+        Pasaje[] arregloPasajes = new Pasaje[pasajes.size()];
+
+        for (int i = 0; i < pasajes.size(); i++) {
+            arregloPasajes[i] = pasajes.get(i);
+        }
+        return arregloPasajes;
     }
 
-    public int getMontoPagado() {
+
+    public int getMontoPagado(){
+        if (pago != null) {
+            return pago.getMonto();
+        }
+        return 0;
+    }
+    public boolean pagaMonto(){
         if (pago == null) {
-            return 0;
+            int montoTotal = getMonto();
+            pago = new PagoEfectivo(montoTotal);
+            return true;
+        }
+        return false;
+    }
+    public boolean pagaMonto(long nroTarjeta){
+        if (pago == null) {
+            int montoTotal = getMonto();
+            pago = new PagoTarjeta((long) montoTotal, (int) nroTarjeta);
+            return true;
+        }
+        return false;
+    }
+    public String getTipoPago(){
+        if (pago instanceof PagoEfectivo){
+            return "Efectivo";
+
+        } else if (pago instanceof PagoTarjeta) {
+            return "Tarjeta";
         }
 
-        return pago.getMonto();
+        return null;
     }
 
-    public boolean pagaMonto() {
-        pago = new PagoEfectivo(getMonto());
-        return true;
-    }
-
-    public boolean pagaMonto(long nroTarjeta) {
-        pago = new PagoTarjeta(getMonto(), nroTarjeta);
-        return true;
+    public int getMonto(){
+        int monto = 0;
+        for (Pasaje pasaje : pasajes) {
+            monto += pasaje.getViaje().getPrecio();
+        }
+        return monto;
     }
 
     @Override
-    public boolean equals(Object otro) {
-        if (this == otro) {
-            return true;
-        }
-
-        if (!(otro instanceof Venta venta)) {
-            return false;
-        }
-
-        return idDocumento.equals(venta.idDocumento)
-                && tipo.equals(venta.tipo);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Venta venta = (Venta) o;
+        return Objects.equals(idDocumento, venta.idDocumento) && tipo == venta.tipo && Objects.equals(fecha, venta.fecha) && Objects.equals(cliente, venta.cliente) && Objects.equals(pago, venta.pago) && Objects.equals(pasajes, venta.pasajes);
     }
 
-    public String getTipoPago() {
-        if (pago == null) {
-            return "";
-        }
 
-        return pago.getClass().getSimpleName();
-    }
-
-    /*
-
-    ===========
-    Metodo extras al uml
-    ===========
-
-    */
-
-    public void addPasaje(Pasaje pasaje) {
-        if (!pasajes.contains(pasaje)) {
-            pasajes.add(pasaje);
-        }
-    }
-
-    public Pago getPago() {
-        return pago;
-    }
-
-    public void setPago(Pago pago) {
-        this.pago = pago;
-    }
 }
